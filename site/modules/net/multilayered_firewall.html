@@ -11,8 +11,8 @@
 <h3>[ THE_SOLUTION ]</h3><p> I implemented a "Defense in Depth" strategy involving two distinct firewall layers and service reconfiguration:</p>
 <br>
 <ul id="layers">
-    <li><h2>Layer_01 (Network - UniFi)</h2><p> I configured UniFi Traffic Rules to explicitly allow traffic from the management server on the local VLAN to the public and private servers running on their respective VLANs, while blocking all other inter-VLAN routing. I had to implement a "BLOCK ALL" rule, then add the "pinholes" back manually to ensure that the servers only talked to each other in the ways they needed to, and that I permitted.</p></li>
-    <li><h2>Layer_02 (Host - UFW)</h2><p> On the Debian VMs, I installed ufw (Uncomplicated Firewall) with a "Default Deny" policy. I explicilty whitelisted only critical services. (e.g. Nginx HTTP/HTTPS)</p></li>
+    <li><h4>Layer_01 (Network - UniFi)</h4><p> I configured UniFi Traffic Rules to explicitly allow traffic from the management server on the local VLAN to the public and private servers running on their respective VLANs, while blocking all other inter-VLAN routing. I had to implement a "BLOCK ALL" rule, then add the "pinholes" back manually to ensure that the servers only talked to each other in the ways they needed to, and that I permitted.</p></li>
+    <li><h4>Layer_02 (Host - UFW)</h4><p> On the Debian VMs, I installed ufw (Uncomplicated Firewall) with a "Default Deny" policy. I explicilty whitelisted only critical services. (e.g. Nginx HTTP/HTTPS)</p></li>
 </ul>
 <br>
 <p> To go more in depth with the individual nodes: MGT and DK3, my Mangement and Private nodes, were kept "semi-open" utilizing a "Default Deny Incoming" and "Default Allow Outgoing" ruleset. On DK3, I allowed specific ports in to allow for API calls. With DK2, I took a much more secure approach; I used a "Default Deny Incoming/Outgoing" ruleset for this, and only opened select pinholes for incoming traffic namely 80,443. On all three nodes I made sure to keep an SSH policy for management, so I didn't lock myself out. For any standard protocols (TCP/UDP) I only allowed the specific protocol along with the port, to limit the traffic further.</p>
@@ -73,5 +73,6 @@
     #layers {
     text-decorations: none;
     padding-left: 5px;
+    list-style-type: none;
     }
 </style>
