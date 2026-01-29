@@ -1,0 +1,61 @@
+<div class="module-wrapper">
+    <div class="module-header">
+        <h2 class="text-amber">>> DATA_CENTER://VIRTUALIZATION_LAYER</h2>
+        <p class="meta-comment"># Proxmox VE 8.1 - 3 Node Hyper-Converged Cluster</p>
+    </div>
+
+    <div class="responsive-stack">
+        <div class="data-section">
+            <h3>[ CLUSTER_TOPOLOGY ]</h3>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>NODE</th>
+                            <th>CPU</th>
+                            <th>RAM</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>PVE-01</td><td>12%</td><td>48/128G</td><td class="online">ONLINE</td></tr>
+                        <tr><td>PVE-02</td><td>08%</td><td>32/128G</td><td class="online">ONLINE</td></tr>
+                        <tr><td>PVE-03</td><td>15%</td><td>64/128G</td><td class="online">ONLINE</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <h3>[ ACTIVE_INSTANCES ]</h3>
+            <ul class="instance-list">
+                <li><span class="id">100</span> [VM] <span class="label">OPNsense_Primary</span></li>
+                <li><span class="id">101</span> [CT] <span class="label">Docker_Stack_01</span></li>
+                <li><span class="id">105</span> [VM] <span class="label">WinServer_AD</span></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    .responsive-stack {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Two columns on desktop */
+        gap: 30px;
+        margin-top: 20px;
+    }
+
+    /* THE MOBILE FIX: Stack everything when screen is narrow */
+    @media (max-width: 850px) {
+        .responsive-stack {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .table-container { width: 100%; overflow-x: auto; }
+    .data-table { width: 100%; text-align: left; border-collapse: collapse; }
+    .data-table th { color: var(--text-amber); border-bottom: 1px solid var(--phosphor-dim); }
+    .online { color: #00ff00; font-weight: bold; }
+    .instance-list { list-style: none; padding: 0; }
+    .instance-list li { border-bottom: 1px dashed rgba(0,255,65,0.2); padding: 5px 0; }
+</style>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>NOTTYXTON // TTY1</title>
+        <link rel="stylesheet" href="/style.css?v=2.2">
+        <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body>
+        <div class="crt-monitor">
+        <div class="scanlines"></div>
+        <div class="bezel"></div>
+        <div class="screen-flicker"></div>
+        
+        <div id="main-content" style="display: block;">
+                <header class="site-header">
+                        <pre class="ascii-art">
+░█▀█░█▀█░▀█▀░▀█▀░█░█░█░█░▀█▀░█▀█░█▀█
+░█░█░█░█░░█░░░█░░░█░░▄▀▄░░█░░█░█░█░█
+░▀░▀░▀▀▀░░▀░░░▀░░░▀░░▀░▀░░▀░░▀▀▀░▀░▀  v.2.0.26
+----------------------------------------------
+SYSTEM READY. LOGGED IN AS root.
+                        </pre>
+
+                        <nav class="text-nav">
+                                [<a href="/">HOME</a>] - [<a href="/pages/projects.html">PROJECTS</a>] - [<a href="/pages/homelab.html">HOMELAB</a>] - [<a href="/pages/about.html">ABOUT</a>] - [<a href="/pages/contact.html">COMM</a>] - [<a href="/assets/tSexton_Resume.pdf" target="_blank" rel="noopener noreferrer">VIEW_RESUME.PDF</a>]
+                        </nav>
+                </header>
+
+            <main class="terminal-body">
+		
+		<section class="project-detail">
+		    <div class="terminal-header">
+		        <h2>FILE: /projects/project_name.filetype</h2>
+		    </div>
+    
+		<div class="case-study-grid">
+       			 <aside class="tech-specs">
+           			<h3>[SYSTEM_SPECS]</h3>
+            		<ul>
+               			<li><strong>OS:</strong> Debian / Proxmox</li>
+                		<li><strong>STACK:</strong> Docker, Ansible, ZFS</li>
+                		<li><strong>HARDWARE:</strong> Dell Optiplex Micro Cluster</li>
+           		</ul>
+		<br><br>
+			<!--- Repository Link for Pages That Need One
+            		<div class="repo-link">
+                		<a href="#">>> ACCESS_SOURCE_CODE</a>
+            		</div>
+			-->
+        		</aside>
+        	<div class="case-study-body">
+            		<h3>>> THE_CHALLENGE</h3>
+            		<p>Manual management of 15+ Docker containers was leading to configuration drift and downtime during updates.</p>
+		<br>
+            		<h3>>> THE_SOLUTION</h3>
+            		<p>I architected an automated deployment pipeline using Ansible. This allowed for 1-click updates and consistent environment variables across the entire cluster.</p>
+		<br>
+            		<h3>>> KEY_LEARNINGS</h3>
+            		<p>During this project, I mastered ZFS snapshotting which saved the system after a failed kernel update on Node-02.</p>
+        	</div>
+    	</div>
+	</section>                
+
+                 <div class="separator">========================================</div>
+ 		<footer class="terminal-footer">
+                     <p><span class="prompt">root@nottyxton:~$</span> cat meta.txt</p>
+                        <div class="meta-links">
+                                [ <a href="https://www.linkedin.com/in/bsexton3787/">LINKEDIN_UPLINK</a> ]
+                                [ <a href="https://www.github.com/Tyxton">SOURCE_CODE_REPO</a> ]
+                                [ <a href="/assets/tSexton_Resume.pdf">DOWNLOAD_CV.PDF</a> ]
+                        </div>
+                    <p>&copy; 2026 NOTTYXTON.NET - OPERATING ON DEBIAN/PROXMOX INFRASTRUCTURE >
+                 </footer>
+            </main>
+        </div> </div>
+</body>
+</html>

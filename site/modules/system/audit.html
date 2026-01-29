@@ -1,0 +1,51 @@
+<div class="system-audit">
+  <pre class="audit-header">
+[ AUDIT_REPORT: HTX_DATA_CENTER_01 ]
+TIMESTAMP: 2026-01-21
+STATUS: IN_DEVELOPMENT
+-----------------------------------------</pre>
+
+  <section class="audit-section">
+    <h3>>> IDENTITY_SUMMARY</h3>
+    <table class="audit-table">
+      <tr><td>[ OBJECT ]</td><td>SYSADMIN // INFRA_ENGINEER</td></tr>
+      <tr><td>[ ORIGIN ]</td><td>HTX_DATA_CENTER_01</td></tr>
+      <tr><td>[ SPECIAL ]</td><td>VIRTUALIZATION // NETWORK_SECURITY</td></tr>
+      <tr><td>[ STATUS ]</td><td>ACTIVE_FOR_HIRE (Q1_2026)</td></tr>
+      <tr><td>[ VERSION ]</td><td>7.8 (YRS_OF_OPERATION)</td></tr>
+    </table>
+  </section>
+
+  <section class="audit-section">
+    <h3>>> CORE_INFRASTRUCTURE_MANIFEST</h3>
+    <p>Current production environment utilizes a non-converged Proxmox installation designed for 99.9% uptime of internal services.</p>
+    <ul class="audit-list">
+      <li><span class="status-ok">[ OK ]</span> <strong>Compute:</strong> Single-Node Proxmox Server</li>
+      <li><span class="status-ok">[ OK ]</span> <strong>Storage:</strong> ZFS RaidZ1 (48TB Raw Capacity) on TrueNAS Scale</li>
+      <li><span class="status-ok">[ OK ]</span> <strong>Network:</strong> UniFi Firewall w/ VLAN Segmentation</li>
+    </ul>
+  </section>
+
+  <section class="audit-section">
+    <h3>>> RECENT_LOG_ENTRIES</h3>
+    <div class="log-entry">
+      <span class="log-date">2026.01.21</span> - Established new UI/UX design for nottyxton.net.
+    </div>
+    <div class="log-entry">
+      <span class="log-date">2026.01.04</span> - Relocated bare-metal nodes to HTX DC; achieved 100% service continuity during cutover.
+    </div>
+  </section>
+
+  <pre class="audit-footer">
+-----------------------------------------
+END_OF_MANIFEST | (C) 2026 TYXTON
+  </pre>
+</div>
+
+<style>
+.audit-section { padding-bottom: 5px; }
+.audit-list li { 
+	list-style: none;
+	padding-left: 5px;
+ }
+</style>
