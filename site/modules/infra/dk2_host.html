@@ -1,16 +1,20 @@
-To accommodate your new vertical, full-width layout, this template is designed to be "plug-and-play" for any category (Bare Metal, Networking, Automation, etc.). It uses a responsive grid that looks like a high-end command center on a monitor but stacks gracefully on a phone.
-1. The Universal Module Template
-
-Save this as a base file (e.g., templates/universal_layer.html) and swap the content out for each layer.
-HTML
-
 <div class="layer-container">
     
     <div class="layer-header">
-        <h2 class="text-amber">>> LAYER_IDENT://<span class="layer-name">CATEGORY_NAME</span></h2>
-        <p class="meta-comment"># System manifest initialized for node: [NOTTYXTON_TX]</p>
+        <h2 class="text-amber">>> PROMETHEUS_STACK://<span class="layer-name">INFRASTRUCTURE</span></h2>
+        <p class="meta-comment">Prometheus, NodeExporter, Cadvisor stack with network segmentation.</p>
     </div>
-
+<p>
+In order to get actual statistics to my website, instead of a bunch of placeholder information; I am currently working on a Prometheus stack.
+The plan is to have Prometheus run on my MGT node, while NodeExporter and Cadvisor will run on DK3 - which are in seperate VLANs. The main reason
+for this is "Out-of-Band" monitoring. So that if my Docker Swarm ever crashes due to a resource leak, the Prometheus instance will remain alive to
+tell me exactly what happened right before.
+<br><br>
+The plan is to scrape all the data from Proxmox, TrueNAS Scale, and my Portainer Swarm so that I may use the data on the site, without having to
+write dozens of API calls through Nginx. This will be faster, safer, and give me a chance to run a production monitoring setup.
+<br><br>
+I will keep this updated with any progress made as well as any disasters in the process.
+</p>
     <div class="layer-grid">
         
         <div class="layer-panel">
