@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>NOTTYXTON // TTY1</title>
+        <link rel="stylesheet" href="/style.css?v=2.2">
+        <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body>
+        <div class="crt-monitor">
+        <div class="scanlines"></div>
+        <div class="bezel"></div>
+        <div class="screen-flicker"></div>
+        
+        <div id="main-content" style="display: block;">
+                <header class="site-header">
+                        <pre class="ascii-art">
+░█▀█░█▀█░▀█▀░▀█▀░█░█░█░█░▀█▀░█▀█░█▀█
+░█░█░█░█░░█░░░█░░░█░░▄▀▄░░█░░█░█░█░█
+░▀░▀░▀▀▀░░▀░░░▀░░░▀░░▀░▀░░▀░░▀▀▀░▀░▀  v.2.0.26
+----------------------------------------------
+SYSTEM READY. LOGGED IN AS root.
+                        </pre>
+
+                        <nav class="text-nav">
+                                [<a href="/">HOME</a>] - [<a href="/pages/projects.html">PROJECTS</a>] - [<a href="/pages/homelab.html">HOMELAB</a>] - [<a href="/pages/about.html">ABOUT</a>] - [<a href="/pages/contact.html">COMM</a>] - [<a href="/assets/tSexton_Resume.pdf" target="_blank" rel="noopener noreferrer">VIEW_RESUME.PDF</a>]
+                        </nav>
+                </header>
+
+            <main class="terminal-body">
+        	<div class="case-study-body">
+        	<h3>>> Network Topology</h3>
+		<br>
+		<pre class="ascii-art" style="font-size: 0.8rem; line-height: 1.2;">
+			[ INTERNET ]
+			     |
+		       [ ISP BRIDGE ]
+			     |
+		    +-------=v=-------+---- [ VLAN 1: Default ] -- (Home Network)
+		    |   UniFi UCG-M   |---- [ VLAN 2: Public ] -- (Nginx, Docker)
+		    |   (UniFi OS)    |---- [ VLAN 3: Private ] -- (NAS, Docker, Proxmox, Backend)
+		    +--------+--------+---- [ VLAN 4: Cameras ] -- (No Internet, No VLAN Access)
+			     |
+		    +-------=v=------+ ----> [ TrueNAS | VLAN 2 ] -- (Dell PowerEdge R510)
+		    | UniFi USW-Lite | ----> [ Proxmox | VLANS 1-3 ] -- (Dell Precision 5810)
+		    |(Managed Switch)| ----> [ Other Devices | VLAN 1 ]
+		    +-------+--------+
+			    |
+		+-----------+-----------------+------------------------------+
+		|                             |                              |
+	[ DK2 | VLAN 2 ]            [ DK3 | VLAN 3 ]                  [ MGT | VLAN 1 ]
+	- Proxmox VE                - Proxmox VE		      - Proxmox VE
+	- Docker (Nginx, Jellyfin)  - Docker (*Arr Stack, Nextcloud)  - Docker (Homepage, Vaultwarden, Homeassistant)
+		</pre>
+		<div class="hardware-manifest">
+		<h3>>> Hardware Manifest</h3>
+		<p>For a deeper dive into what is running in the homelab on a hardware level I've documented everything <a href="/pages/LAYER_00/hw_manifest.html">here.</a>
+		</div>
+		<br>
+		<section class="logic-breakdown">
+    <div class="terminal-card">
+        <h3>>> LOGIC_MANIFESTO: NETWORK_ISOLATION</h3>
+        <p>To ensure security across the homelab, I implemented VLAN tagging:</p>
+        <br>
+        <div class="logic-grid">
+            <div class="logic-item">
+                <h4>[VLAN_1] The Home Network</h4>
+                <p>This is where all of the home devices sit, everything from my desktop, to my roku. As well as my roommates' devices.</p>
+		<br>
+		<p>This is also where the MGT node sits. which runs the Portainer Swarm.</p>
+		<br>
+            </div>
+            <div class="logic-item">
+                <h4>[VLAN_2] Public</h4>
+                <p>This is where all of the public websites and services reside. All of the incoming requests are first proxied by Cloudflare, then sorted by Nginx Proxy Manager (NPM).</p>
+		<br>
+            </div>
+	    <div class="logic-item">
+		<h4>[VLAN_3] Private</h4>
+		<p>This is where all of the backend services reside including the NAS and *arr stack.</p>
+		<br>
+        </div>
+	    <div class="logic-item">
+		<h4>[VLAN 4] Cameras</h4>
+		<p>This is where the cameras reside on the network, there is no internet access, and no interVLAN access. Nothing comes in, nothing comes out. It is completely isolated from the rest of the network.</p>
+		<br>
+	</div>
+	<h3>>> FIREWALL_RULES: ROUTING_POLICIES</h3>
+	<br>
+		<div class="logic-grid">
+		<div class="logic-item">
+		<h4>[DEFAULT DENY]</h4>
+		<p>I have set up a rule that drops all inter-VLAN traffic.</p>
+		<br>
+		</div>
+		<div class="logic-item">
+                <h4>[PIN-HOLE ROUTING]</h4>
+                <p>Instead of allowing DK2 to talk to all of DK3, I only allow the specific IP of the jellyfin container to talk to the specific ip of the NAS on the specific port required for NFS.</p>
+                <br>
+                </div>
+		<div class="logic-item">
+                <h4>[ISOLATE THE MANAGEMENT INTERFACE]</h4>
+                <p>My Proxmox and TrueNAS GUIs are only accessible from a singular "Trusted" device on VLAN 1.</p>
+                <br>
+                </div>
+		<div class="logic-item">
+                <h4>[REVERSE PROXY AND CERTS]</h4>
+                <p>NPM (in the "DMZ") is the <u>only</u> service that is able to listen in on :80 & :443. All of the routing is done via Let's Encrypt with a Cloudflare API. This allows for SSL certificates without opening ports to the internet unnessecarily.</p>
+                <br>
+                </div>
+		<div class="logic-item">
+                <h4>[CONTAINER HARDENING]</h4>
+                <p>I use a Docker Socket Proxy to limit what API calls can be made in the event of a container breakout.</p>
+		<p>Along with this, I use the Proxmox Datacenter firewall that restricts traffic at the virtual NIC before it even gets to my gateway.</p>
+                <br>
+                </div>
+	</div>
+    </div>
+
+    <div class="terminal-card">
+        <h3>>> STORAGE_STRATEGY: DATA_INTEGRITY && NFS_HARDENING</h3>
+        <p>Utilizing a <strong>3-2-1 Backup Rule</strong> managed via automated scripts:</p>
+        <ul class="meta-list">
+            <li>[HOT] ZFS Parity Drives on the TrueNAS installation.</li>
+            <li>[WARM] Proxmox Backup Server (Offsite via Tailscale).</li>
+            <li>[COLD] Certain crucial data is stored offsite, on physical media.</li>
+        </ul>
+	<br>
+	<div class="logic-grid">
+		<div class="logic-item">
+		<h4>[NFS EXPORT PERMISSIONS]</h4>
+		<p>The exports for DK2 are <u>read-only.</u> That way Jellyfin can see and stream the media, but nothing can write to it. There is no reason that a publicly facing media player should have write or execute permissions to a NAS.</p>
+		<br>
+		</div>
+		<div class="logic-item">
+                <h4>[MAPROOT/MAPALL]</h4>
+                <p>These are set to a non-privileged user, as you should never allow root access over NFS.</p>
+                <br>
+                </div>
+		<div class="logic-item">
+                <h4>[SEPERATE SHARES]</h4>
+                <p>DK2 and DK3 do not use the same share, exports are created specifically for each node's usecase.</p>
+                </div>
+	</div>
+    </div>
+</section>
+		</div>
+	</section>                
+
+                 <div class="separator">========================================</div>
+ 			<footer class="terminal-footer">
+                     <p><span class="prompt">root@nottyxton:~$</span> cat meta.txt</p>
+                        <div class="meta-links">
+                                [ <a href="https://www.linkedin.com/in/bsexton3787/">LINKEDIN_UPLINK</a> ]
+                                [ <a href="https://www.github.com/Tyxton">SOURCE_CODE_REPO</a> ]
+                                [ <a href="/assets/tSexton_Resume.pdf">DOWNLOAD_CV.PDF</a> ]
+                        </div>
+                    <p>&copy; 2026 NOTTYXTON.NET - OPERATING ON DEBIAN/PROXMOX INFRASTRUCTURE >
+                 </footer>
+            </main>
+        </div> </div>
+</body>
+</html>

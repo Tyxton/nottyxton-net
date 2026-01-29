@@ -1,0 +1,35 @@
+<div class="module-header">
+    <h2 class="text-amber">>> INDEX://INFRASTRUCTURE/</h2>
+    <p class="meta-comment"># Navigation layer for hardware and software assets</p>
+</div>
+
+<div class="wide-index">
+    <div class="index-row">
+        <a href="#" class="file-link" data-module="infra_proxmox">[ FILE ] cluster_pve.sh</a>
+        <span class="index-details">Hyper-converged virtualization cluster running Proxmox VE 8.1</span>
+    </div>
+    <div class="index-row">
+        <a href="#" class="file-link" data-module="infra_storage">[ FILE ] zfs_array.cfg</a>
+        <span class="index-details">RAIDZ2 Pool configuration | 120TB Raw | HBA Passthrough</span>
+    </div>
+    <div class="index-row">
+        <a href="#" class="file-link" data-module="infra_ups">[ FILE ] power_mgmt.log</a>
+        <span class="index-details">UPS Telemetry via NUT & automated shutdown sequences</span>
+    </div>
+</div>
+
+<style>
+    .wide-index { margin-top: 20px; }
+    .index-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+    }
+    .index-details { opacity: 0.6; font-size: 0.9rem; text-align: right; }
+    
+    @media (max-width: 600px) {
+        .index-row { flex-direction: column; align-items: flex-start; }
+        .index-details { text-align: left; padding-top: 5px; }
+    }
+</style>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>NOTTYXTON // TTY1</title>
+        <link rel="stylesheet" href="/style.css?v=2.2">
+        <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body>
+        <div class="crt-monitor">
+        <div class="scanlines"></div>
+        <div class="bezel"></div>
+        <div class="screen-flicker"></div>
+        
+        <div id="main-content" style="display: block;">
+                <header class="site-header">
+                        <pre class="ascii-art">
+░█▀█░█▀█░▀█▀░▀█▀░█░█░█░█░▀█▀░█▀█░█▀█
+░█░█░█░█░░█░░░█░░░█░░▄▀▄░░█░░█░█░█░█
+░▀░▀░▀▀▀░░▀░░░▀░░░▀░░▀░▀░░▀░░▀▀▀░▀░▀  v.2.0.26
+----------------------------------------------
+SYSTEM READY. LOGGED IN AS root.
+                        </pre>
+
+                        <nav class="text-nav">
+                                [<a href="/">HOME</a>] - [<a href="/pages/projects.html">PROJECTS</a>] - [<a href="/pages/homelab.html">HOMELAB</a>] - [<a href="/pages/about.html">ABOUT</a>] - [<a href="/pages/contact.html">COMM</a>] - [<a href="/assets/tSexton_Resume.pdf" target="_blank" rel="noopener noreferrer">VIEW_RESUME.PDF</a>]
+                        </nav>
+                </header>
+
+            <main class="terminal-body">
+		
+		<section class="project-detail">
+		    <div class="terminal-header">
+		        <h2>FILE: /projects/site_rebuild.log</h2>
+		    </div>
+    
+		<div class="case-study-grid">
+       			 <aside class="tech-specs">
+           			<h3>[SYSTEM_SPECS]</h3>
+            		<ul>
+               			<li><strong>OS:</strong> Debian / Proxmox</li>
+                		<li><strong>STACK:</strong> Docker, Nginx, NPM</li>
+                		<li><strong>HARDWARE:</strong> Dell Precision 5810</li>
+           		</ul>
+		<br><br>
+			<!--- Repository Link for Pages That Need One
+            		<div class="repo-link">
+                		<a href="#">>> ACCESS_SOURCE_CODE</a>
+            		</div>
+			-->
+        		</aside>
+		</div>
+        	<div class="case-study-body">
+            		<h3>>> THE_CHALLENGE</h3>
+            		<p>Rewrite my old website to be something more visually appealing, and to have a greater focus on my projects in tech.</p>
+			<br>
+            		<h3>>> THE_SOLUTION</h3>
+            		<p>I did a full site rewrite from scratch, this time implementing some JavaScript to gain some attention-grabbing visual effects.</p>
+			<br>
+			<p>I also focused on making the website more "professionally appealing" by keeping a consistent, legible, and interesting visual style.</p>
+			<br>
+			<p>I am currently rewriting the old pages to match the visual style and also detailing my processes in the homelab.</p>
+			<br>
+            		<h3>>> KEY_LEARNINGS</h3>
+            		<p>All of the skills used on this project came from my experience in Website Development, though patience and trials were crucial to not only finding a new style that achieved the goals I desired, but rewriting dozens of pages is a task of itself.</p>
+        		<br><br><br>
+		</div>
+		<div class="case-study-body">
+			<h3>>> JAVASCRIPT_CHALLENGE</h3>
+			<p>When building the boot animation, I ran into an issue where everytime the page loaded, it would replay, <u>even on page redirect.</u> This was an issue I wanted to fix immediately since, while unique and visually appealing, looses its charm quickly when viewed dozens of times per visit. <u>Especially</u> when most visitors frequently jump between pages.</p>
+			<br>
+			<p>Any recruiters visiting my page specifically would be deterred by this, their time is valuable, so I had to figure something out.</p>
+			<br>
+			<h3>>> THE_SOLUTION</h3>
+			<p>I implemented a session state check in the script, unlike localStorage, sessionStorage clears itself when the tab is closed meaning that the boot sequence will still play for the first time a user visits the website, but won't annoy them as they click through the various pages. This too, would allow for returning users to still get the animation, as it is a charm of the site.</p>
+			<br>
+			<p>To compliment the session state check, I also added a skipping feature so that when a user clicks, it will automatically skip the boot animation, and just show the content -- that way users don't feel forced to watch it. User satisfaction is a crucial part in UI/UX development afterall.</p>
+			<br>
+			<h3>>> KEY_LEARNINGS</h3>
+			<p>In writing this script, I learned a key skill in web development -- Session State Management to compliment my skills in UI/UX design.</p>
+    	</div>
+	</section>                
+
+                 <div class="separator">========================================</div>
+ 		<footer class="terminal-footer">
+                     <p><span class="prompt">root@nottyxton:~$</span> cat meta.txt</p>
+                        <div class="meta-links">
+                                [ <a href="https://www.linkedin.com/in/bsexton3787/">LINKEDIN_UPLINK</a> ]
+                                [ <a href="https://www.github.com/Tyxton">SOURCE_CODE_REPO</a> ]
+                                [ <a href="/assets/tSexton_Resume.pdf">DOWNLOAD_CV.PDF</a> ]
+                        </div>
+                    <p>&copy; 2026 NOTTYXTON.NET - OPERATING ON DEBIAN/PROXMOX INFRASTRUCTURE >
+                 </footer>
+            </main>
+        </div> </div>
+</body>
+</html>
