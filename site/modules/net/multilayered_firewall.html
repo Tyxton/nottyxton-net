@@ -6,20 +6,20 @@
     </div>
 
 <h3>[ THE_PROBLEM ]</h3><p> My network environment consists of segmented VLANs (Local, Private, and Public). Initial attempts to connect my services together resulted in generic timeouts, while later attempts returned specific "Connection Refused" errors. Furthermore, leaving the network open on a public facing server would invite constant brute-force attacks - noted by my UniFi logs, obscuring legitimate traffic data. </p>
-<br><br>
 
 <h3>[ THE_SOLUTION ]</h3><p> I implemented a "Defense in Depth" strategy involving two distinct firewall layers and service reconfiguration:</p>
-<br>
+
 <ul id="layers">
     <li><h4>Layer_01 (Network - UniFi)</h4><p> I configured UniFi Traffic Rules to explicitly allow traffic from the management server on the local VLAN to the public and private servers running on their respective VLANs, while blocking all other inter-VLAN routing. I had to implement a "BLOCK ALL" rule, then add the "pinholes" back manually to ensure that the servers only talked to each other in the ways they needed to, and that I permitted.</p></li>
     <li><h4>Layer_02 (Host - UFW)</h4><p> On the Debian VMs, I installed ufw (Uncomplicated Firewall) with a "Default Deny" policy. I explicilty whitelisted only critical services. (e.g. Nginx HTTP/HTTPS)</p></li>
 </ul>
-<br>
+
 <p> To go more in depth with the individual nodes: MGT and DK3, my Mangement and Private nodes, were kept "semi-open" utilizing a "Default Deny Incoming" and "Default Allow Outgoing" ruleset. On DK3, I allowed specific ports in to allow for API calls. With DK2, I took a much more secure approach; I used a "Default Deny Incoming/Outgoing" ruleset for this, and only opened select pinholes for incoming traffic namely 80,443. On all three nodes I made sure to keep an SSH policy for management, so I didn't lock myself out. For any standard protocols (TCP/UDP) I only allowed the specific protocol along with the port, to limit the traffic further.</p>
-<br><br>
 
 <h3>[ KEY_LEARNINGS ]</h3><p> Even if a server is "local," network segmentation treats it as a hostile foreign device until routing rules are established.<p>
+<br>
 <p>A timeout usually indicates a firewall is dropping packets silently. A connection refused error means that the packet reached the server, but the operating system or application rejected it.</p>
+<br>
 <p>Utilize logs via tail, and troubleshoot via nc and traceroute to learn exactly what the connections are doing, and why they aren't working as expected.</p>
 
 <style>
@@ -71,8 +71,13 @@
     .table-scroll-wrapper { width: 100%; overflow-x: auto; }
     
     #layers {
-    text-decorations: none;
-    padding-left: 5px;
-    list-style-type: none;
+        text-decorations: none;
+        padding-left: 10px;
+        list-style-type: none;
+    }
+    
+    li {
+        padding-top: 10px;
+	padding-bottom: 10px;
     }
 </style>
