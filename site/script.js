@@ -169,12 +169,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function finishBoot() {
-        loadingScreen.style.display = 'none';
-        mainContent.style.display = 'block';
+        const loadingScreen = document.getElementById('loading-screen');
+        const mainContent = document.getElementById('main-content');
 
-        // Now calling the GLOBAL function
+        if (loadingScreen) loadingScreen.style.display = 'none';
+    
+        if (mainContent) {
+            mainContent.style.display = 'block';
+            mainContent.classList.add('power-on-anim'); 
+        }
+    
         window.loadModule('system_audit');
-
+    
         const f1 = document.querySelector('[data-module="system_audit"]');
         if (f1) f1.classList.add('active');
     }
@@ -229,5 +235,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     startBoot();
-    setInterval(updateMetrics, 1000);
+    setInterval(updateClocks, 1000);
+    updateClocks();
 });

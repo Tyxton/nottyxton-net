@@ -143,12 +143,8 @@ body {
 /* --- MAIN CONTENT STYLING --- */
 #main-content {
     padding-bottom: 50px;
-    max-width: 1400px;
-    width: 95%;
+    max-width: 900px;
     margin: 0 auto;
-
-    padding: 40px;
-    position: relative;
 }
 
 /* Header & Nav */
@@ -231,6 +227,23 @@ body {
 }
 
 /* Header & Nav */
+.system-header {
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+}
+
+.command-nav {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nav-links {
+    display: flex;
+    flex-wrap: wrap; /* Key for mobile: links will wrap to next line */
+    gap: 20px;
+}
 
 .terminal-footer {
     position: fixed;
@@ -260,10 +273,64 @@ body {
     text-transform: uppercase;
 }
 
+
+
+.ascii-art {
+    font-family: monospace;
+    white-space: pre;
+    font-weight: bold;
+    color: var(--phosphor-bright);
+    margin-bottom: 20px;
+    font-size: 0.9rem; /* Adjust depending on ascii art width */
+    line-height: 1;
+    animation: text-flicker 0.05s infinite;
+}
+
 @keyframes text-flicker {
     0% { opacity: 0.98; }
     50% {opacity: 1; }
     100% { opacity: 99; }
+}
+
+.text-nav {
+    margin-bottom: 30px;
+    border-bottom: 2px dashed var(--phosphor-dim);
+    padding-bottom: 10px;
+}
+.text-nav a {
+    text-decoration: none;
+    color: var(--phosphor-bright);
+    margin: 0 10px;
+    font-weight: bold;
+}
+.text-nav a:hover {
+    background-color: var(--phosphor-bright);
+    color: var(--crt-bg);
+    text-shadow: none;
+}
+
+.meta-links a {
+    text-decoration:none;
+    color: var(--phosphor-bright);
+    font-weight: bold;
+}
+
+.meta-links a:hover {
+    background-color: var(--phosphor-bright);
+    color: var(--crt-bg);
+    text-shadow: none;
+}
+
+.hardware_manifest a {
+    text-decoration: underline;
+    color: var(--phosphor-bright);
+    font-weight: bold;
+}
+
+.hardware_manifest a:hover {
+    background-color: var(--phosphor-bright);
+    color: var(--crt-bg);
+    text-shadow: none;
 }
 
 /* Terminal Body Content */
@@ -283,33 +350,54 @@ body {
     font-weight: bold;
 }
 
-.file-link {
-    min-width: fit-content;
+.separator {
+    margin: 30px 0;
+    color: var(--phosphor-dim);
+    letter-spacing: 2px;
 }
 
 h2 {
     margin-bottom: 20px;
     text-transform: uppercase;
+    border-left: 5px solid var(--phosphor-bright);
     padding-left: 10px;
 }
 
-h3 {
-    padding-top: 20px;
-    padding-bottom: 10px;
-    text-transform: uppercase;
-}
-
-h4 {
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-
 /* Project Items */
+.terminal-item {
+    margin-bottom: 25px;
+    padding-left: 20px;
+    border-left: 2px dotted var(--phosphor-dim);
+}
+.terminal-item h3 { margin-bottom: 5px; }
 .meta {
     font-size: 0.8rem;
     color: var(--phosphor-dim);
     margin-bottom: 10px;
 }
+.description { margin-bottom: 10px; }
+.links a {
+    color: var(--phosphor-bright);
+    text-decoration: none;
+    border-bottom: 1px solid var(--phosphor-bright);
+}
+.links a:hover {
+    background: var(--phosphor-bright);
+    color: var(--crt-bg);
+    text-shadow: none;
+}
+
+/* Log Output area */
+.log-output {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    color: var(--phosphor-dim);
+    background-color: rgba(255, 176, 0, 0.05);
+    padding: 15px;
+    border: 1px solid var(--phosphor-dim);
+}
+
 
 /* --- UTILS & ANIMATIONS --- */
 .blinking-cursor {
@@ -350,6 +438,10 @@ h4 {
     .terminal-body { padding: 10px; }
     
     /* Make tables scrollable horizontally if they are still too wide */
+    .data-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
     .tui-header { padding-top: 10px; }
 
     .header-telemetry { display: none; }
@@ -403,6 +495,157 @@ h4 {
         border-bottom: none;
     }
 }
+	
+/* 1. Kill the Grid, switch to a Container */
+.terminal-container {
+    max-width: 1000px; /* Optimal reading width */
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* 2. Move Navigation to a horizontal bar or "Breadcrumb" */
+.terminal-nav {
+    display: flex;
+    flex-wrap: wrap; /* Allows wrapping on mobile */
+    gap: 15px;
+    border-bottom: 1px solid var(--phosphor-dim);
+    padding-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+.case-study-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.tech-specs {
+    background: rgba(255, 176, 0, 0.05);
+    border: 1px dashed var(--phosphor-dim);
+    padding: 1rem;
+    font-size: 0.9rem;
+}
+
+.tech-specs ul {
+    list-style: " > ";
+    padding-left: 1rem;
+}
+
+.case-study-body h3 {
+    color: var(--phosphor-bright);
+    margin: 1.5rem 0 0.5rem 0;
+    text-decoration: underline;
+}
+
+/* Terminal Form Styling */
+.terminal-window-form {
+    border: 1px solid var(--phosphor-dim);
+    background: rgba(0, 0, 0, 0.4);
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.terminal-header-form {
+    background: var(--phosphor-dim);
+    color: var(--crt-bg);
+    padding: 5px 10px;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.terminal-form {
+    padding: 20px;
+}
+
+.form-row {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-row label {
+    font-size: 0.9rem;
+    color: var(--phosphor-dim);
+    margin-bottom: 5px;
+}
+
+/* Gritty Inputs */
+.terminal-form input, 
+.terminal-form textarea, 
+.terminal-form select {
+    background: transparent;
+    border: 1px solid var(--phosphor-dim);
+    color: var(--phosphor-bright);
+    font-family: 'Fira Code', monospace;
+    padding: 10px;
+    outline: none;
+}
+
+.terminal-form input:focus, 
+.terminal-form textarea:focus {
+    border-color: var(--phosphor-bright);
+    box-shadow: 0 0 5px var(--phosphor-dim);
+}
+
+/* Custom Submit Button */
+.submit-btn {
+    background: transparent;
+    border: none;
+    color: var(--phosphor-bright);
+    font-family: inherit;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 10px;
+    width: 100%;
+    transition: 0.3s;
+}
+
+.submit-btn:hover {
+    background: var(--phosphor-bright);
+    color: var(--crt-bg);
+    box-shadow: 0 0 15px var(--phosphor-bright);
+}
+
+.directory-browser {
+    font-family: 'Fira Code', 'Courier New', monospace;
+    background: rgba(0, 20, 0, 0.2);
+    padding: 20px;
+    border: 1px solid var(--phosphor-dim);
+    margin: 0 0 20px 0;
+}
+
+.tree-list {
+    list-style: none;
+    padding-left: 15px;
+    margin: 10px 0;
+}
+
+.tree-item {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.tree-item a {
+    decorations: none;
+    color: var(--phosphor-bright);
+    font-weight: bold;    
+}
+
+.tree-item a:hover {
+    background-color: var(--phosphor-bright);
+    color: var(--crt-bg);
+    text-shadow: none;
+}
+
+.branch {
+    color: var(--phosphor-dim);
+    margin-right: 10px;
+}
 
 .nav-item {
     color: var(--phosphor-bright);
@@ -416,6 +659,13 @@ h4 {
     font-size: 0.85rem;
     margin-left: 15px;
     font-style: italic;
+}
+
+/* GLITCH EFFECTS */
+/* Container to keep the glitch layers aligned */
+.glitch-container {
+    position: relative;
+    display: inline-block;
 }
 
 .glitch {
@@ -439,6 +689,28 @@ h4 {
     display: none;
 }
 
+.crt-overlay::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.25) 50%
+    ), linear-gradient(
+        90deg, 
+        rgba(255, 0, 0, 0.06), 
+        rgba(0, 255, 0, 0.02), 
+        rgba(0, 0, 255, 0.06)
+    );
+    z-index: 999; /* Put it on top */
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none; /* Allows you to click things through the overlay */
+}
+
 .typing-animation {
     animation: scanline-reveal 0.6s steps(30, end);
     overflow: hidden;
@@ -452,6 +724,19 @@ h4 {
     to { max-height: 1000px; opacity: 1; }
 }
 
+/* 1. Simplify the Layout Container */
+.dashboard-grid {
+    display: grid;
+    /* Increase the gap and give the right side '1fr' (all remaining space) */
+    grid-template-columns: 280px 2px minmax(400px, 1fr); 
+    gap: 40px; 
+    align-items: start;
+    margin: 40px auto;
+    width: 95%;
+    max-width: 1600px; /* Use more of the screen width */
+}
+
+/* 3. The Viewscreen now gets the full width */
 .log-viewer {
     width: 100%;
     background: rgba(0, 20, 0, 0.1);
@@ -466,4 +751,47 @@ h4 {
 
 #viewscreen-header {
     padding-bottom: 15px;
+}
+
+/* 3. The Vertical Divider */
+.vertical-divider {
+    background: var(--phosphor-dim);
+    opacity: 0.2;
+    height: 70vh; /* Adjust height to your liking */
+    margin-top: 20px;
+}
+
+/* 4. Streamline the Telemetry Line */
+.telemetry-line {
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-around;
+    color: var(--text-amber);
+    letter-spacing: 1px;
+}
+
+/* Ensure the internal grid for projects uses all available space */
+.project-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 30px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* Fix the 'pinched' file list in the index */
+.directory-listing {
+    width: 100%;
+    border-left: 2px solid rgba(0, 255, 65, 0.1);
+    padding-left: 20px;
+    margin-top: 30px;
+}
+
+.dir-item {
+    display: flex;
+    justify-content: flex-start; /* Ensure items align to the left */
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    white-space: nowrap; /* Prevents descriptions from wrapping too early */
 }
