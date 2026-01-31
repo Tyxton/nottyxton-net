@@ -7,13 +7,28 @@ STATUS: DEPLOYED / HEALTHY
 
   <section class="audit-section">
     <h3>>> IDENTITY_SUMMARY</h3>
-    <table class="audit-table">
-      <tr><td>[ OBJECT ]</td><td>SYSADMIN // INFRA_ENGINEER</td></tr>
-      <tr><td>[ ORIGIN ]</td><td>HTX_DATA_CENTER_01</td></tr>
-      <tr><td>[ SPECIAL ]</td><td>VIRTUALIZATION // NETWORK_SECURITY</td></tr>
-      <tr><td>[ STATUS ]</td><td>ACTIVE_FOR_HIRE (Q1_2026)</td></tr>
-      <tr><td>[ VERSION ]</td><td>7.8 (YRS_OF_OPERATION)</td></tr>
-    </table>
+    <div class="audit-grid">
+        <div class="audit-row">
+            <span class="audit-label">[ OBJECT ]</span>
+            <span class="audit-value">SYSADMIN // INFRA_ENGINEER</span>
+        </div>
+        <div class="audit-row">
+            <span class="audit-label">[ ORIGIN ]</span>
+            <span class="audit-value">HTX_DATA_CENTER_01</span>
+        </div>
+        <div class="audit-row">
+            <span class="audit-label">[ SPECIAL ]</span>
+            <span class="audit-value">VIRTUALIZATION // NETWORK_SECURITY</span>
+        </div>
+        <div class="audit-row">
+            <span class="audit-label">[ STATUS ]</span>
+            <span class="audit-value">ACTIVE_FOR_HIRE (Q1_2026)</span>
+        </div>
+        <div class="audit-row">
+            <span class="audit-label">[ VERSION ]</span>
+            <span class="audit-value">7.8 (YRS_OF_OPERATION)</span>
+        </div>
+    </div>
   </section>
 
   <section class="audit-section">
@@ -55,4 +70,47 @@ END_OF_MANIFEST | (C) 2026 TYXTON
 	list-style: none;
 	padding-left: 5px;
  }
+
+/* Shared Styles */
+.audit-grid {
+    margin-top: 10px;
+}
+
+.audit-row {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.audit-label {
+    color: var(--phosphor-muted); /* Use your dim amber color */
+    width: 120px; /* Fixed width keeps values aligned on desktop */
+    flex-shrink: 0;
+}
+
+.audit-value {
+    color: var(--phosphor-bright); /* Use your bright amber color */
+}
+
+/* Mobile Optimization */
+@media (max-width: 480px) {
+    .audit-row {
+        flex-direction: column; /* Stack label above value */
+        margin-bottom: 12px;
+        border-left: 2px solid var(--p-dim);
+        padding-left: 10px;
+    }
+
+    .audit-label {
+        font-size: 0.75rem;
+        width: auto; /* Reclaim horizontal space */
+        margin-bottom: 2px;
+    }
+
+    .audit-value {
+        font-size: 0.95rem;
+        padding-left: 5px;
+        word-break: break-word; /* Prevents long strings from pushing the edge */
+    }
+}
+
 </style>
