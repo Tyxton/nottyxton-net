@@ -14,7 +14,7 @@
 	On DK2, I setup Jellyfin and Jellyseerr since these will be the public services that users will need to access. In setting up the common keys, the most important variables
 	we need to add are the PUID, GUID, and the no-new-privileges rule.
 	<p>
-	<pre class="compose">
+	<pre class="code">
 ┌── [ DOCKER_COMPOSE: x-common-keys ] ──────────────────────────┐
 │ x-common-keys: &common-keys                                   │
 │   environment:                                                │
@@ -35,7 +35,7 @@
 	<p>
 	On Jellyseerr, I used the flag:
 	</p>
-	<pre class="compose">
+	<pre class="code">
 ┌── [ DOCKER_COMPOSE: jellyseerr var ] ─────────────────────────┐
 │ network_mode: host                                            │
 └───────────────────────────────────────────────────────────────┘
@@ -47,7 +47,7 @@
 	<p>
 	To wrap things up on the DK2 side of the stack, we need to cover the mounts and the GPU passthrough for the container:
 	</p>
-	<pre class="compose">
+	<pre class="code">
 
 ┌── [ DOCKER_COMPOSE: jellyfin var ] ───────────────────────────┐
 │   environment:                                                │
@@ -77,7 +77,7 @@
 	<br>
 	In our common keys, you'll see a lot of similar variables:
 	</p>
-        <pre class="compose">
+        <pre class="code">
 ┌── [ DOCKER_COMPOSE: x-common-keys ] ──────────────────────────┐
 │ x-common-keys: &common-keys                                   │
 │   environment:                                                │
@@ -92,7 +92,7 @@
 	<p>
 	We will also include some new variables unique to this stack:
 	<p>
-	<pre class ="compose">
+	<pre class="code">
 ┌── [ DOCKER_COMPOSE: x-common-keys ext. ]──────────────────────┐
 │   networks:                                                   │
 │     - stack_network                                           │
@@ -134,7 +134,7 @@
 	another for the *arr stack. We also need to create a shared group between them, for the sake of documentation I'll call it sharedgroup. In addition to the preperations above, I
 	then needed to configure the ACL for the dataset. The ACL configuration is as follows:
 	</p>
-	<pre class="compose">
+	<pre class="code">
 ┌── [ ZFS_ACL_CONFIGURATION ] ──────────────────────────────────┐
 │ USER/GROUP      | PERM | ROLE                                 │
 │─────────────────|──────|──────────────────────────────────────│
@@ -186,7 +186,7 @@
 	RSS feeds. On completion, the Radarr/Sonarr API updates Jellyseer that the content is available, which in turn triggers a post-processing script that lets Jellyfin know to refresh the Jellyfin library
 	metadata. 
 	</p>
-	<pre class="compose">
+	<pre class="code">
 ┌── [ SYSTEM_MAP ] ─────────────────────────────────────────────┐
 │ media_bridge (172.20.0.0/16)                                  │
 │  ├─ [ FRONTEND ]                                              │
@@ -280,12 +280,6 @@
     .li {
         padding-top: 5px;
         padding-bottom: 5px;
-    }
-
-    .compose {
-        font-size: 0.85rem;
-	margin-top: 5px;
-	magin-bottom: 5px;
     }
 
     .data-tree {

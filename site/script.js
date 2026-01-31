@@ -33,14 +33,18 @@ window.loadModule = async function(moduleName) {
 
     // 4. Update the Prompt (Forcing the innerHTML)
     if (commandLabel) {
-        const isMobile = window.innerWidth < 768;
-        const displayPath = isMobile
-            ? `~/layers/${fileName}.log`
-            : `/root/projects/modules/${filePath}.log`;
+	    const isMobile = window.innerWidth < 768;
 
-        // We use textContent for the parts that don't need HTML to ensure it renders
-        commandLabel.innerHTML = `<span class="prompt">root@nottyton:~$</span> cat ${displayPath}`;
-        console.log("PROMPT_UPDATED_TO:", displayPath);
+	    if (isMobile) {
+	        // Shorter Mobile Version: $~ cat file.log
+	        commandLabel.innerHTML = `<span class="prompt">$~</span> cat ${fileName}.log`;
+	    } else {
+	        // Full Desktop Version: root@nottyton:~$ cat /root/projects/modules/path/file.log
+	        const displayPath = `/root/projects/modules/${filePath}.log`;
+	        commandLabel.innerHTML = `<span class="prompt">root@nottyton:~$</span> cat ${displayPath}`;
+	    }
+	    
+	    console.log("PROMPT_MODE:", isMobile ? "MOBILE" : "DESKTOP");
     }
 
     // 5. Fetch Content
