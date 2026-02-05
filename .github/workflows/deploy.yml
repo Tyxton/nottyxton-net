@@ -12,10 +12,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Set Git User
+        run: |
+          git config --global user.name "Tyler Sexton"
+          git config --global user.email "79432377+Tyxton@users.noreply.github.com"
+
       - name: Deploy to Server via Rsync
         uses: Burnett01/rsync-deployments@7.0.0
         with:
-          switches: -avzr --delete -e 'ssh =p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no'
+          switches: -avzr --delete -e 'ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no'
           path: ./site/
           remote_path: /home/t/.nginx/config/www/
           remote_host: ${{ secrets.SERVER_IP }}
