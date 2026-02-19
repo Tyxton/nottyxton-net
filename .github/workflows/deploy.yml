@@ -1,4 +1,4 @@
-name: Deploy nottyxton to DK2
+name: Deploy nottyxton to edge-srv-01
 
 on:
   push:
