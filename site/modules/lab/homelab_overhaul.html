@@ -1,0 +1,84 @@
+<div class="layer-container">
+
+    <div class="layer-header">
+        <h2 class="text-amber">>> HOMELAB_OVERHAUL://<span class="layer-name">GENERAL LAB</span></h2>
+        <p class="meta-comment">Restructuring the homelab from the ground up to match production-ready practices and security.</p>
+    </div>
+
+    <h3>>> INFRASTRUCTURE</h3>
+    <h4><a href="#" class="file-link" data-module="infra_infrastructure_overhaul">[ RUN ]: cat /layers/infra_overhaul.log (DEEP_DIVE)</a></h4>
+    <h4>[ General_Improvements ]</h4>
+    <ul class="config-list">
+        <li><span>[ MIGRATE ]</span> - Migrate unnecessary VMs to LXC Containers.</li>
+        <li><span>[ ADOPT ]</span> - Adopt production-ready names for our nodes, and services.</li>
+        <li><span>[ STORAGE ]</span> - Introduced atomic moves, and offloaded local PVE storage.</li>
+        <li><span>[ MIGRATE ]</span> - Converted to Portainer Edge.</li>
+        <li><span>[ ADDED ]</span> - Introduced a comprehensive monitoring stack that covers hypervisor, container, and hardware metrics.</li>
+    </ul>
+
+    <h3>>> NETWORKING</h3>
+    <h4><a href="#" class="file-link" data-module="net_network_overhaul">[ RUN ]: cat /layers/net_overhaul.log (DEEP_DIVE)</a></h4>
+    <h4>[ General_Improvements ]</h4>
+    <ul class="config-list">
+        <li><span>[ FIREWALL ]</span> - Transitioned to UniFi's Zone-Based Firewall, rather than the standard policy table.</li>
+        <li><span>[ SSID ]</span> - Segregated the Guest/Roommate SSID from my trusted SSID.</li>
+        <li><span>[ VLAN ]</span> - Restructured our VLANs, and their purposes.</li>
+        <li><span>[ ADDED ]</span> - Created a dedicated physically/logically isolated NFS storage lane for Proxmox and Motherbase.</li>
+        <li><span>[ RESERVE ]</span> - Introduced DHCP pools, and reservations.</li>
+    </ul>
+
+    <h3>>> AUTOMATION</h3>
+    <h4><a href="#" class="file-link" data-module="auto_automation_overhaul">[ RUN ]: cat /layers/auto_overhaul.log (DEEP_DIVE)</a></h4>
+    <h4>[ General_Improvements ]</h4>
+    <ul class="config-list">
+        <li><span>[ ADDED ]</span> - PVE Backup Scheduling to TrueNAS Scale.</li>
+        <li><span>[ CLEAN ]</span> - Added a cleanup schedule to Proxmox Edge Agents via Cronjob.</li>
+        <li><span>[ CI/CD ]</span> - Implemented a Github Actions pipeline for website development and rsync deployment.</li>
+    </ul>
+
+<style>
+    /* Responsive Grid Logic */
+    .layer-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
+        gap: 30px;
+        margin-top: 25px;
+    }
+
+    @media (max-width: 900px) {
+        .layer-grid {
+            grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
+        }
+    }
+
+    /* Panel Styling */
+    .layer-panel {
+        background: rgba(0, 255, 65, 0.03);
+        border-left: 1px solid rgba(0, 255, 65, 0.1);
+        padding: 20px;
+    }
+
+    .panel-title {
+        font-size: 1.1rem;
+        border-bottom: 1px solid var(--phosphor-dim);
+        padding-bottom: 8px;
+        margin-bottom: 15px;
+    }
+
+    .info-terminal-box {
+        margin-top: 25px;
+        padding: 15px;
+        border: 1px dashed var(--phosphor-dim);
+        font-size: 0.85rem;
+    }
+
+    /* Mobile Table Scroll Fix */
+    .table-scroll-wrapper { width: 100%; overflow-x: auto; }
+
+    .config-list {
+	font-size: 0.8rem;
+	margin: 10px;
+	list-style: none;
+    }
+
+</style>
