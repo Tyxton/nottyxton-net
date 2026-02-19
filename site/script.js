@@ -22,7 +22,7 @@ window.loadModule = async function(moduleName) {
     const viewscreen = document.getElementById('module-viewscreen');
     const commandLabel = document.getElementById('command-label');
 
-    // 2. Debugging: This will tell us if the JS actually 'sees' the prompt
+
     if (!commandLabel) {
         console.warn("COMMAND_LABEL_NOT_FOUND: Check if <div id='command-label'> exists in index.html");
     }
@@ -71,7 +71,6 @@ window.loadModule = async function(moduleName) {
     // Keyboard Functions - NAV
     window.addEventListener('keydown', (e) => {
 
-        // Map F-Keys to your data-module names
         const fKeyMap = {
             'F1': 'system_audit',
             'F2': 'infra_index',
@@ -122,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 2. BOOT LOGIC ---
     function startBoot() {
-        // ... (Your existing bootLines array here) ...
 	const bootLines = [
             { t: "NOTTYXTON BIOS v 2.0.1 (C) 2026", d: 0 },
             { t: "CPU: Intel(R) Xeon(R) Gold - 16 Cores @ 3.2GHz", d: 100 },
