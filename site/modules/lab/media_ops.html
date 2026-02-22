@@ -1,20 +1,30 @@
 <div class="layer-container">
-    
-    <div class="layer-header">
-        <h2 class="text-amber">>> MEDIA_OPS://<span class="layer-name">GEN_LAB</span></h2>
-	<p class="meta-comment">Distributed Media Pipeline & Automated Content Management.</p>
-    </div>
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> MEDIA_OPS://<span class="layer-name">GEN_LAB</span>
+    </h2>
+    <p class="meta-comment">
+      Distributed Media Pipeline & Automated Content Management.
+    </p>
+  </div>
 
-    <h3>[ Service_Orechestration ]</h3>
+  <h3>[ Service_Orechestration ]</h3>
 
-	<p>Through the Portainer Web UI, I orchestrated two docker compose stacks, one for each node (DK2 / Public Node, and DK3 / Backend Node).
-	<br>
-	<h4>DK2_NODE</h4>
-	<p>
-	On DK2, I setup Jellyfin and Jellyseerr since these will be the public services that users will need to access. In setting up the common keys, the most important variables
-	we need to add are the PUID, GUID, and the no-new-privileges rule.
-	<p>
-	<pre class="code">
+  <p>
+    Through the Portainer Web UI, I orchestrated two docker compose stacks, one
+    for each node (DK2 / Public Node, and DK3 / Backend Node). <br />
+  </p>
+
+  <h4>DK2_NODE</h4>
+  <p>
+    On DK2, I setup Jellyfin and Jellyseerr since these will be the public
+    services that users will need to access. In setting up the common keys, the
+    most important variables we need to add are the PUID, GUID, and the
+    no-new-privileges rule.
+  </p>
+
+  <p></p>
+  <pre class="code">
 ┌── [ DOCKER_COMPOSE: x-common-keys ] ──────────────────────────┐
 │ x-common-keys: &common-keys                                   │
 │   environment:                                                │
@@ -25,29 +35,34 @@
 │     - no-new-privileges:true                                  │
 │   restart: unless-stopped                                     │
 └───────────────────────────────────────────────────────────────┘
-	</pre>
-	<p>
-	The PUID and GUID are integral so that Jellyfin can see and interact with the data on the NAS, The user and group setup on the TrueNAS end that share this only have rx
-	(read, execute) permissions. Under no circumstances should a public facing media player have write access to your NAS. To maintain this, our no-new-privileges rule ensures
-	sudo will never run as root. This is very important in a container-breakout scenario.
-	</p>
-	<br>
-	<p>
-	On Jellyseerr, I used the flag:
-	</p>
-	<pre class="code">
+	</pre
+  >
+  <p>
+    The PUID and GUID are integral so that Jellyfin can see and interact with
+    the data on the NAS, The user and group setup on the TrueNAS end that share
+    this only have rx (read, execute) permissions. Under no circumstances should
+    a public facing media player have write access to your NAS. To maintain
+    this, our no-new-privileges rule ensures sudo will never run as root. This
+    is very important in a container-breakout scenario.
+  </p>
+  <br />
+  <p>On Jellyseerr, I used the flag:</p>
+  <pre class="code">
 ┌── [ DOCKER_COMPOSE: jellyseerr var ] ─────────────────────────┐
 │ network_mode: host                                            │
 └───────────────────────────────────────────────────────────────┘
-	</pre>
-	<p>
-	This utilizes host networking for simplified cross-node API routing. This also avoids NAT overhead.
-	</p>
-	<br>
-	<p>
-	To wrap things up on the DK2 side of the stack, we need to cover the mounts and the GPU passthrough for the container:
-	</p>
-	<pre class="code">
+	</pre
+  >
+  <p>
+    This utilizes host networking for simplified cross-node API routing. This
+    also avoids NAT overhead.
+  </p>
+  <br />
+  <p>
+    To wrap things up on the DK2 side of the stack, we need to cover the mounts
+    and the GPU passthrough for the container:
+  </p>
+  <pre class="code">
 
 ┌── [ DOCKER_COMPOSE: jellyfin var ] ───────────────────────────┐
 │   environment:                                                │
@@ -67,17 +82,21 @@
 │             count: all                                        │
 │             capabilities: [gpu]                               │
 └───────────────────────────────────────────────────────────────┘
-	</pre>
-	<p>
-	This ensures that DK2 can access the NAS NFS share from the container, as well as utilize our GPU for transcoding.
-	</p>
-	<br>
-	<h4>DK3_NODE</h4>
-	<p>DK3 has a similar, yet distinct stack - this time involving more services: Radarr, Sonarr, Prowlarr, Bazarr, Sabnzbd
-	<br>
-	In our common keys, you'll see a lot of similar variables:
-	</p>
-        <pre class="code">
+	</pre
+  >
+  <p>
+    This ensures that DK2 can access the NAS NFS share from the container, as
+    well as utilize our GPU for transcoding.
+  </p>
+  <br />
+  <h4>DK3_NODE</h4>
+  <p>
+    DK3 has a similar, yet distinct stack - this time involving more services:
+    Radarr, Sonarr, Prowlarr, Bazarr, Sabnzbd
+    <br />
+    In our common keys, you'll see a lot of similar variables:
+  </p>
+  <pre class="code">
 ┌── [ DOCKER_COMPOSE: x-common-keys ] ──────────────────────────┐
 │ x-common-keys: &common-keys                                   │
 │   environment:                                                │
@@ -88,11 +107,12 @@
 │     - no-new-privileges:true                                  │
 │   restart: unless-stopped                                     │
 └───────────────────────────────────────────────────────────────┘
-	</pre>
-	<p>
-	We will also include some new variables unique to this stack:
-	<p>
-	<pre class="code">
+	</pre
+  >
+  <p>We will also include some new variables unique to this stack:</p>
+
+  <p></p>
+  <pre class="code">
 ┌── [ DOCKER_COMPOSE: x-common-keys ext. ]──────────────────────┐
 │   networks:                                                   │
 │     - stack_network                                           │
@@ -108,33 +128,51 @@
 │    driver: bridge						│
 │      name: foobar_network					│
 └───────────────────────────────────────────────────────────────┘
-	</pre>
-	<p>
-	Of course, the first several variables were noted in the DK2, the only thing that changed for DK3 was the PUID for the user on the NAS.
-	<p>
-	<br>
-	<p>
-	Where it differs is in the network and the cap_* rules. The reason I added an internal network for this stack is so I can route the API calls internally between the
-	services (e.g. http://service:port rather than http://vm_ip:port) as they can be unstable. The cap_* rules remove linux kernel capabilities from the containers, then only
-	add the ones necessary for the services like setting the UID and GID so that they can communicate with the NAS, as well as chown so that they can write files.
-	</p>
-	<br>
-	<p>
-	The main reason I did not add the same cap_* rules to DK2 was because of the GPU passthrough, trying to whitelist everything that was necessary on the kernel level would've
-	been quite the task. For the "ease of deployment" I decided to stick with just the no-new-privileges to prevent climbing.
-	</p>
-    <h3>[ Permissions, Storage ]</h3>
-	<p>
-	DK2 and DK3 both need to access data from the NAS, but it has to be handeled differently due to the public nature of DK2.
-	</p>
-	<br>
-	<p>
-	On the TrueNAS end, I need DK2 and DK3 to access the storage_pool/media dataset. In order for them to gain access, I needed to setup two NFS shares pointed to this dataset, one
-	that only DK2 could access, and one that only DK3 can access; instead of using hostnames, I used the VMs' static IPs. Along with this two users were created, one for jellyfin,
-	another for the *arr stack. We also need to create a shared group between them, for the sake of documentation I'll call it sharedgroup. In addition to the preperations above, I
-	then needed to configure the ACL for the dataset. The ACL configuration is as follows:
-	</p>
-	<pre class="code">
+	</pre
+  >
+  <p>
+    Of course, the first several variables were noted in the DK2, the only thing
+    that changed for DK3 was the PUID for the user on the NAS.
+  </p>
+
+  <p>
+    <br />
+  </p>
+
+  <p>
+    Where it differs is in the network and the cap_* rules. The reason I added
+    an internal network for this stack is so I can route the API calls
+    internally between the services (e.g. http://service:port rather than
+    http://vm_ip:port) as they can be unstable. The cap_* rules remove linux
+    kernel capabilities from the containers, then only add the ones necessary
+    for the services like setting the UID and GID so that they can communicate
+    with the NAS, as well as chown so that they can write files.
+  </p>
+  <br />
+  <p>
+    The main reason I did not add the same cap_* rules to DK2 was because of the
+    GPU passthrough, trying to whitelist everything that was necessary on the
+    kernel level would've been quite the task. For the "ease of deployment" I
+    decided to stick with just the no-new-privileges to prevent climbing.
+  </p>
+  <h3>[ Permissions, Storage ]</h3>
+  <p>
+    DK2 and DK3 both need to access data from the NAS, but it has to be handeled
+    differently due to the public nature of DK2.
+  </p>
+  <br />
+  <p>
+    On the TrueNAS end, I need DK2 and DK3 to access the storage_pool/media
+    dataset. In order for them to gain access, I needed to setup two NFS shares
+    pointed to this dataset, one that only DK2 could access, and one that only
+    DK3 can access; instead of using hostnames, I used the VMs' static IPs.
+    Along with this two users were created, one for jellyfin, another for the
+    *arr stack. We also need to create a shared group between them, for the sake
+    of documentation I'll call it sharedgroup. In addition to the preperations
+    above, I then needed to configure the ACL for the dataset. The ACL
+    configuration is as follows:
+  </p>
+  <pre class="code">
 ┌── [ ZFS_ACL_CONFIGURATION ] ──────────────────────────────────┐
 │ USER/GROUP      | PERM | ROLE                                 │
 │─────────────────|──────|──────────────────────────────────────│
@@ -143,50 +181,76 @@
 │ sharedgroup     | r-x  | Ceiling Group (NFS Visibility)       │
 │ MASK            | rwx  | Permission Ceiling                   │
 └─────────────────┴──────┴──────────────────────────────────────┘
-	</pre>
-	<p>
-	To cover ths in more detail, the jellyfin user is allowed to read and enter directories. The arr user is allowed to read, edit, and enter directories. The sharedgroup sets the
-	minimum permissions required by the users, they share a group so that they can both "own" the dataset navigating permission conflicts. Anything that attempts to connect that isn't
-	jellyusr, arruser, and in sharedgroup gets squashed into other and cannot see any of the data. Mask is a rule that sets the "permission ceiling" the max permissions that any user
-	can have in the ACL.
-	</p>
-	<br>
-	<p>
-	The VM nodes connect to these NFS shares directly via fstab mounting, but the VMs themselves have no permissions to access any of the data as the UID and GIDs do not match. This
-	is why they were specifically set in the docker compose, so that any "untagged" attempts to login are thwarted. In order to access the data you need a "hall-pass". To further lock
-	down Jellyfin's access; while the host VM has access to the whole dataset, the docker container only has access to the specific subdirectories it needs. (e.g. the VM has access to
-	/nas/mount, while jellyfin sees only /nas/mount/foo and /nas/mount/bar).
-	</p>
-	<br>
-	<p>
-	To clarify the specific permissions, only jellyfin in the DK2 stack has access to read the data from it's NFS share over certain subdirectories. The *arrstack has permission to
-	fully access the and modify the data in it's NFS share.
-	</p>
-	<br>
-	<p>
-	On the *arrstack docker compose, I mounted all of the volumes as /nas/mount/ instead of the specific subdirectories explicitly needed. This allows the OS to use hardlinks, instantly
-	moving files without doubling the diskspace. This optimizes the disk read write I/O and consequently improves the speed data is served to external users. Specifically, this ensures they share the
-	same vnode/inode context, which allows ZFS to perform a rename instead of a copy + delete. On the indivual services the root folder is specified (e.g. radarr's root volume is set to /nas/mount/foo
-	 despite the container having /nas/mount as the volume).
-	</p>
-    <h3>[ Reverse_Proxy ]</h3>
-	<p>
-	To lock things down further, I utilized Nginx Proxy Manager to route my traffic to these nodes. Traffic coming into foobar.nottyxton.net first get proxied through Cloudflare, then
-	are sent to NPM to send where they need to go. This is all using Cloudflare SSL certificates, and forcing the use of SSL. When I am on my local network it the traffic goes straight
-	to my NPM internally instead of out to WAN and back into LAN.
-	</p>
-	<br>
-	<p>
-	To force authentication for Jellyseerr, I implemented OIDC to ensure only authorized "audit" users can access the request pipeline.
-	</p>
-    <h3>[ API_Integration ]</h3>
-	<p>
-	To document the automization I'll take a snippet of one of the processes if a user wanted to request something. When an authorized user accesses the request platform over SSL, they are able to request
-	an addition. The Jellyseerr API than calls to the Radarr/Sonarr API, which add it to their "wanted" (need to add) list. The Radarr/Sonnar API, than call to the Prowlarr API to sync their own indexer
-	RSS feeds. On completion, the Radarr/Sonarr API updates Jellyseer that the content is available, which in turn triggers a post-processing script that lets Jellyfin know to refresh the Jellyfin library
-	metadata. 
-	</p>
-	<pre class="code">
+	</pre
+  >
+  <p>
+    To cover ths in more detail, the jellyfin user is allowed to read and enter
+    directories. The arr user is allowed to read, edit, and enter directories.
+    The sharedgroup sets the minimum permissions required by the users, they
+    share a group so that they can both "own" the dataset navigating permission
+    conflicts. Anything that attempts to connect that isn't jellyusr, arruser,
+    and in sharedgroup gets squashed into other and cannot see any of the data.
+    Mask is a rule that sets the "permission ceiling" the max permissions that
+    any user can have in the ACL.
+  </p>
+  <br />
+  <p>
+    The VM nodes connect to these NFS shares directly via fstab mounting, but
+    the VMs themselves have no permissions to access any of the data as the UID
+    and GIDs do not match. This is why they were specifically set in the docker
+    compose, so that any "untagged" attempts to login are thwarted. In order to
+    access the data you need a "hall-pass". To further lock down Jellyfin's
+    access; while the host VM has access to the whole dataset, the docker
+    container only has access to the specific subdirectories it needs. (e.g. the
+    VM has access to /nas/mount, while jellyfin sees only /nas/mount/foo and
+    /nas/mount/bar).
+  </p>
+  <br />
+  <p>
+    To clarify the specific permissions, only jellyfin in the DK2 stack has
+    access to read the data from it's NFS share over certain subdirectories. The
+    *arrstack has permission to fully access the and modify the data in it's NFS
+    share.
+  </p>
+  <br />
+  <p>
+    On the *arrstack docker compose, I mounted all of the volumes as /nas/mount/
+    instead of the specific subdirectories explicitly needed. This allows the OS
+    to use hardlinks, instantly moving files without doubling the diskspace.
+    This optimizes the disk read write I/O and consequently improves the speed
+    data is served to external users. Specifically, this ensures they share the
+    same vnode/inode context, which allows ZFS to perform a rename instead of a
+    copy + delete. On the indivual services the root folder is specified (e.g.
+    radarr's root volume is set to /nas/mount/foo despite the container having
+    /nas/mount as the volume).
+  </p>
+  <h3>[ Reverse_Proxy ]</h3>
+  <p>
+    To lock things down further, I utilized Nginx Proxy Manager to route my
+    traffic to these nodes. Traffic coming into foobar.nottyxton.net first get
+    proxied through Cloudflare, then are sent to NPM to send where they need to
+    go. This is all using Cloudflare SSL certificates, and forcing the use of
+    SSL. When I am on my local network it the traffic goes straight to my NPM
+    internally instead of out to WAN and back into LAN.
+  </p>
+  <br />
+  <p>
+    To force authentication for Jellyseerr, I implemented OIDC to ensure only
+    authorized "audit" users can access the request pipeline.
+  </p>
+  <h3>[ API_Integration ]</h3>
+  <p>
+    To document the automization I'll take a snippet of one of the processes if
+    a user wanted to request something. When an authorized user accesses the
+    request platform over SSL, they are able to request an addition. The
+    Jellyseerr API than calls to the Radarr/Sonarr API, which add it to their
+    "wanted" (need to add) list. The Radarr/Sonnar API, than call to the
+    Prowlarr API to sync their own indexer RSS feeds. On completion, the
+    Radarr/Sonarr API updates Jellyseer that the content is available, which in
+    turn triggers a post-processing script that lets Jellyfin know to refresh
+    the Jellyfin library metadata.
+  </p>
+  <pre class="code">
 ┌── [ SYSTEM_MAP ] ─────────────────────────────────────────────┐
 │ media_bridge (172.20.0.0/16)                                  │
 │  ├─ [ FRONTEND ]                                              │
@@ -199,104 +263,110 @@
 │  └─ [ STORAGE ]                                               │
 │     └─ ZFS Dataset (Atomic: ENABLED)                          │
 └───────────────────────────────────────────────────────────────┘
-	</pre>
+	</pre
+  >
 
-<div class="compliance">
-&gt;&gt; COMPLIANCE_NOTE: This stack is utilized for the management and transcoding of locally-owned physical media backups and open-source archival content. All traffic is routed via encrypted tunnels to maintain network intregrity. This module is not meant to endorse piracy, this is entirely meant to showcase network architecture using multi-container integrated services.
+  <div class="compliance">
+    &gt;&gt; COMPLIANCE_NOTE: This stack is utilized for the management and
+    transcoding of locally-owned physical media backups and open-source archival
+    content. All traffic is routed via encrypted tunnels to maintain network
+    intregrity. This module is not meant to endorse piracy, this is entirely
+    meant to showcase network architecture using multi-container integrated
+    services.
+  </div>
+
+  <style>
+       /* Responsive Grid Logic */
+       .layer-grid {
+           display: grid;
+           grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
+           gap: 30px;
+           margin-top: 25px;
+       }
+
+       @media (max-width: 900px) {
+           .layer-grid {
+               grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
+           }
+       }
+
+       /* Panel Styling */
+       .layer-panel {
+           background: rgba(0, 255, 65, 0.03);
+           border-left: 1px solid rgba(0, 255, 65, 0.1);
+           padding: 20px;
+       }
+
+       .panel-title {
+           font-size: 1.1rem;
+           border-bottom: 1px solid var(--phosphorhosphor-dim);
+           padding-bottom: 8px;
+           margin-bottom: 15px;
+       }
+
+       /* Table & List Aesthetics */
+       .manifest-table { width: 100%; text-align: left; border-collapse: collapse; }
+       .manifest-table th { padding: 8px; font-size: 0.8rem; opacity: 0.6; }
+       .manifest-table td { padding: 10px 8px; border-bottom: 1px solid rgba(0, 255, 65, 0.05); }
+
+       .status-list { list-style: none; padding: 0; font-size: 0.9rem; }
+       .status-list li { margin-bottom: 8px; display: flex; gap: 10px; }
+       .timestamp { color: var(--text-amber); opacity: 0.7; }
+
+       .info-terminal-box {
+           margin-top: 25px;
+           padding: 15px;
+           border: 1px dashed var(--phosphorhosphor-dim);
+           font-size: 0.85rem;
+       }
+
+       /* Mobile Table Scroll Fix */
+       .table-scroll-wrapper { width: 100%; overflow-x: auto; }
+
+       #layers {
+           text-decorations: none;
+           padding-left: 10px;
+           list-style-type: none;
+       }
+
+       .compliance {
+    color: var(--phosphorhosphor-muted);
+    font-size: 0.85rem;
+    font-style: italic;
+           border-left: 2px solid var(--phosphorhosphor-dim);
+    padding-left: 10px;
+    margin-top: 20px;
+    opacity: 0.7;
+       }
+
+       .acl {
+           font-size:0.85rem;
+           list-style-type: none;
+           padding-left 10px;
+           padding-bottom:10px;
+           padding-top: 10px;
+       }
+
+       .li {
+           padding-top: 5px;
+           padding-bottom: 5px;
+       }
+
+       .data-tree {
+        font-family: 'Courier New', monospace;
+        line-height: 1.4;
+        color: var(--phosphor-dim);
+    }
+
+    .tree-branch {
+        color: var(--phosphor-muted);
+        margin-right: 10px;
+        user-select: none; /* Prevents selecting the ASCII lines */
+    }
+
+    .tree-leaf {
+        color: var(--phosphor-bright);
+        font-weight: bold;
+    }
+  </style>
 </div>
-
-<style>
-    /* Responsive Grid Logic */
-    .layer-grid {
-        display: grid;
-        grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
-        gap: 30px;
-        margin-top: 25px;
-    }
-
-    @media (max-width: 900px) {
-        .layer-grid {
-            grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
-        }
-    }
-
-    /* Panel Styling */
-    .layer-panel {
-        background: rgba(0, 255, 65, 0.03);
-        border-left: 1px solid rgba(0, 255, 65, 0.1);
-        padding: 20px;
-    }
-
-    .panel-title {
-        font-size: 1.1rem;
-        border-bottom: 1px solid var(--phosphorhosphor-dim);
-        padding-bottom: 8px;
-        margin-bottom: 15px;
-    }
-
-    /* Table & List Aesthetics */
-    .manifest-table { width: 100%; text-align: left; border-collapse: collapse; }
-    .manifest-table th { padding: 8px; font-size: 0.8rem; opacity: 0.6; }
-    .manifest-table td { padding: 10px 8px; border-bottom: 1px solid rgba(0, 255, 65, 0.05); }
-
-    .status-list { list-style: none; padding: 0; font-size: 0.9rem; }
-    .status-list li { margin-bottom: 8px; display: flex; gap: 10px; }
-    .timestamp { color: var(--text-amber); opacity: 0.7; }
-
-    .info-terminal-box {
-        margin-top: 25px;
-        padding: 15px;
-        border: 1px dashed var(--phosphorhosphor-dim);
-        font-size: 0.85rem;
-    }
-
-    /* Mobile Table Scroll Fix */
-    .table-scroll-wrapper { width: 100%; overflow-x: auto; }
-    
-    #layers {
-        text-decorations: none;
-        padding-left: 10px;
-        list-style-type: none;
-    }
-    
-    .compliance {
-	color: var(--phosphorhosphor-muted);
-	font-size: 0.85rem;
-	font-style: italic;
-        border-left: 2px solid var(--phosphorhosphor-dim);
-	padding-left: 10px;
-	margin-top: 20px;
-	opacity: 0.7;
-    }
-
-    .acl {
-        font-size:0.85rem;
-        list-style-type: none;
-        padding-left 10px;
-        padding-bottom:10px;
-        padding-top: 10px;
-    }
-    
-    .li {
-        padding-top: 5px;
-        padding-bottom: 5px;
-    }
-
-    .data-tree {
-	    font-family: 'Courier New', monospace;
-	    line-height: 1.4;
-	    color: var(--phosphor-dim);
-	}
-
-	.tree-branch {
-	    color: var(--phosphor-muted);
-	    margin-right: 10px;
-	    user-select: none; /* Prevents selecting the ASCII lines */
-	}
-
-	.tree-leaf {
-	    color: var(--phosphor-bright);
-	    font-weight: bold;
-	}
-
-</style>

@@ -1,62 +1,72 @@
 <div class="layer-container">
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> NETWORK_OVERHAUL://<span class="layer-name">NETWORKING</span>
+    </h2>
+    <p class="meta-comment">
+      Reworking networking to meet best production standards, and security.
+    </p>
+  </div>
 
-    <div class="layer-header">
-        <h2 class="text-amber">>> NETWORK_OVERHAUL://<span class="layer-name">NETWORKING</span></h2>
-        <p class="meta-comment">Reworking networking to meet best production standards, and security.</p>
-    </div>
+  <h3>>> PART OF A OVERARCHING PROJECT</h3>
+  <h4>
+    Read more here:
+    <a href="#" class="file-link" data-module="lab_homelab_overhaul"
+      >[ DIR ] homelab_overhaul/</a
+    >
+  </h4>
 
-    <h3>>> PART OF A OVERARCHING PROJECT</h3>
-    <h4>Read more here: <a href="#" class="file-link" data-module="lab_homelab_overhaul">[ DIR ] homelab_overhaul/</a></h4>
-
-    <h3>>> THIS PAGE IS CURRENTLY BEING WRITTEN, COME BACK SOON!</h3>
-    <br>
-    <p>EOF...</p>
-    <br>
+  <h3>>> THIS PAGE IS CURRENTLY BEING WRITTEN, COME BACK SOON!</h3>
+  <br />
+  <p>EOF...</p>
+  <br />
 </div>
 
 <style>
-    /* Responsive Grid Logic */
+  /* Responsive Grid Logic */
+  .layer-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
+    gap: 30px;
+    margin-top: 25px;
+  }
+
+  @media (max-width: 900px) {
     .layer-grid {
-        display: grid;
-        grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
-        gap: 30px;
-        margin-top: 25px;
+      grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
     }
+  }
 
-    @media (max-width: 900px) {
-        .layer-grid {
-            grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
-        }
-    }
+  /* Panel Styling */
+  .layer-panel {
+    background: rgba(0, 255, 65, 0.03);
+    border-left: 1px solid rgba(0, 255, 65, 0.1);
+    padding: 20px;
+  }
 
-    /* Panel Styling */
-    .layer-panel {
-        background: rgba(0, 255, 65, 0.03);
-        border-left: 1px solid rgba(0, 255, 65, 0.1);
-        padding: 20px;
-    }
+  .panel-title {
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--phosphor-dim);
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+  }
 
-    .panel-title {
-        font-size: 1.1rem;
-        border-bottom: 1px solid var(--phosphor-dim);
-        padding-bottom: 8px;
-        margin-bottom: 15px;
-    }
+  .info-terminal-box {
+    margin-top: 25px;
+    padding: 15px;
+    border: 1px dashed var(--phosphor-dim);
+    font-size: 0.85rem;
+  }
 
-    .info-terminal-box {
-        margin-top: 25px;
-        padding: 15px;
-        border: 1px dashed var(--phosphor-dim);
-        font-size: 0.85rem;
-    }
+  /* Mobile Table Scroll Fix */
+  .table-scroll-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
 
-    /* Mobile Table Scroll Fix */
-    .table-scroll-wrapper { width: 100%; overflow-x: auto; }
-
-    .config-list {
-	font-size: 0.8rem;
-	margin: 10px;
-	list-style: none;
-    }
-
+  .config-list {
+    font-size: 0.8rem;
+    margin: 10px;
+    list-style: none;
+  }
 </style>
