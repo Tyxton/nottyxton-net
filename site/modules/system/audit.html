@@ -3,58 +3,75 @@
 [ AUDIT_REPORT: HTX_DATA_CENTER_01 ]
 TIMESTAMP: 2026-02-18
 STATUS: DEPLOYED / HEALTHY
------------------------------------------</pre>
+-----------------------------------------</pre
+  >
 
   <section class="audit-section">
     <h3>>> IDENTITY_SUMMARY</h3>
     <div class="audit-grid">
-        <div class="audit-row">
-            <span class="audit-label">[ OBJECT ]</span>
-            <span class="audit-value">SYSADMIN // INFRA_ENGINEER</span>
-        </div>
-        <div class="audit-row">
-            <span class="audit-label">[ ORIGIN ]</span>
-            <span class="audit-value">HTX_DATA_CENTER_01</span>
-        </div>
-        <div class="audit-row">
-            <span class="audit-label">[ SPECIAL ]</span>
-            <span class="audit-value">VIRTUALIZATION // NETWORK_SECURITY</span>
-        </div>
-        <div class="audit-row">
-            <span class="audit-label">[ STATUS ]</span>
-            <span class="audit-value">ACTIVE_FOR_HIRE (Q1_2026)</span>
-        </div>
-        <div class="audit-row">
-            <span class="audit-label">[ VERSION ]</span>
-            <span class="audit-value">7.8 (YRS_OF_OPERATION)</span>
-        </div>
+      <div class="audit-row">
+        <span class="audit-label">[ OBJECT ]</span>
+        <span class="audit-value">SYSADMIN // INFRA_ENGINEER</span>
+      </div>
+      <div class="audit-row">
+        <span class="audit-label">[ ORIGIN ]</span>
+        <span class="audit-value">HTX_DATA_CENTER_01</span>
+      </div>
+      <div class="audit-row">
+        <span class="audit-label">[ SPECIAL ]</span>
+        <span class="audit-value">VIRTUALIZATION // NETWORK_SECURITY</span>
+      </div>
+      <div class="audit-row">
+        <span class="audit-label">[ STATUS ]</span>
+        <span class="audit-value">ACTIVE_FOR_HIRE (Q1_2026)</span>
+      </div>
+      <div class="audit-row">
+        <span class="audit-label">[ VERSION ]</span>
+        <span class="audit-value">7.8 (YRS_OF_OPERATION)</span>
+      </div>
     </div>
   </section>
 
   <section class="audit-section">
     <h3>>> CORE_INFRASTRUCTURE_MANIFEST</h3>
-    <p>Current production environment utilizes a non-converged Proxmox installation designed for 99.9% uptime of internal services.</p>
-    <br>
+    <p>
+      Current production environment utilizes a non-converged Proxmox
+      installation designed for 99.9% uptime of internal services.
+    </p>
+    <br />
     <ul class="audit-list">
-      <li><span class="status-ok">[ OK ]</span> <strong>Compute:</strong> Single-Node Proxmox Server</li>
-      <li><span class="status-ok">[ OK ]</span> <strong>Storage:</strong> ZFS RaidZ1 (48TB Raw Capacity) on TrueNAS Scale</li>
-      <li><span class="status-ok">[ OK ]</span> <strong>Network:</strong> UniFi Firewall w/ VLAN Segmentation</li>
+      <li>
+        <span class="status-ok">[ OK ]</span>
+        <strong>Compute:</strong> Single-Node Proxmox Server
+      </li>
+      <li>
+        <span class="status-ok">[ OK ]</span> <strong>Storage:</strong> ZFS
+        RaidZ1 (48TB Raw Capacity) on TrueNAS Scale
+      </li>
+      <li>
+        <span class="status-ok">[ OK ]</span> <strong>Network:</strong> UniFi
+        Firewall w/ VLAN Segmentation
+      </li>
     </ul>
   </section>
 
   <section class="audit-section">
     <h3>>> RECENT_LOG_ENTRIES</h3>
     <div class="log-entry">
-      <span class="log-data">2026.02.18</span> - Reworked network architecture to include standardization and more security.
+      <span class="log-data">2026.02.18</span> - Reworked network architecture
+      to include standardization and more security.
     </div>
     <div class="log-entry">
-      <span class="log-date">2026.01.29</span> - Implemented CI/CD for nottyxton.net via github/github actions.
+      <span class="log-date">2026.01.29</span> - Implemented CI/CD for
+      nottyxton.net via github/github actions.
     </div>
     <div class="log-entry">
-      <span class="log-date">2026.01.28</span> - Hardened network for publicly facing services.
+      <span class="log-date">2026.01.28</span> - Hardened network for publicly
+      facing services.
     </div>
     <div class="log-entry">
-      <span class="log-date">2026.01.21</span> - Established new UI/UX design for nottyxton.net.
+      <span class="log-date">2026.01.21</span> - Established new UI/UX design
+      for nottyxton.net.
     </div>
   </section>
 
@@ -65,52 +82,53 @@ END_OF_MANIFEST | (C) 2026 TYXTON
 </div>
 
 <style>
-.audit-section { padding-bottom: 5px; }
-.audit-list li { 
-	list-style: none;
-	padding-left: 5px;
- }
+  .audit-section {
+    padding-bottom: 5px;
+  }
+  .audit-list li {
+    list-style: none;
+    padding-left: 5px;
+  }
 
-/* Shared Styles */
-.audit-grid {
+  /* Shared Styles */
+  .audit-grid {
     margin-top: 10px;
-}
+  }
 
-.audit-row {
+  .audit-row {
     display: flex;
     margin-bottom: 5px;
-}
+  }
 
-.audit-label {
+  .audit-label {
     color: var(--phosphor-muted); /* Use your dim amber color */
     width: 120px; /* Fixed width keeps values aligned on desktop */
     flex-shrink: 0;
-}
+  }
 
-.audit-value {
+  .audit-value {
     color: var(--phosphor-bright); /* Use your bright amber color */
-}
+  }
 
-/* Mobile Optimization */
-@media (max-width: 480px) {
+  /* Mobile Optimization */
+  @media (max-width: 480px) {
     .audit-row {
-        flex-direction: column; /* Stack label above value */
-        margin-bottom: 12px;
-        border-left: 2px solid var(--p-dim);
-        padding-left: 10px;
+      flex-direction: column; /* Stack label above value */
+      margin-bottom: 12px;
+      border-left: 2px solid var(--p-dim);
+      padding-left: 10px;
     }
 
     .audit-label {
-        font-size: 0.75rem;
-        width: auto; /* Reclaim horizontal space */
-        margin-bottom: 2px;
+      font-size: 0.75rem;
+      width: auto; /* Reclaim horizontal space */
+      margin-bottom: 2px;
     }
 
     .audit-value {
-        font-size: 0.95rem;
-        padding-left: 5px;
-        word-break: break-word; /* Prevents long strings from pushing the edge */
+      font-size: 0.95rem;
+      padding-left: 5px;
+      word-break: break-word; /* Prevents long strings from pushing the edge */
     }
-}
-
+  }
 </style>

@@ -1,40 +1,73 @@
 <div class="module-header">
-    <h2 class="text-amber">>> INDEX://INFRASTRUCTURE/</h2>
-    <p class="meta-comment"># Navigation layer for hardware and software assets</p>
+  <h2 class="text-amber">>> INDEX://INFRASTRUCTURE/</h2>
+  <p class="meta-comment">
+    # Navigation layer for hardware and software assets
+  </p>
 </div>
-    <div class="index-row">
-        <a href="#" class="file-link" data-module="infra_infrastructure_overhaul">[ FILE ] infra_overhaul.log</a>
-        <span class="index-details">Reworking infrastructure to meet best production standards, and security.</span>
-    </div>
-    <div class="index-row">
-        <a href="#" class="file-link" data-module="infra_non_converged">[ FILE ] non_converged_cluster.log</a>
-        <span class="index-details">Deployment of a hardware-accelerated virtualization environment using ZFS storage arrays and PCIe passthrough.</span>
-    </div>
-    <div class="index-row">
-        <a href="#" class="file-link" data-module="infra_gpu_passthrough">[ FILE ] gpu_passthrough.log</a>
-        <span class="index-details">GPU-passthrough configuration within a virtualized environment.</span>
-    </div>
-    <div class="index-row">
-        <a href="#" class="file-link" data-module="infra_storage_fabric">[ FILE ] storage_fabric.log</a>
-        <span class="index-details">Non-converged ZFS architecture providic atomic data integrity and parity.</span>
-    </div>
+<div class="index-row">
+  <a href="#" class="file-link" data-module="infra_infrastructure_overhaul"
+    >[ FILE ] infra_overhaul.log</a
+  >
+  <span class="index-details"
+    >Reworking infrastructure to meet best production standards, and
+    security.</span
+  >
+</div>
+<div class="index-row">
+  <a href="#" class="file-link" data-module="infra_non_converged"
+    >[ FILE ] non_converged_cluster.log</a
+  >
+  <span class="index-details"
+    >Deployment of a hardware-accelerated virtualization environment using ZFS
+    storage arrays and PCIe passthrough.</span
+  >
+</div>
+<div class="index-row">
+  <a href="#" class="file-link" data-module="infra_gpu_passthrough"
+    >[ FILE ] gpu_passthrough.log</a
+  >
+  <span class="index-details"
+    >GPU-passthrough configuration within a virtualized environment.</span
+  >
+</div>
+<div class="index-row">
+  <a href="#" class="file-link" data-module="infra_storage_fabric"
+    >[ FILE ] storage_fabric.log</a
+  >
+  <span class="index-details"
+    >Non-converged ZFS architecture providic atomic data integrity and
+    parity.</span
+  >
+</div>
 
 <style>
-    .wide-index { margin-top: 20px; }
+  .wide-index {
+    margin-top: 20px;
+  }
+  .index-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+  }
+  .index-details {
+    opacity: 0.6;
+    font-size: 0.9rem;
+    text-align: right;
+  }
+  .index-row a {
+    text-decorations: none;
+    color: var(--phosphor-bright);
+    font-weight: bold;
+  }
+  @media (max-width: 600px) {
     .index-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid rgba(0, 255, 65, 0.1);
-    } 
-    .index-details { opacity: 0.6; font-size: 0.9rem; text-align: right; }
-    .index-row a {
-        text-decorations: none;
-        color: var(--phosphor-bright);
-        font-weight: bold;
+      flex-direction: column;
+      align-items: flex-start;
     }
-    @media (max-width: 600px) {
-        .index-row { flex-direction: column; align-items: flex-start; }
-        .index-details { text-align: left; padding-top: 5px; }
+    .index-details {
+      text-align: left;
+      padding-top: 5px;
     }
+  }
 </style>

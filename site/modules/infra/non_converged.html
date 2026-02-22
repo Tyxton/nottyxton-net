@@ -1,21 +1,32 @@
 <div class="layer-container">
-    
-    <div class="layer-header">
-        <h2 class="text-amber">>> NON_COVERGED_CLUSTER://<span class="layer-name">INFRASTRUCTURE</span></h2>
-        <p class="meta-comment">Deployment of a hardware-accelerated virtualization environment utilizing ZFS storage arrays and PCIe passthrough.</p>
-    </div>
-
-    <h3>>> THE_COMPUTE_LAYER</h3>
-    <h4>[ Non_Converged Architecture ]</h4>
-
-    <p>
-    In my network setup, I have chosen to seperate the compute and the storage. One of the main reasons I started with this was accessibility. Starting a homelab as a teenager does not present you with many
-    options to choose from when picking recycled servers. In fact, I started this website on an old thinkpad. When I bought my Dell Precision 5810 from eBay, it did everything at once, with only 1Tb of usable
-    storage (2Tb RAIDZ1). After running just the 5810 for around a year, I managed to come across my Dell PowerEdge R510. Immediately, I came to the conclusion I wanted to maximize the 12 available drive bays.
-    Initially, I was going to make it my "everything server" but I ran into a few issues in doing so. I found the R510 to be lacking in expandability; namely, I was unable to move my graphics cards over.
-    The riser card equipped in my R510 comes with 4 PCIe slots:
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> NON_COVERGED_CLUSTER://<span class="layer-name">INFRASTRUCTURE</span>
+    </h2>
+    <p class="meta-comment">
+      Deployment of a hardware-accelerated virtualization environment utilizing
+      ZFS storage arrays and PCIe passthrough.
     </p>
-    <pre class="code">
+  </div>
+
+  <h3>>> THE_COMPUTE_LAYER</h3>
+  <h4>[ Non_Converged Architecture ]</h4>
+
+  <p>
+    In my network setup, I have chosen to seperate the compute and the storage.
+    One of the main reasons I started with this was accessibility. Starting a
+    homelab as a teenager does not present you with many options to choose from
+    when picking recycled servers. In fact, I started this website on an old
+    thinkpad. When I bought my Dell Precision 5810 from eBay, it did everything
+    at once, with only 1Tb of usable storage (2Tb RAIDZ1). After running just
+    the 5810 for around a year, I managed to come across my Dell PowerEdge R510.
+    Immediately, I came to the conclusion I wanted to maximize the 12 available
+    drive bays. Initially, I was going to make it my "everything server" but I
+    ran into a few issues in doing so. I found the R510 to be lacking in
+    expandability; namely, I was unable to move my graphics cards over. The
+    riser card equipped in my R510 comes with 4 PCIe slots:
+  </p>
+  <pre class="code">
        _________________________________________________________________________
       | PCB P/N: DEL-J599M-MP | REV:A00                                         |
    ___|                                                                         |
@@ -34,33 +45,47 @@
       |                                                                         |
       |__________||||||||||||||||||___||||||____________________||||||||__|||||_|
                  ||||||||||||||||||   ||||||                    ||||||||  |||||
-    </pre>
-    <p>
-    To go over the full breakdown, the storage PCIe slot, is used for the dedicated storage controller; Slot 1 is electrically x4, physically x8; Slot 2 is electrically x4, physically x8; Slot 3 is electrically
-    x8, physically x8.
-    </p>
-    <br>
-    <p>
-    My NVIDIA Quadro P4000 that I use for media transcoding is x16, making it incompatible for use. There are some graphics cards that are x8 available on the market, but are either outdated, or really difficult
-    to obtain Enterprise-grade cards.
-    </p>
-    <br>
-    <p>
-    The seperation, did however lead to some unique benefits from a hyper-converged setup. If any of my compute nodes fail, or even the entire compute hypervisor, the data remains safely on the NAS via backups
-    and linked storage. I also dodge the overhead from virtualizing TrueNAS, allowing it to use dedicated hardware increased the performance and stability of both the Proxmox and TrueNAS servers. While the
-    initial choice wasn't a non-converged setup, I am quite happy with the results.
-    </p>
+    </pre
+  >
+  <p>
+    To go over the full breakdown, the storage PCIe slot, is used for the
+    dedicated storage controller; Slot 1 is electrically x4, physically x8; Slot
+    2 is electrically x4, physically x8; Slot 3 is electrically x8, physically
+    x8.
+  </p>
+  <br />
+  <p>
+    My NVIDIA Quadro P4000 that I use for media transcoding is x16, making it
+    incompatible for use. There are some graphics cards that are x8 available on
+    the market, but are either outdated, or really difficult to obtain
+    Enterprise-grade cards.
+  </p>
+  <br />
+  <p>
+    The seperation, did however lead to some unique benefits from a
+    hyper-converged setup. If any of my compute nodes fail, or even the entire
+    compute hypervisor, the data remains safely on the NAS via backups and
+    linked storage. I also dodge the overhead from virtualizing TrueNAS,
+    allowing it to use dedicated hardware increased the performance and
+    stability of both the Proxmox and TrueNAS servers. While the initial choice
+    wasn't a non-converged setup, I am quite happy with the results.
+  </p>
 
-    <h4>[ Switch Aggregation & LACP ]</h4>
-    <p>
-    To tie everything together, I use port aggregation to connect these systems to each other. I utilize the IEEE 802.3ad (LACP) protocol to bond the NICs on each server. Each server is equipped with x2 1GbE NICs,
-    I configured the port channels on my UniFi-Lite-16-POE switch to handle the hash-policy (Layer 2+3), ensuring traffic is distributed on both links. Something to note, this does not double the bandwidth of
-    the servers, this merely acts as load balancing for multiple instances connecting at one time. This also allows for a physical cable or port failure without dropping the NFS mounts that Proxmox relies on for
-    the VM disks.
-    </p>
+  <h4>[ Switch Aggregation & LACP ]</h4>
+  <p>
+    To tie everything together, I use port aggregation to connect these systems
+    to each other. I utilize the IEEE 802.3ad (LACP) protocol to bond the NICs
+    on each server. Each server is equipped with x2 1GbE NICs, I configured the
+    port channels on my UniFi-Lite-16-POE switch to handle the hash-policy
+    (Layer 2+3), ensuring traffic is distributed on both links. Something to
+    note, this does not double the bandwidth of the servers, this merely acts as
+    load balancing for multiple instances connecting at one time. This also
+    allows for a physical cable or port failure without dropping the NFS mounts
+    that Proxmox relies on for the VM disks.
+  </p>
 
-    <h4>[ 'Raw Specs' ]</h4>
-    <pre class="code">
+  <h4>[ 'Raw Specs' ]</h4>
+  <pre class="code">
 +----------------+--------------------------+--------------------------+
 | COMPONENT      | NODE_01: COMPUTE (PVE)   | NODE_02: STORAGE (NAS)   |
 +----------------+--------------------------+--------------------------+
@@ -82,70 +107,86 @@
 | ACCESS         | UniFi Express (UX)                                  |
 | ARCHITECTURE   | Layer 2+3 Hash (802.3ad) // VLAN Segmentation       |
 +----------------+-----------------------------------------------------+
-    </pre>
+    </pre
+  >
 
-    <h3>>> GPU_PASSTHROUGH && HARDWARE_ABSTRACTION</h3>
-    <h4>[ SYSTEM_CAPABILITY ]: HARDWARE_ACCELERATION</h4>
-    <h4>[ HARDWARE ]: NVIDIA Quadro P4000 (1792 CUDA Cores)</h4>
-    <h4>[ INTEGRATION ]: Full PCIe Passthrough to DK2_NODE via VFIO</h4>
-    <p>
-    The system utilizes a specialized GPU-passthrough configuration to enable bare-metal transcoding performance within a virtualized environment. This requires specific IOMMU isolation and kernel-level module
-    overrides to bridge the hardware/guest-OS abstraction layer.
-    </p>
-    <h4><a href="#" class="file-link" data-module="infra_gpu_passthrough">[ RUN ]: cat /layers/gpu_passthrough.log (DEEP_DIVE)</a></h4>
+  <h3>>> GPU_PASSTHROUGH && HARDWARE_ABSTRACTION</h3>
+  <h4>[ SYSTEM_CAPABILITY ]: HARDWARE_ACCELERATION</h4>
+  <h4>[ HARDWARE ]: NVIDIA Quadro P4000 (1792 CUDA Cores)</h4>
+  <h4>[ INTEGRATION ]: Full PCIe Passthrough to DK2_NODE via VFIO</h4>
+  <p>
+    The system utilizes a specialized GPU-passthrough configuration to enable
+    bare-metal transcoding performance within a virtualized environment. This
+    requires specific IOMMU isolation and kernel-level module overrides to
+    bridge the hardware/guest-OS abstraction layer.
+  </p>
+  <h4>
+    <a href="#" class="file-link" data-module="infra_gpu_passthrough"
+      >[ RUN ]: cat /layers/gpu_passthrough.log (DEEP_DIVE)</a
+    >
+  </h4>
 
-    <h3>>> STORAGE_FABRIC</h3>
-    <h4>[ SYSTEM_CAPABILITY ]: DATA_INTEGRITY_STORAGE</h4>
-    <h4>[ STORAGE_MEDIA ]: 12x 4TB SAS Enterprise Drives (RaidZ1)</h4>
-    <h4>[ FABRIC ]: Non-Converged TrueNAS Scale via LACP</h4>
-    <p>
-    The storage architecture utilizes ZFS to provide atomic data integrity and high-speed parity. By separating storage from compute, the system achieves enterprise-grade isolation and disaster recovery potential.
-    </p>
-    <h4><a href="#" class="file-link" data-module="infra_storage_fabric">[ RUN ]: cat /layers/storage_fabric.log (DEEP_DIVE)</a></h4>
+  <h3>>> STORAGE_FABRIC</h3>
+  <h4>[ SYSTEM_CAPABILITY ]: DATA_INTEGRITY_STORAGE</h4>
+  <h4>[ STORAGE_MEDIA ]: 12x 4TB SAS Enterprise Drives (RaidZ1)</h4>
+  <h4>[ FABRIC ]: Non-Converged TrueNAS Scale via LACP</h4>
+  <p>
+    The storage architecture utilizes ZFS to provide atomic data integrity and
+    high-speed parity. By separating storage from compute, the system achieves
+    enterprise-grade isolation and disaster recovery potential.
+  </p>
+  <h4>
+    <a href="#" class="file-link" data-module="infra_storage_fabric"
+      >[ RUN ]: cat /layers/storage_fabric.log (DEEP_DIVE)</a
+    >
+  </h4>
 
-<style>
+  <style>
     /* Responsive Grid Logic */
     .layer-grid {
-        display: grid;
-        grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
-        gap: 30px;
-        margin-top: 25px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
+      gap: 30px;
+      margin-top: 25px;
     }
 
     @media (max-width: 900px) {
-        .layer-grid {
-            grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
-        }
+      .layer-grid {
+        grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
+      }
     }
 
     /* Panel Styling */
     .layer-panel {
-        background: rgba(0, 255, 65, 0.03);
-        border-left: 1px solid rgba(0, 255, 65, 0.1);
-        padding: 20px;
+      background: rgba(0, 255, 65, 0.03);
+      border-left: 1px solid rgba(0, 255, 65, 0.1);
+      padding: 20px;
     }
 
     .panel-title {
-        font-size: 1.1rem;
-        border-bottom: 1px solid var(--phosphor-dim);
-        padding-bottom: 8px;
-        margin-bottom: 15px;
+      font-size: 1.1rem;
+      border-bottom: 1px solid var(--phosphor-dim);
+      padding-bottom: 8px;
+      margin-bottom: 15px;
     }
 
     .info-terminal-box {
-        margin-top: 25px;
-        padding: 15px;
-        border: 1px dashed var(--phosphor-dim);
-        font-size: 0.85rem;
+      margin-top: 25px;
+      padding: 15px;
+      border: 1px dashed var(--phosphor-dim);
+      font-size: 0.85rem;
     }
 
     /* Mobile Table Scroll Fix */
-    .table-scroll-wrapper { width: 100%; overflow-x: auto; }
-    
-    .config-list {
-	font-size: 0.8rem;
-	margin: 10px;
-	list-style: none;
+    .table-scroll-wrapper {
+      width: 100%;
+      overflow-x: auto;
     }
 
-</style>
+    .config-list {
+      font-size: 0.8rem;
+      margin: 10px;
+      list-style: none;
+    }
+  </style>
+</div>

@@ -1,83 +1,166 @@
 <div class="layer-container">
-    
-    <div class="layer-header">
-        <h2 class="text-amber">>> FIREWALL_ARCHITECTURE://<span class="layer-name">NETWORKING</span></h2>
-        <p class="meta-comment">Mutli-layered firewall architecture and connectivity troubleshooting.</p>
-    </div>
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> FIREWALL_ARCHITECTURE://<span class="layer-name">NETWORKING</span>
+    </h2>
+    <p class="meta-comment">
+      Mutli-layered firewall architecture and connectivity troubleshooting.
+    </p>
+  </div>
 
-<h3>[ THE_PROBLEM ]</h3><p> My network environment consists of segmented VLANs (Local, Private, and Public). Initial attempts to connect my services together resulted in generic timeouts, while later attempts returned specific "Connection Refused" errors. Furthermore, leaving the network open on a public facing server would invite constant brute-force attacks - noted by my UniFi logs, obscuring legitimate traffic data. </p>
+  <h3>[ THE_PROBLEM ]</h3>
+  <p>
+    My network environment consists of segmented VLANs (Local, Private, and
+    Public). Initial attempts to connect my services together resulted in
+    generic timeouts, while later attempts returned specific "Connection
+    Refused" errors. Furthermore, leaving the network open on a public facing
+    server would invite constant brute-force attacks - noted by my UniFi logs,
+    obscuring legitimate traffic data.
+  </p>
 
-<h3>[ THE_SOLUTION ]</h3><p> I implemented a "Defense in Depth" strategy involving two distinct firewall layers and service reconfiguration:</p>
+  <h3>[ THE_SOLUTION ]</h3>
+  <p>
+    I implemented a "Defense in Depth" strategy involving two distinct firewall
+    layers and service reconfiguration:
+  </p>
 
-<ul id="layers">
-    <li><h4>Layer_01 (Network - UniFi)</h4><p> I configured UniFi Traffic Rules to explicitly allow traffic from the management server on the local VLAN to the public and private servers running on their respective VLANs, while blocking all other inter-VLAN routing. I had to implement a "BLOCK ALL" rule, then add the "pinholes" back manually to ensure that the servers only talked to each other in the ways they needed to, and that I permitted.</p></li>
-    <li><h4>Layer_02 (Host - UFW)</h4><p> On the Debian VMs, I installed ufw (Uncomplicated Firewall) with a "Default Deny" policy. I explicilty whitelisted only critical services. (e.g. Nginx HTTP/HTTPS)</p></li>
-</ul>
+  <ul id="layers">
+    <li>
+      <h4>Layer_01 (Network - UniFi)</h4>
+      <p>
+        I configured UniFi Traffic Rules to explicitly allow traffic from the
+        management server on the local VLAN to the public and private servers
+        running on their respective VLANs, while blocking all other inter-VLAN
+        routing. I had to implement a "BLOCK ALL" rule, then add the "pinholes"
+        back manually to ensure that the servers only talked to each other in
+        the ways they needed to, and that I permitted.
+      </p>
+    </li>
+    <li>
+      <h4>Layer_02 (Host - UFW)</h4>
+      <p>
+        On the Debian VMs, I installed ufw (Uncomplicated Firewall) with a
+        "Default Deny" policy. I explicilty whitelisted only critical services.
+        (e.g. Nginx HTTP/HTTPS)
+      </p>
+    </li>
+  </ul>
 
-<p> To go more in depth with the individual nodes: MGT and DK3, my Mangement and Private nodes, were kept "semi-open" utilizing a "Default Deny Incoming" and "Default Allow Outgoing" ruleset. On DK3, I allowed specific ports in to allow for API calls. With DK2, I took a much more secure approach; I used a "Default Deny Incoming/Outgoing" ruleset for this, and only opened select pinholes for incoming traffic namely 80,443. On all three nodes I made sure to keep an SSH policy for management, so I didn't lock myself out. For any standard protocols (TCP/UDP) I only allowed the specific protocol along with the port, to limit the traffic further.</p>
+  <p>
+    To go more in depth with the individual nodes: MGT and DK3, my Mangement and
+    Private nodes, were kept "semi-open" utilizing a "Default Deny Incoming" and
+    "Default Allow Outgoing" ruleset. On DK3, I allowed specific ports in to
+    allow for API calls. With DK2, I took a much more secure approach; I used a
+    "Default Deny Incoming/Outgoing" ruleset for this, and only opened select
+    pinholes for incoming traffic namely 80,443. On all three nodes I made sure
+    to keep an SSH policy for management, so I didn't lock myself out. For any
+    standard protocols (TCP/UDP) I only allowed the specific protocol along with
+    the port, to limit the traffic further.
+  </p>
 
-<h3>[ KEY_LEARNINGS ]</h3><p> Even if a server is "local," network segmentation treats it as a hostile foreign device until routing rules are established.<p>
-<br>
-<p>A timeout usually indicates a firewall is dropping packets silently. A connection refused error means that the packet reached the server, but the operating system or application rejected it.</p>
-<br>
-<p>Utilize logs via tail, and troubleshoot via nc and traceroute to learn exactly what the connections are doing, and why they aren't working as expected.</p>
+  <h3>[ KEY_LEARNINGS ]</h3>
+  <p>
+    Even if a server is "local," network segmentation treats it as a hostile
+    foreign device until routing rules are established.
+  </p>
+  <p>
+    <br />
+  </p>
 
-<style>
+  <p>
+    A timeout usually indicates a firewall is dropping packets silently. A
+    connection refused error means that the packet reached the server, but the
+    operating system or application rejected it.
+  </p>
+  <br />
+  <p>
+    Utilize logs via tail, and troubleshoot via nc and traceroute to learn
+    exactly what the connections are doing, and why they aren't working as
+    expected.
+  </p>
+
+  <style>
     /* Responsive Grid Logic */
     .layer-grid {
-        display: grid;
-        grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
-        gap: 30px;
-        margin-top: 25px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
+      gap: 30px;
+      margin-top: 25px;
     }
 
     @media (max-width: 900px) {
-        .layer-grid {
-            grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
-        }
+      .layer-grid {
+        grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
+      }
     }
 
     /* Panel Styling */
     .layer-panel {
-        background: rgba(0, 255, 65, 0.03);
-        border-left: 1px solid rgba(0, 255, 65, 0.1);
-        padding: 20px;
+      background: rgba(0, 255, 65, 0.03);
+      border-left: 1px solid rgba(0, 255, 65, 0.1);
+      padding: 20px;
     }
 
     .panel-title {
-        font-size: 1.1rem;
-        border-bottom: 1px solid var(--phosphor-dim);
-        padding-bottom: 8px;
-        margin-bottom: 15px;
+      font-size: 1.1rem;
+      border-bottom: 1px solid var(--phosphor-dim);
+      padding-bottom: 8px;
+      margin-bottom: 15px;
     }
 
     /* Table & List Aesthetics */
-    .manifest-table { width: 100%; text-align: left; border-collapse: collapse; }
-    .manifest-table th { padding: 8px; font-size: 0.8rem; opacity: 0.6; }
-    .manifest-table td { padding: 10px 8px; border-bottom: 1px solid rgba(0, 255, 65, 0.05); }
+    .manifest-table {
+      width: 100%;
+      text-align: left;
+      border-collapse: collapse;
+    }
+    .manifest-table th {
+      padding: 8px;
+      font-size: 0.8rem;
+      opacity: 0.6;
+    }
+    .manifest-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(0, 255, 65, 0.05);
+    }
 
-    .status-list { list-style: none; padding: 0; font-size: 0.9rem; }
-    .status-list li { margin-bottom: 8px; display: flex; gap: 10px; }
-    .timestamp { color: var(--text-amber); opacity: 0.7; }
+    .status-list {
+      list-style: none;
+      padding: 0;
+      font-size: 0.9rem;
+    }
+    .status-list li {
+      margin-bottom: 8px;
+      display: flex;
+      gap: 10px;
+    }
+    .timestamp {
+      color: var(--text-amber);
+      opacity: 0.7;
+    }
 
     .info-terminal-box {
-        margin-top: 25px;
-        padding: 15px;
-        border: 1px dashed var(--phosphor-dim);
-        font-size: 0.85rem;
+      margin-top: 25px;
+      padding: 15px;
+      border: 1px dashed var(--phosphor-dim);
+      font-size: 0.85rem;
     }
 
     /* Mobile Table Scroll Fix */
-    .table-scroll-wrapper { width: 100%; overflow-x: auto; }
-    
+    .table-scroll-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+
     #layers {
-        text-decorations: none;
-        padding-left: 10px;
-        list-style-type: none;
+      text-decorations: none;
+      padding-left: 10px;
+      list-style-type: none;
     }
-    
+
     li {
-        padding-top: 10px;
-	padding-bottom: 10px;
+      padding-top: 10px;
+      padding-bottom: 10px;
     }
-</style>
+  </style>
+</div>

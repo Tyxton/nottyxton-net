@@ -1,76 +1,88 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>NOTTYXTON // TTY1</title>
-	<link rel="stylesheet" href="/style.css?v=2.2.39">
-	<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
-	<link rel="apple-touch-icon" href="apple-touch-icon.png">
-</head>
-<body>
-	<div class="crt-monitor">  
-	<div class="scanlines"></div>
-	<div class="bezel"></div>
-	<div class="screen-flicker"></div>
-	<div id="loading-screen">
-	<div id="boot-text"></div>
-		<span class="blinking-cursor">█</span>
-    	</div>
-	<div id="main-content" class="terminal-body" style="display: none;">
-	
-	<header class="tui-header">
-		<div class="header-main">
-			<pre class="glitch">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NOTTYXTON // TTY1</title>
+    <link rel="stylesheet" href="/style.css?v=2.2.39" />
+    <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  </head>
+  <body>
+    <div class="crt-monitor">
+      <div class="scanlines"></div>
+      <div class="bezel"></div>
+      <div class="screen-flicker"></div>
+      <div id="loading-screen">
+        <div id="boot-text"></div>
+        <span class="blinking-cursor">█</span>
+      </div>
+      <div id="main-content" class="terminal-body" style="display: none">
+        <header class="tui-header">
+          <div class="header-main">
+            <pre class="glitch">
 ░█▀█░█▀█░▀█▀░▀█▀░█░█░█░█░▀█▀░█▀█░█▀█
 ░█░█░█░█░░█░░░█░░░█░░▄▀▄░░█░░█░█░█░█
 ░▀░▀░▀▀▀░░▀░░░▀░░░▀░░▀░▀░░▀░░▀▀▀░▀░▀
-</pre>
-			<div class="header-telemetry">
-				<div>NODE: edge-srv-01</div>
-				<div>DIST: DEBIAN_12 && PROXMOX VE</div>
-				<div>SYS_TIME: <span class="sys-clock">SYS_TIME: 00:00:00</span> CST</div>
-			</div>
-		</div>
-	</header>
+</pre
+            >
+            <div class="header-telemetry">
+              <div>NODE: edge-srv-01</div>
+              <div>DIST: DEBIAN_12 && PROXMOX VE</div>
+              <div>
+                SYS_TIME: <span class="sys-clock">SYS_TIME: 00:00:00</span> CST
+              </div>
+            </div>
+          </div>
+        </header>
 
-		<nav class="tui-nav-row">
-			<a href="#" class="nav-item" data-module="system_audit">
-				<span class="nav-key">F1</span><span class="nav-label">HOME</span>
-			</a>
-			<a href="#" class="nav-item" data-module="infra_index">
-                                <span class="nav-key">F2</span><span class="nav-label">INFRA</span>
-                        </a>
-			<a href="#" class="nav-item" data-module="auto_index">
-                                <span class="nav-key">F3</span><span class="nav-label">AUTO</span>
-                        </a>
-			<a href="#" class="nav-item" data-module="lab_index">
-                                <span class="nav-key">F4</span><span class="nav-label">LAB</span>
-                        </a>
-			<a href="#" class="nav-item" data-module="net_index">
-                                <span class="nav-key">F5</span><span class="nav-label">NET</span>
-                        </a>
-			<a href="/assets/tSexton_Resume.pdf" target="_blank" rel="noopener noreferrer" class="nav-item">
-                                <span class="nav-key">F9</span><span class="nav-label">RESUME</span>
-                        </a>
-		</nav>
+        <nav class="tui-nav-row">
+          <a href="#" class="nav-item" data-module="system_audit">
+            <span class="nav-key">F1</span><span class="nav-label">HOME</span>
+          </a>
+          <a href="#" class="nav-item" data-module="infra_index">
+            <span class="nav-key">F2</span><span class="nav-label">INFRA</span>
+          </a>
+          <a href="#" class="nav-item" data-module="auto_index">
+            <span class="nav-key">F3</span><span class="nav-label">AUTO</span>
+          </a>
+          <a href="#" class="nav-item" data-module="lab_index">
+            <span class="nav-key">F4</span><span class="nav-label">LAB</span>
+          </a>
+          <a href="#" class="nav-item" data-module="net_index">
+            <span class="nav-key">F5</span><span class="nav-label">NET</span>
+          </a>
+          <a
+            href="/assets/tSexton_Resume.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="nav-item"
+          >
+            <span class="nav-key">F9</span><span class="nav-label">RESUME</span>
+          </a>
+        </nav>
 
-	    <section class="log-viewer">
-		<div id="viewscreen-header">
-		<span class="prompt"></span> <span id="command-label"></span>
-		</div>
-		    <div id="module-viewscreen" class="viewscreen-content typing-animation"></div>
-            </section>
-		
-	    <div class="mobile-footer-spacer"></div>
-		
-		<footer class="terminal-footer">
-		    <div class="footer-item">[ STATUS: OPERATIONAL ]</div>
-		    <div class="footer-item">&copy; NOTTYXTON.NET v2.0.26</div>
-		    <div class="footer-item">SYS_TIME: <span class="sys-clock">SYS_TIME: 00:00:00</span> CST</div>
-		</footer>
-            </main>
-        </div> </div>
+        <section class="log-viewer">
+          <div id="viewscreen-header">
+            <span class="prompt"></span> <span id="command-label"></span>
+          </div>
+          <div
+            id="module-viewscreen"
+            class="viewscreen-content typing-animation"
+          ></div>
+        </section>
+
+        <div class="mobile-footer-spacer"></div>
+
+        <footer class="terminal-footer">
+          <div class="footer-item">[ STATUS: OPERATIONAL ]</div>
+          <div class="footer-item">&copy; NOTTYXTON.NET v2.0.26</div>
+          <div class="footer-item">
+            SYS_TIME: <span class="sys-clock">SYS_TIME: 00:00:00</span> CST
+          </div>
+        </footer>
+      </div>
+    </div>
     <script src="script.js?v=3.1.23"></script>
-</body>
+  </body>
 </html>

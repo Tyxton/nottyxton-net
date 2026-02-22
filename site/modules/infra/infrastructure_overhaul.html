@@ -1,133 +1,274 @@
 <div class="layer-container">
-    
-    <div class="layer-header">
-        <h2 class="text-amber">>> OVERHAUL://<span class="layer-name">INFRASTRUCTURE</span></h2>
-        <p class="meta-comment">Reworking infrastructure to meet best production standards, and security.</p>
-    </div>
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> OVERHAUL://<span class="layer-name">INFRASTRUCTURE</span>
+    </h2>
+    <p class="meta-comment">
+      Reworking infrastructure to meet best production standards, and security.
+    </p>
+  </div>
 
-    <h3>>> PART OF A OVERARCHING PROJECT</h3>
-    <h4>Read more here: <a href="#" class="file-link" data-module="lab_homelab_overhaul">[ DIR ] homelab_overhaul/</a></h4>
+  <h3>>> PART OF A OVERARCHING PROJECT</h3>
+  <h4>
+    Read more here:
+    <a href="#" class="file-link" data-module="lab_homelab_overhaul"
+      >[ DIR ] homelab_overhaul/</a
+    >
+  </h4>
 
-    <h3>>> PROXMOX OVERHAUL</h3>
-    <h4>[ PROBLEM ]</h4>
-    <p>All of the production nodes were virtual machines, this causes excess read-write I/O and RAM overhead.</p>
-    <h4>[ SOLUTION ]</h4>
-    <p>Implement LXC containers rather than just using VMs. This would mean converting our current backend and management VMs to LXCs, we want to keep our outbound VM as is to heighten security and isolation. </p>
-    <br>
-    <p> Along with this we are going to create a new NPM LXC for our internal services, rather than routing all of our split-horizon traffic through one instance, this will allow us to further separate the internal egress from the external.</p>
-    <h4>[ KEY_IMPROVEMENTS ]</h4>
-    <ul class="config-list">
-        <li><span>[ NEW ]</span> *arr stack would have instantaneous atomic moves (hardlinks), eliminating the CPU/RAM overhead of copying datasets between virtual disks.</li>
-        <li><span>[ NEW ]</span> less RAM real-estate/overhead locked into our VMs. </li>
-        <li><span>[ NEW ]</span> Created a local NPM LXC for our split-horizon traffic.</li>
-    </ul>
-    <h4>[ UPTIME ]</h4>
-    <p>To go over how I did this without losing service uptime, I temporarily hosted nottyxton.net on Github Pages, this allows for the site to still be "up" while I work on my backend. For the VMs, and LXCs I created the LXC and transfered the configuration files via RSYNC <strong>before</strong> decommissioning the original VM. This allowed for everything to seamlessly transfer over.<p>
-    <br>
+  <h3>>> PROXMOX OVERHAUL</h3>
+  <h4>[ PROBLEM ]</h4>
+  <p>
+    All of the production nodes were virtual machines, this causes excess
+    read-write I/O and RAM overhead.
+  </p>
+  <h4>[ SOLUTION ]</h4>
+  <p>
+    Implement LXC containers rather than just using VMs. This would mean
+    converting our current backend and management VMs to LXCs, we want to keep
+    our outbound VM as is to heighten security and isolation.
+  </p>
+  <br />
+  <p>
+    Along with this we are going to create a new NPM LXC for our internal
+    services, rather than routing all of our split-horizon traffic through one
+    instance, this will allow us to further separate the internal egress from
+    the external.
+  </p>
+  <h4>[ KEY_IMPROVEMENTS ]</h4>
+  <ul class="config-list">
+    <li>
+      <span>[ NEW ]</span> *arr stack would have instantaneous atomic moves
+      (hardlinks), eliminating the CPU/RAM overhead of copying datasets between
+      virtual disks.
+    </li>
+    <li>
+      <span>[ NEW ]</span> less RAM real-estate/overhead locked into our VMs.
+    </li>
+    <li>
+      <span>[ NEW ]</span> Created a local NPM LXC for our split-horizon
+      traffic.
+    </li>
+  </ul>
+  <h4>[ UPTIME ]</h4>
+  <p>
+    To go over how I did this without losing service uptime, I temporarily
+    hosted nottyxton.net on Github Pages, this allows for the site to still be
+    "up" while I work on my backend. For the VMs, and LXCs I created the LXC and
+    transfered the configuration files via RSYNC
+    <strong>before</strong> decommissioning the original VM. This allowed for
+    everything to seamlessly transfer over.
+  </p>
+  <p>
+    <br />
+  </p>
 
+  <h3>>> NAMING OVERHAUL</h3>
+  <h4>[ PROBLEM ]</h4>
+  <p>
+    None of our naming conventions are standardized, from our physical hardware,
+    down to our individual containers. Not only does this make it easy to lose
+    track of multiple instances of the same service, this does not replicate a
+    production-ready environment - which I want to do.
+  </p>
+  <h4>[ SOLUTION ]</h4>
+  <p>
+    We are going to keep our physical servers as "Raiden" (Proxmox VE) and
+    "Motherbase" (TrueNAS Scale) these are "operator-friendly hostnames" and
+    typical of production environments. For our NAS data pools, we have been
+    using Kazuhira, Meiling, and Ocelot - I am going to keep this as well, we
+    will get to their renaming in a moment. For our IoT, We're going to keep
+    Snake, Otacon, Codec, and Paz; for the same "operator-friendly" ideology as
+    before.
+  </p>
+  <br />
+  <p>
+    <strong>Now, for the changes:</strong> our main VMs were previously MGT
+    (Management), DK2 (Docker 2), DK3 (Docker 3). We are going to rename this
+    with the scheme [purpose-group]-[specialization]-[unit-number]. This now
+    becomes <strong>ops-core-01</strong> (operations-core_infrastructure-node1),
+    <strong>edge-srv-01</strong> (public-services-node1), and
+    <strong>ops-node-01</strong> (operations-production node-node1). We are
+    going to do the same for our new LXC,
+    <strong>ops-proxy-01</strong> (operations-proxy-node1). This makes it very
+    easy to look at our hostname and figure out what exactly it is doing without
+    needing to have set it up yourself or use a table.
+  </p>
+  <br />
+  <p>
+    To complement this, we are going to standardize our IDs as well. Since we
+    use VLAN tagging in Proxmox for our VLANs 10, 20, 30, 40, and 50 we are
+    going to give the IDs [VLAN,LAST OCTET]. For instance we have ops-node-01 at
+    10.30.0.50, the container's ID will be 350.
+  </p>
 
+  <h4>[ KEY_IMPROVEMENTS ]</h4>
+  <ul class="config-list">
+    <li>
+      <span>[ NEW ]</span> Production ready naming conventions for nodes,
+      containers, and compose stacks.
+    </li>
+    <li><span>[ NEW ]</span> Standardized LXC and VM IDs.</li>
+  </ul>
+  <br />
 
-    <h3>>> NAMING OVERHAUL</h3>
-    <h4>[ PROBLEM ]</h4>
-    <p>None of our naming conventions are standardized, from our physical hardware, down to our individual containers. Not only does this make it easy to lose track of multiple instances of the same service, this does not replicate a production-ready environment - which I want to do.</p>
-    <h4>[ SOLUTION ]</h4>
-    <p>We are going to keep our physical servers as "Raiden" (Proxmox VE) and "Motherbase" (TrueNAS Scale) these are "operator-friendly hostnames" and typical of production environments. For our NAS data pools, we have been using Kazuhira, Meiling, and Ocelot - I am going to keep this as well, we will get to their renaming in a moment. For our IoT, We're going to keep Snake, Otacon, Codec,  and Paz; for the same "operator-friendly" ideology as before.</p>
-    <br>
-    <p><strong>Now, for the changes:</strong> our main VMs were previously MGT (Management), DK2 (Docker 2), DK3 (Docker 3). We are going to rename this with the scheme [purpose-group]-[specialization]-[unit-number]. This now becomes <strong>ops-core-01</strong> (operations-core_infrastructure-node1), <strong>edge-srv-01</strong> (public-services-node1), and <strong>ops-node-01</strong> (operations-production node-node1). We are going to do the same for our new LXC, <strong>ops-proxy-01</strong> (operations-proxy-node1). This makes it very easy to look at our hostname and figure out what exactly it is doing without needing to have set it up yourself or use a table.</p>
-    <br>
-    <p>To complement this, we are going to standardize our IDs as well. Since we use VLAN tagging in Proxmox for our VLANs 10, 20, 30, 40, and 50 we are going to give the IDs [VLAN,LAST OCTET]. For instance we have ops-node-01 at 10.30.0.50, the container's ID will be 350.</p>
+  <h3>>> HYBRID STORAGE</h3>
+  <h4>
+    [ PROBLEM ]
+    <h4>
+      <p>
+        Currently, all of our VMs are utilizing the Proxmox VE ZFS storage pool,
+        which is very limited (1TB mirrored ZFS) and does not offer great
+        parity.
+      </p>
+      <h4>
+        [ SOLUTION ]
+        <p>
+          The only VM this change will really effect is edge-srv-01. Since it
+          does not need to read or write data particularly fast, we are going to
+          move the VM's storage to our NAS. This process between Proxmox and
+          TrueNAS is really simple, we just mount the NFS share at the
+          Datacenter level, and point the VM's mount point to that directory.
+        </p>
+        <h4>[ KEY_IMPROVEMENTS ]</h4>
+        <ul class="config-list">
+          <li><span>[ NEW ]</span> Offloaded excess storage to TrueNAS.</li>
+          <li>
+            <span>[ NEW ]</span> Added PVE Datacenter strorage volumes for NFS
+            shares for LXCs and VM usage.
+          </li>
+        </ul>
 
-    <h4>[ KEY_IMPROVEMENTS ]</h4>
-    <ul class="config-list">
-        <li><span>[ NEW ]</span> Production ready naming conventions for nodes, containers, and compose stacks.</li>
-        <li><span>[ NEW ]</span> Standardized LXC and VM IDs.</li>
-    </ul>
-    <br>
+        <h3>>> PROXMOX STORAGE</h3>
+        <h4>[ PROBLEM ]</h4>
+        <p>
+          Proxmox had been using its local storage to create backups, then copy
+          them to our TrueNAS dataset over NFS. While we will still be using
+          NFS, we are going to directly mount the shares from our Datacenter. We
+          have now offloaded our backups, images and isos, as well as our VM
+          disks. The naming conventions are not in parity, however. From the
+          TrueNAS end; I wanted things to be "operator-friendly" this was a
+          personal decision on my part, looking at shares that are more "unique"
+          is quicker for me to identify quickly. But in Proxmox we used our
+          purpose-oriented naming. /mnt/kazuhira/proxmox_backups is mounted to
+          prod_backups_01, or /mnt/ocelot/media is prod-media-01
+          /mnt/kazuhira/prometheus_data is itim-data-01. So on, so forth.
+        </p>
+        <h4>[ KEY_IMPROVEMENTS ]</h4>
+        <ul class="config-list">
+          <li>
+            <span>[ NEW ]</span> Standardized NFS mount naming conventions for
+            PVE.
+          </li>
+          <li>
+            <span>[ NEW ]</span> Introduced NFS mounts directly to PVE for
+            backups, disk images, and ISOs.
+          </li>
+        </ul>
 
+        <h3>>> PORTAINER CHANGES</h3>
+        <h4>[ PORTAINER_EDGE ]</h4>
+        <p>
+          In this overhaul, I also made the switch from Docker Standalone Agents
+          to Docker Edge Agents, the main advantage that comes from this is
+          management over all connected nodes the orchestrator (management)
+          node. In order to transition all of the docker-compose.yml files over
+          so that I can quickly spin them back up, was copy them, save them
+          locally, then paste and deploy. Though, I did forget to do this with
+          the entirety of ops-core-01; thankfully, we can use Portainer's
+          inspect tool for the orphaned containers, get the necessary
+          information we need, paste them in our compose, then deploy them.
+          Currently, Portainer cannot automatically reconstruct the original
+          compose file from an orphaned container.
+        </p>
+        <p></p>
+        <h4>[ NAMING_CONVENTIONS ]</h4>
+        <p>
+          To continue with our production-ready naming, we will change the names
+          of our stacks and containers. For our Stacks we will be using [Service
+          Group]-[Identifier], for instance, our monitoring group on ops-node-01
+          is itim-prod (IT Infrastructure Monitoring - Production), and for the
+          containers running in this stack we use the container_name variable to
+          use [Stack Prefix]-[Service], for example, node-exporter would be
+          itim-node-exporter. Now we know what stack that container belongs to
+          just by looking at it, this also means we can have two of the same
+          container in a stack and differentiate between them.
+        </p>
+        <p></p>
+        <h4>[ ADDITIONS ]</h4>
+        <p>
+          I have added Prometheus, Grafana, Node Exporter, and cAdvisor on the
+          ops-core-01; for ops-node-01 and ops-proxy-01, I added node-exporter;
+          and for edge-srv-01 I added node-exporter and nvidia-dcgm-exporter; I
+          also installed node-exporter on Proxmox itself. This gives me granular
+          telemetry from the hypervisor, containers, and even the hardware.
+        </p>
 
+        <h4>[ KEY_IMPROVEMENTS ]</h4>
+        <ul class="config-list">
+          <li>
+            <span>[ NEW ]</span> Transitioned to Portainer Edge Agents from
+            Docker Standalone.
+          </li>
+          <li>
+            <span>[ NEW ]</span> Introduced standardized naming conventions for
+            our compose stacks and containers.
+          </li>
+          <li>
+            <span>[ NEW ]</span> Implemented a dense monitoring stack for
+            infrastructure, down to the hardware.
+          </li>
+        </ul>
 
-    <h3>>> HYBRID STORAGE</h3>
-    <h4>[ PROBLEM ]<h4>
-    <p>Currently, all of our VMs are utilizing the Proxmox VE ZFS storage pool, which is very limited (1TB mirrored ZFS) and does not offer great parity.</p>
-    <h4>[ SOLUTION ]
-    <p>The only VM this change will really effect is edge-srv-01. Since it does not need to read or write data particularly fast, we are going to move the VM's storage to our NAS. This process between Proxmox and TrueNAS is really simple, we just mount the NFS share at the Datacenter level, and point the VM's mount point to that directory.</p>
-    <h4>[ KEY_IMPROVEMENTS ]</h4>
-    <ul class="config-list">
-        <li><span>[ NEW ]</span> Offloaded excess storage to TrueNAS.</li>
-        <li><span>[ NEW ]</span> Added PVE Datacenter strorage volumes for NFS shares for LXCs and VM usage.</li>
-    </ul>
+        <style>
+          /* Responsive Grid Logic */
+          .layer-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
+            gap: 30px;
+            margin-top: 25px;
+          }
 
+          @media (max-width: 900px) {
+            .layer-grid {
+              grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
+            }
+          }
 
-    <h3>>> PROXMOX STORAGE</h3>
-    <h4>[ PROBLEM ]</h4>
-    <p>Proxmox had been using its local storage to create backups, then copy them to our TrueNAS dataset over NFS. While we will still be using NFS, we are going to directly mount the shares from our Datacenter. We have now offloaded our backups, images and isos, as well as our VM disks. The naming conventions are not in parity, however. From the TrueNAS end; I wanted things to be "operator-friendly" this was a personal decision on my part, looking at shares that are more "unique" is quicker for me to identify quickly. But in Proxmox we used our purpose-oriented naming. /mnt/kazuhira/proxmox_backups is mounted to prod_backups_01, or /mnt/ocelot/media is prod-media-01 /mnt/kazuhira/prometheus_data is itim-data-01. So on, so forth.</p>
-    <h4>[ KEY_IMPROVEMENTS ]</h4>
-    <ul class="config-list">
-        <li><span>[ NEW ]</span> Standardized NFS mount naming conventions for PVE.</li>
-        <li><span>[ NEW ]</span> Introduced NFS mounts directly to PVE for backups, disk images, and ISOs. </li>
-    </ul>
+          /* Panel Styling */
+          .layer-panel {
+            background: rgba(0, 255, 65, 0.03);
+            border-left: 1px solid rgba(0, 255, 65, 0.1);
+            padding: 20px;
+          }
 
+          .panel-title {
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--phosphor-dim);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+          }
 
-    <h3>>> PORTAINER CHANGES</h3>
-    <h4>[ PORTAINER_EDGE ]</h4>
-    <p>In this overhaul, I also made the switch from Docker Standalone Agents to Docker Edge Agents, the main advantage that comes from this is management over all connected nodes the orchestrator (management) node. In order to transition all of the docker-compose.yml files over so that I can quickly spin them back up, was copy them, save them locally, then paste and deploy. Though, I did forget to do this with the entirety of ops-core-01; thankfully, we can use Portainer's inspect tool for the orphaned containers, get the necessary information we need, paste them in our compose, then deploy them. Currently, Portainer cannot automatically reconstruct the original compose file from an orphaned container.<p>
-    <h4>[ NAMING_CONVENTIONS ]</h4>
-    <p>To continue with our production-ready naming, we will change the names of our stacks and containers. For our Stacks we will be using [Service Group]-[Identifier], for instance, our monitoring group on ops-node-01 is itim-prod (IT Infrastructure Monitoring - Production), and for the containers running in this stack we use the container_name variable to use [Stack Prefix]-[Service], for example, node-exporter would be itim-node-exporter. Now we know what stack that container belongs to just by looking at it, this also means we can have two of the same container in a stack and differentiate between them.<p>
-    <h4>[ ADDITIONS ]</h4>
-    <p>I have added Prometheus, Grafana, Node Exporter, and cAdvisor on the ops-core-01; for ops-node-01 and ops-proxy-01, I added node-exporter; and for edge-srv-01 I added node-exporter and nvidia-dcgm-exporter; I also installed node-exporter on Proxmox itself. This gives me granular telemetry from the hypervisor, containers, and even the hardware.</p>
+          .info-terminal-box {
+            margin-top: 25px;
+            padding: 15px;
+            border: 1px dashed var(--phosphor-dim);
+            font-size: 0.85rem;
+          }
 
-    <h4>[ KEY_IMPROVEMENTS ]</h4>
-    <ul class="config-list">
-        <li><span>[ NEW ]</span> Transitioned to Portainer Edge Agents from Docker Standalone.</li>
-        <li><span>[ NEW ]</span> Introduced standardized naming conventions for our compose stacks and containers.</li>
-        <li><span>[ NEW ]</span> Implemented a dense monitoring stack for infrastructure, down to the hardware.</li>
-    </ul>
+          /* Mobile Table Scroll Fix */
+          .table-scroll-wrapper {
+            width: 100%;
+            overflow-x: auto;
+          }
 
+          .config-list {
+            font-size: 0.8rem;
+            margin: 10px;
+            list-style: none;
+          }
+        </style>
+      </h4>
+    </h4>
+  </h4>
 </div>
-
-<style>
-    /* Responsive Grid Logic */
-    .layer-grid {
-        display: grid;
-        grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
-        gap: 30px;
-        margin-top: 25px;
-    }
-
-    @media (max-width: 900px) {
-        .layer-grid {
-            grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
-        }
-    }
-
-    /* Panel Styling */
-    .layer-panel {
-        background: rgba(0, 255, 65, 0.03);
-        border-left: 1px solid rgba(0, 255, 65, 0.1);
-        padding: 20px;
-    }
-
-    .panel-title {
-        font-size: 1.1rem;
-        border-bottom: 1px solid var(--phosphor-dim);
-        padding-bottom: 8px;
-        margin-bottom: 15px;
-    }
-
-    .info-terminal-box {
-        margin-top: 25px;
-        padding: 15px;
-        border: 1px dashed var(--phosphor-dim);
-        font-size: 0.85rem;
-    }
-
-    /* Mobile Table Scroll Fix */
-    .table-scroll-wrapper { width: 100%; overflow-x: auto; }
-    
-    .config-list {
-	font-size: 0.8rem;
-	margin: 10px;
-	list-style: none;
-    }
-
-</style>

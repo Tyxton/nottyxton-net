@@ -1,108 +1,156 @@
 <div class="layer-container">
-    
-    <div class="layer-header">
-        <h2 class="text-amber">>> STORAGE_FABRIC://<span class="layer-name">INFRASTRUCTURE</span></h2>
-        <p class="meta-comment">Non-converged ZFS architecture providic atomic data integrity and parity.</p>
-    </div>
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> STORAGE_FABRIC://<span class="layer-name">INFRASTRUCTURE</span>
+    </h2>
+    <p class="meta-comment">
+      Non-converged ZFS architecture providic atomic data integrity and parity.
+    </p>
+  </div>
 
-    <h3>>> ZFS_TOPOLOGY && VDEV STRATEGY</h3>
-    <h4>[ VDEV_CONFIG ]</h4>
-    <p>
-    On TrueNAS, I have three seperate ZFS pools - for the sake of opsec - we will call them vmpool, cloudpool, and mediapool. I had to come up with exactly how I wanted to configure these pools while giving
-    myself both parity, and usable storage space. For all of the pools, I decided to go with RAIDZ1.
-    </p>
-    <ul class="config-list">
-        <li>VMPOOL: 1x RAIDZ1 | 3 Wide | 3.64TiB Usable Each</li>
-	<li>CLOUDPOOL: 1x RAIDZ1 | 3 Wide | 3.64TiB Usable Each | Cache 1x 465.76GiB Usable</li>
-	<li>MEDIAPOOL: 1x RAIDZ1 | 6 Wide | 3.64TiB Usable Each | Cache 1x 465.76GiB Usable</li>
-    </ul>
-    <p>
-    Since vmpool and cloudpool are configured similarly, I will detail them first. With RAIDz1, I am allowed one drive failure in either pool, while also maintaining 64.58% of the usable ZFS storage capacity;
-    also gaining up to 2x read speed. For the mediapool, I am also allowed one drive failure, but here I maintain 80.73% of the usable ZFS storage capacity; I also gain up to 5x read speed. For me, this trade-off
-    is worth it due to my proximity to the server (i.e. in my apartment) making it easy to hotswap a drive if one ever failed. Since the mediapool just stores my local movie and tv collection, high fault
-    tolerance is not very important to me, there is no crucial data that I cannot recover if two drives fail at once. The read speed benefit is also very beneficial to my Jellyfin setup, as I can stream video
-    without as much buffering time. For the vmpool, this hosts backups of my various devices on the network (which is also why it doesn't have a cache drive) it is not read from often, and again does not require
-    much fault tolerance for my usecase. My cloudpool, however, this does hold important data to me, I would like the fault tolerance to be higher on this pool, but we are limited by the 3-wide configuration.
-    Because of this, I utilize the 3-2-1 data protection method for the data on this pool, I will detail this more later.
-    </p>
-    <h4>[ NON_CONVERGED BENEFITS ]</h4>
-    <p>
-    I moved TrueNAS over to physical hardware after getting my Dell PowerEdge R510, previously I was virtualizing it in proxmox. The HBA Passthrough setup I had was ineffecient and unstable, often leading to
-    random drive disconnects, data loss, and even performance issues. By moving this over to a bare-metal setup, this removed all of the read write I/O issues I had faced previously.
-    </p>
-    
-    <h3>>> DATASET_TUNING</h3>
-    <h4>[ Recordsize Optimization ]</h4>
-    <p>
-    For my mediapool and cloudpool, I set larger recordsizes (512K) to not only improve the read/write speed of the dataset, but also reduced metadata overhead and lessened fragmentation. On the VMpool, I set
-    smaller recordsizes to match the VM's block size preventing write amplification.
-    </p>
-    <h4>[ Atomic Operation ]</h4>
-    <p>
-    The ZFS dataset is setup in such a way that allows for instant moves (hardlinks) between the subfolders (e.g. downloads to media folders) which was crucial for my Jellyfin and Arr stack project. This negates
-    full copies and pastes which would take up a lot of read/write IO, clutter up disk space (even temporarily), and lessen the amount of the disks spinning unnecessarily perserving their lifespan.
-    </p>
-    <h4><a href="#" class="file-link" data-module="lab_media_ops">[ RUN ] cat layers/media_ops.log</a></h4>
-    
-    <h3>>> DATA_PROTECTION && MAINTENANCE</h3>
-    <h4>[ Scrub Schedules ]</h4>
-    <p>
-    With TrueNAS you can automate scrubbing the datasets, I have mine set to scrub once a week during low-use hours. This helps to minimize if not eliminate any bitrot that naturally occurs over time.
-    </p>
-    <h4>[ Snapshot Lifecycle ]</h4>
-    <p>
-    I have 2 snapshot policies in place for my ZFS pools. Since data is not moved in and out terribly often I just use Daily and Weekly snapshots in the event of an accidental deletion, or on the off chance I am
-    effected with a ransomware attack or "lock-up".
-    </p>
-    <h4>[ S.M.A.R.T Monitoring ]</h4>
-    <p>
-    TrueNAS Scale 25.10+ utilizes automatic monitoring of the read/write speed and temperature of the disks, though, I utilize the Scrutiny application this offers better visualization and historical data. When
-    TrueNAS detects critical issues, or even an imminent failure, it notifies me so that I can catch it before the failure itself occurs.
-    </p>
+  <h3>>> ZFS_TOPOLOGY && VDEV STRATEGY</h3>
+  <h4>[ VDEV_CONFIG ]</h4>
+  <p>
+    On TrueNAS, I have three seperate ZFS pools - for the sake of opsec - we
+    will call them vmpool, cloudpool, and mediapool. I had to come up with
+    exactly how I wanted to configure these pools while giving myself both
+    parity, and usable storage space. For all of the pools, I decided to go with
+    RAIDZ1.
+  </p>
+  <ul class="config-list">
+    <li>VMPOOL: 1x RAIDZ1 | 3 Wide | 3.64TiB Usable Each</li>
+    <li>
+      CLOUDPOOL: 1x RAIDZ1 | 3 Wide | 3.64TiB Usable Each | Cache 1x 465.76GiB
+      Usable
+    </li>
+    <li>
+      MEDIAPOOL: 1x RAIDZ1 | 6 Wide | 3.64TiB Usable Each | Cache 1x 465.76GiB
+      Usable
+    </li>
+  </ul>
+  <p>
+    Since vmpool and cloudpool are configured similarly, I will detail them
+    first. With RAIDz1, I am allowed one drive failure in either pool, while
+    also maintaining 64.58% of the usable ZFS storage capacity; also gaining up
+    to 2x read speed. For the mediapool, I am also allowed one drive failure,
+    but here I maintain 80.73% of the usable ZFS storage capacity; I also gain
+    up to 5x read speed. For me, this trade-off is worth it due to my proximity
+    to the server (i.e. in my apartment) making it easy to hotswap a drive if
+    one ever failed. Since the mediapool just stores my local movie and tv
+    collection, high fault tolerance is not very important to me, there is no
+    crucial data that I cannot recover if two drives fail at once. The read
+    speed benefit is also very beneficial to my Jellyfin setup, as I can stream
+    video without as much buffering time. For the vmpool, this hosts backups of
+    my various devices on the network (which is also why it doesn't have a cache
+    drive) it is not read from often, and again does not require much fault
+    tolerance for my usecase. My cloudpool, however, this does hold important
+    data to me, I would like the fault tolerance to be higher on this pool, but
+    we are limited by the 3-wide configuration. Because of this, I utilize the
+    3-2-1 data protection method for the data on this pool, I will detail this
+    more later.
+  </p>
+  <h4>[ NON_CONVERGED BENEFITS ]</h4>
+  <p>
+    I moved TrueNAS over to physical hardware after getting my Dell PowerEdge
+    R510, previously I was virtualizing it in proxmox. The HBA Passthrough setup
+    I had was ineffecient and unstable, often leading to random drive
+    disconnects, data loss, and even performance issues. By moving this over to
+    a bare-metal setup, this removed all of the read write I/O issues I had
+    faced previously.
+  </p>
 
-<style>
+  <h3>>> DATASET_TUNING</h3>
+  <h4>[ Recordsize Optimization ]</h4>
+  <p>
+    For my mediapool and cloudpool, I set larger recordsizes (512K) to not only
+    improve the read/write speed of the dataset, but also reduced metadata
+    overhead and lessened fragmentation. On the VMpool, I set smaller
+    recordsizes to match the VM's block size preventing write amplification.
+  </p>
+  <h4>[ Atomic Operation ]</h4>
+  <p>
+    The ZFS dataset is setup in such a way that allows for instant moves
+    (hardlinks) between the subfolders (e.g. downloads to media folders) which
+    was crucial for my Jellyfin and Arr stack project. This negates full copies
+    and pastes which would take up a lot of read/write IO, clutter up disk space
+    (even temporarily), and lessen the amount of the disks spinning
+    unnecessarily perserving their lifespan.
+  </p>
+  <h4>
+    <a href="#" class="file-link" data-module="lab_media_ops"
+      >[ RUN ] cat layers/media_ops.log</a
+    >
+  </h4>
+
+  <h3>>> DATA_PROTECTION && MAINTENANCE</h3>
+  <h4>[ Scrub Schedules ]</h4>
+  <p>
+    With TrueNAS you can automate scrubbing the datasets, I have mine set to
+    scrub once a week during low-use hours. This helps to minimize if not
+    eliminate any bitrot that naturally occurs over time.
+  </p>
+  <h4>[ Snapshot Lifecycle ]</h4>
+  <p>
+    I have 2 snapshot policies in place for my ZFS pools. Since data is not
+    moved in and out terribly often I just use Daily and Weekly snapshots in the
+    event of an accidental deletion, or on the off chance I am effected with a
+    ransomware attack or "lock-up".
+  </p>
+  <h4>[ S.M.A.R.T Monitoring ]</h4>
+  <p>
+    TrueNAS Scale 25.10+ utilizes automatic monitoring of the read/write speed
+    and temperature of the disks, though, I utilize the Scrutiny application
+    this offers better visualization and historical data. When TrueNAS detects
+    critical issues, or even an imminent failure, it notifies me so that I can
+    catch it before the failure itself occurs.
+  </p>
+
+  <style>
     /* Responsive Grid Logic */
     .layer-grid {
-        display: grid;
-        grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
-        gap: 30px;
-        margin-top: 25px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
+      gap: 30px;
+      margin-top: 25px;
     }
 
     @media (max-width: 900px) {
-        .layer-grid {
-            grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
-        }
+      .layer-grid {
+        grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
+      }
     }
 
     /* Panel Styling */
     .layer-panel {
-        background: rgba(0, 255, 65, 0.03);
-        border-left: 1px solid rgba(0, 255, 65, 0.1);
-        padding: 20px;
+      background: rgba(0, 255, 65, 0.03);
+      border-left: 1px solid rgba(0, 255, 65, 0.1);
+      padding: 20px;
     }
 
     .panel-title {
-        font-size: 1.1rem;
-        border-bottom: 1px solid var(--phosphor-dim);
-        padding-bottom: 8px;
-        margin-bottom: 15px;
+      font-size: 1.1rem;
+      border-bottom: 1px solid var(--phosphor-dim);
+      padding-bottom: 8px;
+      margin-bottom: 15px;
     }
 
     .info-terminal-box {
-        margin-top: 25px;
-        padding: 15px;
-        border: 1px dashed var(--phosphor-dim);
-        font-size: 0.85rem;
+      margin-top: 25px;
+      padding: 15px;
+      border: 1px dashed var(--phosphor-dim);
+      font-size: 0.85rem;
     }
 
     /* Mobile Table Scroll Fix */
-    .table-scroll-wrapper { width: 100%; overflow-x: auto; }
-    
-    .config-list {
-	font-size: 0.8rem;
-	margin: 10px;
-	list-style: none;
+    .table-scroll-wrapper {
+      width: 100%;
+      overflow-x: auto;
     }
 
-</style>
+    .config-list {
+      font-size: 0.8rem;
+      margin: 10px;
+      list-style: none;
+    }
+  </style>
+</div>

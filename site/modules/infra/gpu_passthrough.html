@@ -1,111 +1,161 @@
 <div class="layer-container">
-    
-    <div class="layer-header">
-        <h2 class="text-amber">>> GPU_PASSTHROUGH && HARDWARE_ABSTRACTION://<span class="layer-name">INFRASTRUCTURE</span></h2>
-        <p class="meta-comment">Deployment of a hardware-accelerated virtualization environment utilizing ZFS storage arrays and PCIe passthrough.</p>
-    </div>
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> GPU_PASSTHROUGH && HARDWARE_ABSTRACTION://<span class="layer-name"
+        >INFRASTRUCTURE</span
+      >
+    </h2>
+    <p class="meta-comment">
+      Deployment of a hardware-accelerated virtualization environment utilizing
+      ZFS storage arrays and PCIe passthrough.
+    </p>
+  </div>
 
-    <h3>>> GPU_PASSTHROUGH && HARDWARE_ABSTRACTION</h3>
-    <h4>[ IOMMU ISOLATION ]</h4>
-    <p>
-    This is a technique I initially learned for my linux gaming desktop, however, it plays perfectly in my server architecture. On a linux-based system the process is really similar, despite the Arch Desktop and
-    Proxmox (Debian) server. To utilize hardware passthrough you need to meet three parameters:
-    </p>
-    <ul class="config-list">
-        <li>IOMMU (Intel VT-d /AMD-Vi): These motherboard chipsets enable direct access to physical PCI/PCIe devices.</li>
-	<li>BIOS ENABLED VIRTUALIZATION: You must enable virtualization/IOMMU in your BIOS settings.</li>
-	<li>KERNEL PARAMETERS: You also must configure your linux kernel with the necessary parameters for your device.</li>
-	<li>VFIO SETUP: This specific kernel-level driver exposes the direct devices to the userspace.</li>
-	<li>QEMU/KVM (Hypervisor): You then must configure your hypervisor to "see" and use the physical hardware on the guest device.</li>
-    </ul>
-    <p>
-    On Proxmox, the setup is relatively simple. Proxmox uses the GRUB bootloader, which gives you the option to append kernel parameters at boot, there we need to enable "intel_iommu=on" or "amd_iommu=on"
-    depending on what chipset your setup is using. but we also need to append additional commands that tell Proxmox not to utilize the GPU for itself, as well as isolating our PCI device into it's own IOMMU
-    group. Group isolation is extremely important because we are only trying to pass the GPU through, occasionally other devices (e.g the CPU) will be grouped together, and you will pass everything in that
-    group. In my Proxmox GRUB configuration I have these lines in GRUB_CMDLINE_LINUX_DEFAULT:
-    </p>
-    <ul class="config-list">
-	<li>quiet</li>
-	<li>intel_iommu=on</li>
-	<li>pcie_acs_override=downstream,multifunction</li>
-	<li>video=efifb:off</li>
-    </ul>
-    <p>
-    The quiet kernel parameter is unrelated to the PCI Passthrough, but to detail the rest: "intel_iommu=on" enables the Intel VT-d capability in the kernel, without stating this, the operating system will never
-    be able to utilize the chipset; "pcie_acs_override=downstrean,multifunction" overrides the motherboards PCIe ACS settings to force seperate IOMMU groups for devices that would otherwise be grouped together;
-    "video=efifb:off" disables the EFI framebuffer on the boot GPU. This prevents the host hypervisor from binding to the GPU early in the boot process, which often prevents the GPU from being successfully
-    assigned to a VM.
-    </p>
-    <br>
-    <p>
-    Now, we have to edit the kernel modules; this is different from the parameters. Kernel parameters are more akin to configuration options, while kernel modules are actual pieces of code that extends the
-    functionality of the kernel, more akin to a driver. For the modules we must use:
-    </p>
-    <ul class="config-list">
-	<li>vfio</li>
-	<li>vfio_iommu_type1</li>
-	<li>vfio_pci</li>
-	<li>vfio_virqfd</li>
-    </ul>
-    <p>
-    These modules all act together to allow the PCIe device to be assigned to a VM. "vfio" is the core module that exposes the device, "vfio_iommu_type1" ensures a VM can only access its own memory, preventing it
-    from currupting the host's memory, "vfio_pci" is the specific driver that binds to the PCI device and allows them to be passed through to a VM instead of being assigned to the host, "vfio_firqfd" is mostly
-    obsolete as of Linux Kernel 6.2, however I leave this legacy module in my configuration as a specification.
-    </p>
-    <br>
-    <p>
-    To finish things up, we have to blacklist the nouveau/nvidia drivers from loading in the kernel. After this, we are then able to assign the PCI device to our VM under either the UI configuration or the vm.conf
-    file. It's important to enable x-vga=1 for a Proxmox setup, this makes the passed GPU function as the primary display device inside of the VM. This handles compatibility issues by disabling emulated graphics
-    and enabling necessary BIOS/UEFI hooks for the GPU to initialize.
-    </p>
-    <br>
-    <p>
-    After all of this setup and configuration, we now have our GPU in our VM of choice!
-    </p>
+  <h3>>> GPU_PASSTHROUGH && HARDWARE_ABSTRACTION</h3>
+  <h4>[ IOMMU ISOLATION ]</h4>
+  <p>
+    This is a technique I initially learned for my linux gaming desktop,
+    however, it plays perfectly in my server architecture. On a linux-based
+    system the process is really similar, despite the Arch Desktop and Proxmox
+    (Debian) server. To utilize hardware passthrough you need to meet three
+    parameters:
+  </p>
+  <ul class="config-list">
+    <li>
+      IOMMU (Intel VT-d /AMD-Vi): These motherboard chipsets enable direct
+      access to physical PCI/PCIe devices.
+    </li>
+    <li>
+      BIOS ENABLED VIRTUALIZATION: You must enable virtualization/IOMMU in your
+      BIOS settings.
+    </li>
+    <li>
+      KERNEL PARAMETERS: You also must configure your linux kernel with the
+      necessary parameters for your device.
+    </li>
+    <li>
+      VFIO SETUP: This specific kernel-level driver exposes the direct devices
+      to the userspace.
+    </li>
+    <li>
+      QEMU/KVM (Hypervisor): You then must configure your hypervisor to "see"
+      and use the physical hardware on the guest device.
+    </li>
+  </ul>
+  <p>
+    On Proxmox, the setup is relatively simple. Proxmox uses the GRUB
+    bootloader, which gives you the option to append kernel parameters at boot,
+    there we need to enable "intel_iommu=on" or "amd_iommu=on" depending on what
+    chipset your setup is using. but we also need to append additional commands
+    that tell Proxmox not to utilize the GPU for itself, as well as isolating
+    our PCI device into it's own IOMMU group. Group isolation is extremely
+    important because we are only trying to pass the GPU through, occasionally
+    other devices (e.g the CPU) will be grouped together, and you will pass
+    everything in that group. In my Proxmox GRUB configuration I have these
+    lines in GRUB_CMDLINE_LINUX_DEFAULT:
+  </p>
+  <ul class="config-list">
+    <li>quiet</li>
+    <li>intel_iommu=on</li>
+    <li>pcie_acs_override=downstream,multifunction</li>
+    <li>video=efifb:off</li>
+  </ul>
+  <p>
+    The quiet kernel parameter is unrelated to the PCI Passthrough, but to
+    detail the rest: "intel_iommu=on" enables the Intel VT-d capability in the
+    kernel, without stating this, the operating system will never be able to
+    utilize the chipset; "pcie_acs_override=downstrean,multifunction" overrides
+    the motherboards PCIe ACS settings to force seperate IOMMU groups for
+    devices that would otherwise be grouped together; "video=efifb:off" disables
+    the EFI framebuffer on the boot GPU. This prevents the host hypervisor from
+    binding to the GPU early in the boot process, which often prevents the GPU
+    from being successfully assigned to a VM.
+  </p>
+  <br />
+  <p>
+    Now, we have to edit the kernel modules; this is different from the
+    parameters. Kernel parameters are more akin to configuration options, while
+    kernel modules are actual pieces of code that extends the functionality of
+    the kernel, more akin to a driver. For the modules we must use:
+  </p>
+  <ul class="config-list">
+    <li>vfio</li>
+    <li>vfio_iommu_type1</li>
+    <li>vfio_pci</li>
+    <li>vfio_virqfd</li>
+  </ul>
+  <p>
+    These modules all act together to allow the PCIe device to be assigned to a
+    VM. "vfio" is the core module that exposes the device, "vfio_iommu_type1"
+    ensures a VM can only access its own memory, preventing it from currupting
+    the host's memory, "vfio_pci" is the specific driver that binds to the PCI
+    device and allows them to be passed through to a VM instead of being
+    assigned to the host, "vfio_firqfd" is mostly obsolete as of Linux Kernel
+    6.2, however I leave this legacy module in my configuration as a
+    specification.
+  </p>
+  <br />
+  <p>
+    To finish things up, we have to blacklist the nouveau/nvidia drivers from
+    loading in the kernel. After this, we are then able to assign the PCI device
+    to our VM under either the UI configuration or the vm.conf file. It's
+    important to enable x-vga=1 for a Proxmox setup, this makes the passed GPU
+    function as the primary display device inside of the VM. This handles
+    compatibility issues by disabling emulated graphics and enabling necessary
+    BIOS/UEFI hooks for the GPU to initialize.
+  </p>
+  <br />
+  <p>
+    After all of this setup and configuration, we now have our GPU in our VM of
+    choice!
+  </p>
 
-<style>
+  <style>
     /* Responsive Grid Logic */
     .layer-grid {
-        display: grid;
-        grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
-        gap: 30px;
-        margin-top: 25px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr; /* Weighted toward the table side */
+      gap: 30px;
+      margin-top: 25px;
     }
 
     @media (max-width: 900px) {
-        .layer-grid {
-            grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
-        }
+      .layer-grid {
+        grid-template-columns: 1fr; /* Stacks vertically on tablets/phones */
+      }
     }
 
     /* Panel Styling */
     .layer-panel {
-        background: rgba(0, 255, 65, 0.03);
-        border-left: 1px solid rgba(0, 255, 65, 0.1);
-        padding: 20px;
+      background: rgba(0, 255, 65, 0.03);
+      border-left: 1px solid rgba(0, 255, 65, 0.1);
+      padding: 20px;
     }
 
     .panel-title {
-        font-size: 1.1rem;
-        border-bottom: 1px solid var(--phosphor-dim);
-        padding-bottom: 8px;
-        margin-bottom: 15px;
+      font-size: 1.1rem;
+      border-bottom: 1px solid var(--phosphor-dim);
+      padding-bottom: 8px;
+      margin-bottom: 15px;
     }
 
     .info-terminal-box {
-        margin-top: 25px;
-        padding: 15px;
-        border: 1px dashed var(--phosphor-dim);
-        font-size: 0.85rem;
+      margin-top: 25px;
+      padding: 15px;
+      border: 1px dashed var(--phosphor-dim);
+      font-size: 0.85rem;
     }
 
     /* Mobile Table Scroll Fix */
-    .table-scroll-wrapper { width: 100%; overflow-x: auto; }
-    
-    .config-list {
-	font-size: 0.8rem;
-	margin: 10px;
-	list-style: none;
+    .table-scroll-wrapper {
+      width: 100%;
+      overflow-x: auto;
     }
 
-</style>
+    .config-list {
+      font-size: 0.8rem;
+      margin: 10px;
+      list-style: none;
+    }
+  </style>
+</div>
