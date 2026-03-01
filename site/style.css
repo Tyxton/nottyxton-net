@@ -1,18 +1,25 @@
-/* --- CORE VARIABLES & RESET --- */
+/* --------------------------------
+     [ CORE_SYSTEM_VARIABLES ]
+  Phosphor Pallete, and CRT base
+-------------------------------- */
 :root {
-  /* Amber Phosphor color palette */
   --phosphor-bright: #ffb000;
   --phosphor-dim: #b37b00;
   --phosphor-muted: #755800;
   --phosphor-glow: rgba(255, 176, 0, 0.4);
-
-  --crt-bg: #110c00; /* Very dark brown/black background */
+  --crt-bg: #110c00;
   --crt-off: #050400;
+}
 
-  /* LOGICAL WEIGHTS */
-  --color-text: var(--phosphor-bright);
-  --color-label: var(--phosphor-dim);
-  --color-ghost: var(--phosphor-muted);
+@import url("https://fonts.googleapis.com/css2?family=VT323&family=Fira+Code:wght@400;700&display=swap");
+
+html,
+body {
+  font-family: "VT323", monospace;
+  height: 100%;
+  width: 100%;
+  background-color: #000;
+  overflow-x: hidden;
 }
 
 * {
@@ -21,13 +28,98 @@
   box-sizing: border-box;
 }
 
-html,
-body {
-  height: 100%;
+/* ---------------------------------------
+        [ CRT_HARDWARE_EMULATION ]
+  Scanlines, Flicker, and Bezel Effects
+--------------------------------------- */
+
+/* --- Physical Monitor Overlays --- */
+
+.crt-monitor {
   width: 100%;
-  background-color: #000;
-  overflow-x: hidden; /* Prevent scrolling outside the "monitor" */
-  font-family: "Courier New", Courier, monospace; /* Fallback monospace */
+  height: 100%;
+  position: relative;
+  background-color: var(--crt-bg);
+  color: var(--phosphor-bright);
+  text-shadow:
+    0 0 2px var(--phosphor-dim),
+    0 0 8px var(--phosphor-bright);
+  overflow-y: auto;
+  padding: 20px;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.9);
+  border-radius: 10px;
+  border: 3px solid #222;
+}
+
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.screen-flicker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 176, 0, 0.02);
+  opacity: 0;
+  z-index: 9998;
+  pointer-events: none;
+  animation: flicker 0.15s infinite;
+}
+
+.bezel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  z-index: 12;
+  border-radius: 10px;
+}
+
+/* --- Boot Sequence UI --- */
+
+#loading-screen {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--phosphor-dim);
+  padding: 20px;
+  background-color: var(--crt-bg);
+  height: 100vh;
+  overflow: hidden;
+}
+
+.skip-hint {
+  margin-top: 20px;
+  color: var(--phosphor-muted);
+  font-style: italic;
+  animation: blink 1s infinite;
+}
+
+#boot-text {
+  white-space: pre-wrap;
+  line-height: 1.4;
+}
+
+.power-on-anim {
+  animation: turnOn 0.8s ease-in-out forwards;
 }
 
 body::after {
@@ -50,145 +142,27 @@ body::after {
   background-size:
     100% 4px,
     3px 100%;
-  pointer-events: none; /* Allows clicking through the scanlines */
-}
-
-.text-amber {
-  text-shadow: 0 0 5px rgba(255, 176, 0, 0.7); /* Subtle Bloom */
-}
-
-/* Load a better monospace font if available */
-@import url("https://fonts.googleapis.com/css2?family=VT323&family=Fira+Code:wght@400;700&display=swap");
-body {
-  /* VT323 is more "pixelated retro", Fira Code is cleaner terminal. Pick your poison. */
-  font-family: "VT323", monospace;
-}
-
-/* --- THE CRT MONITOR CONTAINER --- */
-.crt-monitor {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  background-color: var(--crt-bg);
-  color: var(--phosphor-bright);
-  /* The crucial text glow effect */
-  text-shadow:
-    0 0 2px var(--phosphor-dim),
-    0 0 8px var(--phosphor-bright);
-  overflow-y: auto; /* Allow scrolling *inside* the screen */
-  padding: 20px;
-
-  /* CRT Curve and Vignette Effect */
-  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.9);
-  /* Subtle curvature using border radius, easier on eyes than actual 3D transforms */
-  border-radius: 10px;
-  border: 3px solid #222;
-}
-
-/* --- CRT EFFECTS LAYERS (Overlays) --- */
-
-/* 1. Scanlines */
-.scanlines {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0) 50%,
-    rgba(0, 0, 0, 0.25) 50%
-  );
-  background-size: 100% 4px; /* Size of scanlines */
-  pointer-events: none; /* Click through them */
-  z-index: 9999;
-}
-
-/* 2. Subtle Screen Flicker */
-.screen-flicker {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 176, 0, 0.02);
-  opacity: 0;
-  z-index: 9998;
   pointer-events: none;
-  animation: flicker 0.15s infinite;
 }
 
-/* 3. The Bezel (Dark edges) */
-.bezel {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.7);
-  pointer-events: none;
-  z-index: 12;
-  border-radius: 10px;
-}
-
-/* --- LOADING SCREEN --- */
-#loading-screen {
-  font-family: "Courier New", Courier, monospace;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.2;
-  color: var(--phosphor-dim);
-  padding: 20px;
-  background-color: var(--crt-bg);
-  height: 100vh;
-  overflow: hidden;
-}
-
-.skip-hint {
-  margin-top: 20px;
-  color: var(--phosphor-muted);
-  font-style: italic;
-  animation: blink 1s infinite;
-}
-
-#boot-text {
-  white-space: pre-wrap; /* Preserve line breaks in text */
-  line-height: 1.4;
-}
-
-/* The animation when the computer "turns on" */
-.power-on-anim {
-  animation: turnOn 0.8s ease-in-out forwards;
-}
-
-/* --- MAIN CONTENT STYLING --- */
-#main-content {
-  padding-bottom: 50px;
-  max-width: 1400px;
-  width: 95%;
-  margin: 0 auto;
-
-  padding: 40px;
-  position: relative;
-}
-
-/* Header & Nav */
+/* --------------------------------------
+          [ NAVI_&_GLOBAL_UI ]
+  Sticky Nav, Key Bindings, and Footer
+-------------------------------------- */
 .tui-nav-row {
   position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 9800;
-  background: var(
-    --crt-bg
-  ); /* Match background so text doesn't bleed through */
+  background: var(--crt-bg);
   border-bottom: 1px solid var(--phosphor-dim);
   padding: 10px 0;
   pointer-events: auto;
 }
 
 .nav-key {
-  color: var(--phosphor-bg); /* Black text */
-  background: var(--phosphor-dim); /* Dim amber bg */
+  color: var(--phosphor-bg);
+  background: var(--phosphor-dim);
   padding: 0 5px;
   text-decoration: none;
   font-weight: bold;
@@ -196,7 +170,7 @@ body {
 
 .nav-key.active,
 .nav-key:hover {
-  background: var(--phosphor-bright); /* Bright amber when active */
+  background: var(--phosphor-bright);
   color: var(--phosphor-bg);
   box-shadow: 0 0 10px var(--phosphor-glow);
 }
@@ -206,30 +180,24 @@ body {
   margin-left: 5px;
 }
 
-.header-main {
-  display: flex;
-  justify-content: flex-start; /* Keeps them close to each other */
-  align-items: flex-end; /* Aligns text to the bottom of the logo */
-  gap: 40px; /* Space between logo and telemetry */
-  margin-bottom: 10px;
-}
-
-.header-telemetry {
-  font-family: "Courier New", monospace;
-  font-size: 0.9rem;
-  color: var(--phosphor-dim); /* Using the dimmer amber for stats */
-}
-
+/* --- Depreciated
 .nav-item {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  border: 1px solid transparent; /* Prevents shifting when active */
+  border: 1px solid transparent;
   cursor: pointer;
   pointer-events: auto;
 }
+--- */
 
-/* The F-Key Box */
+.nav-item {
+  color: var(--phosphor-bright);
+  text-decoration: none;
+  padding: 2px 5px;
+  transition: all 0.2s ease;
+}
+
 .nav-key {
   background-color: var(--phosphor-muted);
   color: var(--phosphor-bright);
@@ -242,11 +210,10 @@ body {
   pointer-events: none;
 }
 
-/* THE INVERSION (Active/Hover State) */
 .nav-item.active .nav-key,
 .nav-item:hover .nav-key {
   background-color: var(--phosphor-bright);
-  color: var(--phosphor-bg); /* Dark background color */
+  color: var(--phosphor-bg);
 }
 
 .nav-item.active .nav-label,
@@ -255,15 +222,13 @@ body {
   text-decoration: underline;
 }
 
-/* Header & Nav */
-
 .terminal-footer {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   box-sizing: border-box;
-  background: rgba(20, 15, 0, 0.95); /* Dim amber tint */
+  background: var(--crt-bg);
   border-top: 1px solid var(--phosphor-muted);
   display: flex;
   flex-wrap: nowrap;
@@ -272,7 +237,7 @@ body {
   padding: 6px 15px;
   font-size: 0.7rem;
   z-index: 100;
-  pointer-events: none; /* Let clicks pass through to content if needed */
+  pointer-events: none;
   color: var(--phosphor-muted);
   margin: 0;
 }
@@ -285,21 +250,35 @@ body {
   text-transform: uppercase;
 }
 
-@keyframes text-flicker {
-  0% {
-    opacity: 0.98;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 99;
-  }
+/* -----------------------------------------
+          [ TYPOGRAPHY_&_CONTENT ]
+  Headers, Project Lists, and ASCII Blocks
+----------------------------------------- */
+#main-content {
+  padding-bottom: 50px;
+  max-width: 1400px;
+  width: 95%;
+  margin: 0 auto;
+  padding: 40px;
+  position: relative;
 }
 
-/* Terminal Body Content */
+.header-main {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 40px;
+  margin-bottom: 10px;
+}
+
+.header-telemetry {
+  font-family: "Courier New", monospace;
+  font-size: 0.9rem;
+  color: var(--phosphor-dim);
+}
+
 .terminal-body {
-  max-width: 1100px; /* Limits width for readability on huge monitors */
+  max-width: 1100px;
   margin: 0 auto;
   padding: 20px;
   z-index: 10;
@@ -342,7 +321,6 @@ h4 {
   padding-bottom: 10px;
 }
 
-/* Project Items */
 .meta {
   font-size: 0.8rem;
   color: var(--phosphor-dim);
@@ -352,61 +330,171 @@ h4 {
 .code {
   font-size: 0.85rem;
   margin-top: 5px;
-
   white-space: pre;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   max-width: 100%;
-
   scrollbar-width: thin;
   scrollbar-color: var(--phosphor-dim) transparent;
 }
 
-/* --- UTILS & ANIMATIONS --- */
 .blinking-cursor {
   animation: blink 1s step-end infinite;
   margin-left: 5px;
 }
 
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
+.meta-comment {
+  color: var(--phosphor-dim);
+  font-size: 0.85rem;
+  margin-left: 15px;
+  font-style: italic;
 }
 
-@keyframes flicker {
-  0% {
-    opacity: 0.8;
-  }
-  50% {
-    opacity: 0.9;
-  }
-  100% {
-    opacity: 0.8;
-  }
+.glitch {
+  position: relative;
+  font-size: 0.9rem;
+  white-space: pre;
+  animation: hardware-flicker 4s infinite;
 }
 
-/* CRT Power On Effect */
-@keyframes turnOn {
-  0% {
-    transform: scale(1, 0.001);
-    opacity: 0;
-    filter: brightness(10);
-  }
-  30% {
-    transform: scale(1, 0.001);
-    opacity: 1;
-  }
-  70% {
-    transform: scale(1.1, 0.8);
-  }
-  100% {
-    transform: scale(1, 1);
-    filter: brightness(1);
-  }
+.glitch::before,
+.glitch::after {
+  display: none;
 }
 
-/* Responsive adjustments */
+.typing-animation {
+  animation: scanline-reveal 0.6s steps(30, end);
+  overflow: hidden;
+  white-space: normal;
+  border-left: 2px solid var(--phosphor-bright);
+  padding-left: 15px;
+}
+
+.log-viewer {
+  width: 100%;
+  background: rgba(0, 20, 0, 0.1);
+  min-height: 50vh;
+  padding-top: 15px;
+}
+
+#viewscreen-content {
+  line-height: 1.6;
+  padding-right: 50px;
+}
+
+#viewscreen-header {
+  padding-bottom: 15px;
+}
+
+/* --- Index/Directory Styling --- */
+.wide-index {
+  margin-top: 20px;
+}
+.index-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 176, 0, 0.1);
+}
+.index-details {
+  opacity: 0.6;
+  font-size: 0.9rem;
+  text-align: right;
+}
+.index-row a {
+  text-decoration: none;
+  color: var(--phosphor-bright);
+  font-weight: bold;
+}
+
+/* --- Legacy / Archived Entries --- */
+.legacy-list {
+  color: var(--phosphor-muted) !important;
+  opacity: 0.8;
+}
+
+/* --- Audit/Landing Module --- */
+.audit-section {
+  padding-bottom: 5px;
+}
+.audit-list li {
+  list-style: none;
+  padding-left: 5px;
+}
+
+/* Shared Styles */
+.audit-grid {
+  margin-top: 10px;
+}
+
+.audit-row {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.audit-label {
+  color: var(--phosphor-muted);
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.audit-value {
+  color: var(--phosphor-bright);
+}
+
+/* --- List Styling Modules --- */
+.config-list {
+  font-size: 0.8rem;
+  margin: 10px;
+  list-style: none;
+}
+
+/* --- Legal/Compliance Note --- */
+.compliance {
+  color: var(--phosphor-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+  border-left: 2px solid var(--phosphor-dim);
+  padding-left: 10px;
+  margin-top: 20px;
+  opacity: 0.7;
+}
+
+/* --- Data Tree Styling --- */
+.acl {
+  font-size: 0.85rem;
+  list-style-type: none;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+.li {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.data-tree {
+  font-family: "Courier New", monospace;
+  line-height: 1.4;
+  color: var(--phosphor-dim);
+}
+
+.tree-branch {
+  color: var(--phosphor-muted);
+  margin-right: 10px;
+  user-select: none;
+}
+
+.tree-leaf {
+  color: var(--phosphor-bright);
+  font-weight: bold;
+}
+
+/* --------------------------
+  [ MOBILE_RESPONSIVENESS ]
+-------------------------- */
+
 @media (max-width: 480px) {
   #main-content {
     width: 100% !important;
@@ -415,7 +503,6 @@ h4 {
     padding: 10px 10px 160px 10px;
   }
 
-  /* Shrink the main headers */
   h1,
   h2,
   h3,
@@ -469,7 +556,6 @@ h4 {
     opacity: 0.1 !important;
   }
 
-  /* Make tables scrollable horizontally if they are still too wide */
   .tui-header {
     padding-top: 10px;
   }
@@ -489,7 +575,7 @@ h4 {
 
   .tui-nav-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columns for perfect symmetry */
+    grid-template-columns: repeat(3, 1fr);
     gap: 5px;
     padding: 10px;
     background: var(--crt-bg);
@@ -516,7 +602,7 @@ h4 {
   }
 
   .terminal-footer {
-    flex-direction: column; /* Stack vertically */
+    flex-direction: column;
     height: auto;
     justify-content: center;
     text-align: center;
@@ -540,27 +626,60 @@ h4 {
     width: 100%;
     display: block;
   }
+
+  /* --- Audit/Landing Module --- */
+  .audit-section {
+    padding-bottom: 5px;
+  }
+  .audit-list li {
+    list-style: none;
+    padding-left: 5px;
+  }
+
+  /* Shared Styles */
+  .audit-grid {
+    margin-top: 10px;
+  }
+
+  .audit-row {
+    display: flex;
+    margin-bottom: 5px;
+  }
+
+  .audit-label {
+    color: var(--phosphor-muted);
+    width: 120px;
+    flex-shrink: 0;
+  }
+
+  .audit-value {
+    color: var(--phosphor-bright);
+  }
+
+  /* --- Index/Directory Styling --- */
+  .index-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .index-details {
+    text-align: left;
+    padding-top: 5px;
+  }
 }
 
-.nav-item {
-  color: var(--phosphor-bright);
-  text-decoration: none;
-  padding: 2px 5px;
-  transition: all 0.2s ease;
-}
+/* ---------------------
+  [ ANIMATION_ENGINE ]
+--------------------- */
 
-.meta-comment {
-  color: #666; /* Dim gray for comments */
-  font-size: 0.85rem;
-  margin-left: 15px;
-  font-style: italic;
-}
-
-.glitch {
-  position: relative;
-  font-size: 0.9rem;
-  white-space: pre;
-  animation: hardware-flicker 4s infinite;
+@keyframes scanline-reveal {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 1000px;
+    opacity: 1;
+  }
 }
 
 @keyframes hardware-flicker {
@@ -589,43 +708,51 @@ h4 {
   }
 }
 
-/* Remove the pseudo-elements (before/after) that were causing the color split */
-.glitch::before,
-.glitch::after {
-  display: none;
-}
-
-.typing-animation {
-  animation: scanline-reveal 0.6s steps(30, end);
-  overflow: hidden;
-  white-space: normal;
-  border-left: 2px solid var(--phosphor-bright);
-  padding-left: 15px;
-}
-
-@keyframes scanline-reveal {
-  from {
-    max-height: 0;
-    opacity: 0;
+@keyframes text-flicker {
+  0% {
+    opacity: 0.98;
   }
-  to {
-    max-height: 1000px;
+  50% {
     opacity: 1;
   }
+  100% {
+    opacity: 99;
+  }
 }
 
-.log-viewer {
-  width: 100%;
-  background: rgba(0, 20, 0, 0.1);
-  min-height: 50vh;
-  padding-top: 15px;
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
 }
 
-#viewscreen-content {
-  line-height: 1.6; /* Improve readability */
-  padding-right: 50px; /* Prevent text from hitting the far right edge */
+@keyframes flicker {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.8;
+  }
 }
 
-#viewscreen-header {
-  padding-bottom: 15px;
+@keyframes turnOn {
+  0% {
+    transform: scale(1, 0.001);
+    opacity: 0;
+    filter: brightness(10);
+  }
+  30% {
+    transform: scale(1, 0.001);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(1.1, 0.8);
+  }
+  100% {
+    transform: scale(1, 1);
+    filter: brightness(1);
+  }
 }

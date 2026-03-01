@@ -15,7 +15,7 @@ STATUS: DEPLOYED / HEALTHY
       </div>
       <div class="audit-row">
         <span class="audit-label">[ ORIGIN ]</span>
-        <span class="audit-value">HTX_DATA_CENTER_01</span>
+        <span class="audit-value">MSF_01</span>
       </div>
       <div class="audit-row">
         <span class="audit-label">[ SPECIAL ]</span>
@@ -58,6 +58,10 @@ STATUS: DEPLOYED / HEALTHY
   <section class="audit-section">
     <h3>>> RECENT_LOG_ENTRIES</h3>
     <div class="log-entry">
+      <span class="log-data">2026.02.28</span> - Cleanup of nottyxton.net
+      stylesheet, reworking of DNS server, new content added.
+    </div>
+    <div class="log-entry">
       <span class="log-data">2026.02.18</span> - Reworked network architecture
       to include standardization and more security.
     </div>
@@ -80,55 +84,3 @@ STATUS: DEPLOYED / HEALTHY
 END_OF_MANIFEST | (C) 2026 TYXTON
   </pre>
 </div>
-
-<style>
-  .audit-section {
-    padding-bottom: 5px;
-  }
-  .audit-list li {
-    list-style: none;
-    padding-left: 5px;
-  }
-
-  /* Shared Styles */
-  .audit-grid {
-    margin-top: 10px;
-  }
-
-  .audit-row {
-    display: flex;
-    margin-bottom: 5px;
-  }
-
-  .audit-label {
-    color: var(--phosphor-muted); /* Use your dim amber color */
-    width: 120px; /* Fixed width keeps values aligned on desktop */
-    flex-shrink: 0;
-  }
-
-  .audit-value {
-    color: var(--phosphor-bright); /* Use your bright amber color */
-  }
-
-  /* Mobile Optimization */
-  @media (max-width: 480px) {
-    .audit-row {
-      flex-direction: column; /* Stack label above value */
-      margin-bottom: 12px;
-      border-left: 2px solid var(--p-dim);
-      padding-left: 10px;
-    }
-
-    .audit-label {
-      font-size: 0.75rem;
-      width: auto; /* Reclaim horizontal space */
-      margin-bottom: 2px;
-    }
-
-    .audit-value {
-      font-size: 0.95rem;
-      padding-left: 5px;
-      word-break: break-word; /* Prevents long strings from pushing the edge */
-    }
-  }
-</style>
