@@ -408,9 +408,17 @@ h4 {
 }
 
 /* --- Legacy / Archived Entries --- */
-.legacy-list {
-  color: var(--phosphor-muted) !important;
-  opacity: 0.8;
+.legacy-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--phosphor-muted);
+}
+
+.legacy-row a {
+  text-decoration: none;
+  color: var(--phosphor-muted);
+  font-weight: italic;
 }
 
 /* --- Audit/Landing Module --- */
