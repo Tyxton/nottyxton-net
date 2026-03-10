@@ -1,0 +1,139 @@
+<div class="layer-container">
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> GAMEARR_DEVELOPMENT://<span class="layer-name">GENERAL LAB</span>
+    </h2>
+    <p class="meta-comment">
+      Developing a Video Game PVR to fit the *Arr ecosystem.
+    </p>
+  </div>
+  <h3>>> Introductions</h3>
+  <p>
+    This entry is going to be a little less clinical and documentative than
+    usual. I want to start this off by stating that I am not by any means an
+    application developer. At best, I am a web-end UI/UX programmer. I've
+    dabbled in a few programming languages, I've written some scripts for around
+    the homelab, altered config files, and I've written a few mock programs,
+    calculators, calendars, etc. But I've never really had the desire or need to
+    learn application programming, software. I work closely with hardware which
+    is what I enjoy doing, hence the homelab. Though, roughly two weeks ago now,
+    I had the passing thought. "I don't really have much I want to add to the
+    servers, every new big project I want to do would cost money I don't have
+    with new technologies and hardware... I wonder if there's an *arr for video
+    games." And to my surprise, not really. I only saw a few projects, and none
+    of them did quite what I wanted to.
+  </p>
+  <br />
+  <p>
+    I mean no shade or offense to the developers of Questarr or Playerr, but
+    they have a more limited scope than what I am imagining for Gamearr. Both
+    projects lack in the "diversity" of game preservation. Questarr works almost
+    exclusively with Prowlarr/Torznab, and Playerr does the same with more
+    handheld-specific features. Torznab and Newznab (Torrents and Usenet) have a
+    lot, but they don't have everything or the best versions of what's out there
+    - especially in regards to legacy consoles. There's self-hosted library
+    managers like RomM, GameVault, Gameyfin that do great at showing your
+    existing game library, but don't do any of the aquisition. There's Lutris
+    for the desktop, its a very powerful tool, but that isn't built for a
+    homelab, it's not designed to run in a container on a server 24/7.
+  </p>
+  <br />
+  <p>
+    Point being, there isn't an existing software that offers what I envision
+    the end-goal v1.0 of Gamearr to be. The all-in-one Video Game PVR solution.
+    Rather than just relying on Torznab and Newznab, video game preservation is
+    largely done outside of that. Direct Download ROM sites, TSV sheets, etc
+    etc. I'm trying to build the tool that does it all. The first "mock up" v0.1
+    was just a CLI NoPayStation PS Vita parser, search the title, find the one
+    that matched what you wanted by region, then pull it and extract it. No
+    metadata, no fancy UI, just moving data. The test of "is this something
+    achievable." It went well so in v0.2, I added a queue system, and added
+    support for PSP and PSX which NPS has the TSV files for, added a very
+    barebones SQLite database. In v0.3, I made it docker-compatible with
+    background runners, and at this point was still CLI based. v0.4, I build the
+    core of the Web UI transitioning to FastAPI, expanded the SQLite, automated
+    the Metadata fetch through the IGDB API while trying to respect their
+    servers in the process. And once I had a functional demo, flipped the repo
+    to public. I got some valid criticisms for the quality of the code, and
+    worked hard to refactor it so it meets the production ready standards that
+    the *arr community expects from such a project. I'm testing and wrapping up
+    the backend portion of v0.5 before I tackle the UI refactor; this time the
+    big improvement is NAS and ARM support.
+  </p>
+  <br />
+  <p>
+    I've been learning as I go, with each step of development, Gamearr becomes
+    more stable, more refined, I'm having to look up less and less how to do
+    certain things. It's becoming less forums, YouTube tutorials, and outdated
+    Python 2 programming instructions and more programming. Which honestly, I'm
+    very glad for. Here soon in v0.6 I'll be working on preparing the backend
+    for nearly full platform support. Everything from the Dreamcast and Sega
+    Saturn hopefully all the way up to the PS4 and Xbox 360. Every console has
+    it's own unique requirements, methods of preservation, metadata parsing,
+    etc. But I also think it's a perfect spot for Gamearr to really shine. I'm
+    not building it for the 'low-hanging fruit' of popular formats. It's being
+    built for the edge cases - the encrypted, the fragmented, and the preserved.
+    From an emulation or a physical hardware standpoint. It's also why I wanted
+    to finish v0.6 before v0.7's goals of safely sourcing DDLs, Torznab, and
+    Newznab. Really prep it for the anything case.
+  </p>
+  <br />
+  <p>
+    In this development cycle I've been really thankful for my homelab, the
+    non-converged isolated VLAN between Raiden and Motherbase have proven a
+    really effective testing environment. Everything from permission errors in
+    docker, to the LXC, to the mount in the PVE host, to the NAS itself. I can
+    test it before I put a production-ready version out there. That said, I hope
+    that I develop a little bit of a community to test the ARM side of things. I
+    don't currently have a device with ARM support, and considering the start of
+    that was in this most recent version, I am actively seeking people
+    interested in this project with ARM-based nodes to stress-test these
+    binaries hard before they hit the main branch. I want to make something that
+    will last, something that will be of use to the community, something that
+    can grow with the ever changing needs of the video game preservation
+    community.
+  </p>
+  <br />
+  <p>
+    I kick myself sometimes thinking about it, but I really did look at Sonarr &
+    Radarr, some of the most successful, polished, functional automation suites
+    in the homelab world and "I'm going to build that, but for the one medium
+    that is notoriously fragmented, protected by encryption, and lacks a unified
+    metadata standard."
+  </p>
+  <br />
+  <p>
+    That said, the process of learning has been quite fulfilling and enjoyable,
+    though I do hope it's not a solo-project forever.
+  </p>
+  <br />
+  <h3>>> The Plans For Gamearr</h3>
+  <p>
+    On the github repo I do talk about the various development stages and what
+    the overarching goal for each alpha/beta version will be. The current
+    version v0.5-alpha focuses on NAS stability, reliability, file integrity,
+    and preserving your physical drives, while also including ARM support as
+    more of a bonus for the users with Synology NAS or a Raspberry Pi. v0.6 like
+    I mentioned mainly focuses on expanding the metadata, parsing, and
+    decryption of pre-ninth generation platforms. v0.7 works on incorportating
+    Torznab and Newznab sources, hopefully having it perfectly integrate with
+    Prowlarr, while keeping TSV sources for PSV, PSP, and PSX and introducing
+    the DDL parsing the XML used there. In v0.8 I'll be trying to get PC, and
+    ninth gen support integrated, one of the biggest features I'm looking foward
+    to is auto-pulling from the Steam Wishlist much like Sonarr/Radarr have the
+    watchlist. v0.9 will mostly be polishing up, especially in regards to the
+    downloading process. I'm not sure exactly how I'll do it yet, but make sure
+    that no bad rips, malicious files, what have you, make it into your
+    downloads folder, or especially to your NAS. And then after all of that
+    hopefully v1.0 will see the light of day.
+  </p>
+  <br />
+  <p>
+    I can't make any timeline promises on when these versions will release, as
+    each new version takes longer and longer, but considing I went from the CLI
+    to where we're at now in two weeks, I'm hoping not too long. The demand is
+    there, and hopefully I can make the tool that people want/need. The thing
+    that's been missing from the self-hosted/homelab community for years. The
+    Video Game PVR that can do it all.
+  </p>
+</div>
