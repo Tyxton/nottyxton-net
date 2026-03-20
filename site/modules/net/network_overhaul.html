@@ -16,8 +16,306 @@
     >
   </h4>
 
-  <h3>>> THIS PAGE IS CURRENTLY BEING WRITTEN, COME BACK SOON!</h3>
+  <h3>>> VLAN OVERHAUL</h3>
+  <h4>[ PROBLEM ]</h4>
+  <p>
+    Previously, the way I had the VLANs set up did work, however, they were
+    largely unprofessional, unstructured, and had a vulnerability in the default
+    VLAN.
+  </p>
+  <h4>[ SOLUTION ]</h4>
+  <p>
+    So the first thing I will be doing is "renaming" the VLANs, and adding a new
+    one. Previously, we had:
+  </p>
+  <pre class="code">
+ ┌────────────────────────────────────────────────────────────┐ 
+ │ [ PREVIOUS_VLAN_STRUCTURE ]                                │ 
+ │                                                            │ 
+ │   ├─ VLAN 1 - (Default) Untrusted                          │ 
+ │   │    └─(Roommate Devices, Guest, DMZ)                    │ 
+ │   │                                                        │ 
+ │   ├─ VLAN 2 - Management                                   │ 
+ │   │    └─(Core Fabric, Infrastructure, Private VMs/LXCs)   │ 
+ │   │                                                        │ 
+ │   ├─ VLAN 3 - Trusted                                      │ 
+ │   │    └─(Personal Devices, Dev Station, Laptop)           │ 
+ │   │                                                        │ 
+ │   ├─ VLAN 4 - IoT                                          │ 
+ │   ┴    └─(Printers, Smart Devices, etc)                    │ 
+ │                                                            │ 
+ └────────────────────────────────────────────────────────────┘ 
+  </pre>
+  <p>
+    Firstly, the naming schema of 1-4 is functional, but largely unused in
+    professional environments, to make the best habit, I want to change the
+    schema to intervals of 10. Second - and my biggest issue with this
+    configuration - VLAN 1 being both the DMZ and the Untrusted VLAN. This
+    change is <strong>CRITICAL</strong> so as to not compromise my roommate's
+    devices, they deserve the same amount of care that my own devices receive.
+    Lastly, my core infrastructure and fabric should not be on the same playing
+    field as my docker nodes - one bad update, one unseen vulnerability, one
+    breached container, and they don't even need to leave the switch to gain
+    access. This is also <strong>CRITICAL</strong>, we do not want this kind of
+    vulnerability in the network.
+  </p>
   <br />
-  <p>EOF...</p>
+  <p>
+    We fix this by introducing a new, more segmented structure, I'll also be
+    adding a new VLAN which I will touch on in just a moment:
+  </p>
+  <pre class="code">
+ ┌────────────────────────────────────────────────────────────┐
+ │ [ CURRENT_VLAN_STRUCTURE ]                                 │
+ │                                                            │
+ │   │                                                        │
+ │   ├─ VLAN 10 - Untrusted                                   │
+ │   │    └─(Roommate Devices, Guest)                         │
+ │   │                                                        │
+ │   ├─ VLAN 20 - (Default) Management                        │
+ │   │     ─(Core Fabric, Infrastructure)                     │
+ │   │                                                        │
+ │   ├─ VLAN 30 - Trusted                                     │
+ │   │     ─(Personal Devices, Private VMs/LXCs)              │
+ │   │                                                        │
+ │   │─ VLAN 40 - DMZ/Public                                  │
+ │   │     ─(Public Facing Services)                          │
+ │   │                                                        │
+ │   │─ VLAN 50 - Storage                                     │
+ │   ┴     ─(Isolated, Air-Gapped Storage Lane)               │
+ │                                                            │
+ └────────────────────────────────────────────────────────────┘
+  </pre>
+  <p>
+    To go over the design choices, I moved to a more production standard naming
+    schema, this is mostly just habit development, and completely removed the
+    orignal VLANs. Segmented Roommate/Guest from the DMZ, giving that it's own
+    dedicated VLAN. For the more interesting design choices, we moved the
+    private VMs and LXCs to Trusted alongside my dev station, laptop, phone, and
+    even Roku. While I could have made another VLAN for the Trusted devices, I
+    decided that for my network, this is efficient due to the fact all four of
+    these devices regularly interact with these nodes, as well as the fact that
+    there are additional firewalls configured on the VM/LXC level that
+    explicitly allow these IP addresses in or out over the necessary ports. For
+    instance, my phone will never be able, nor should ever be able to SSH,
+    though I should access my Web UIs. Had I not implemented this, I would not
+    have structured it this way. Then, we have Management as the default, this
+    is where all of my networking hardware, Proxmox, and TrueNAS live. While it
+    is the default network, it is impossible to connect to it over WiFi - it is
+    never advertised. I have my ports configured in such a way that they are
+    disabled while not in use, and the two SSIDs are within VLAN 10 and 30. This
+    is also for simplicity, and ease of adoption. Last, we have the Storage
+    VLAN. This is a noDHCP, 10.50.0.x/30, isolated VLAN. This is used as a
+    point-to-point NFS lane between Proxmox and TrueNAS, the reason I set up the
+    VLAN for this is switch recognition. This never escapes the switch into the
+    gateway, DNS server, or anywhere else. Block all rules across the board, no
+    DHCP, a subnet of 30 only allows for 2 devices. Essentially invisible to the
+    entire network.
+  </p>
+  <h4>[ KEY_IMPROVEMENTS ]</h4>
+  <ul class="config-list">
+    <li><span>[ NEW ]</span> Seperated DMZ and Untrusted Traffic.</li>
+    <li>
+      <span>[ NEW ]</span> Isolated Storage Traffic Between NFS endpoints.
+    </li>
+    <li><span>[ NEW ]</span> Management as default.</li>
+  </ul>
   <br />
+  <h3>>> SUBNET_STANDARDIZATION</h3>
+  <h4>[ PROBLEM ]</h4>
+  <p>
+    Again, this is more of a production-ready push on my part to meet
+    production-ready standards. The subnet schema is horribly unstandardized.
+  </p>
+  <pre class="code">
+ ┌────────────────────────────────────────────────┐
+ │[ PREVIOUS_SUBNET_SCHEMA ]                      │
+ │                                                │
+ │ VLAN      NAME         SUBNET        GATEWAY   │
+ ├───────┬────────────┬─────────────┬─────────────┤
+ │  1    │ Untrusted  │ 192.168.1.X │ 192.168.1.1 │
+ │  2    │ Management │ 192.168.2.X │ 192.168.1.1 │
+ │  3    │ Trusted    │ 10.0.1.X    │ 192.168.1.1 │
+ │  4    │ IoT        │ 172.16.1.X  │ 192.168.1.1 │
+ │       │            │             │             │
+ └───────┴────────────┴─────────────┴─────────────┘
+  </pre>
+  <p>
+    Once again, this is rather everywhere, using every address in RFC1918, all
+    pointing to our gateway in other VLAN. While this works, its very much in
+    need of standardization.
+  </p>
+  <h4>[ SOLUTION ]</h4>
+  <pre class="code">
+ ┌────────────────────────────────────────────────┐
+ │[ CURRENT_SUBNET_SCHEMA ]                       │
+ │                                                │
+ │ VLAN      NAME         SUBNET        GATEWAY   │
+ ├───────┬────────────┬─────────────┬─────────────┤
+ │  10   │ Untrusted  │ 10.10.0.X   │ 10.10.0.1   │
+ │  20   │ Management │ 10.20.0.X   │ 10.20.0.1   │
+ │  30   │ Trusted    │ 10.30.0.X   │ 10.30.0.1   │
+ │  40   │ DMZ/Public │ 10.40.0.X   │ 10.40.0.1   │
+ │  50   │ Storage    │ 10.50.0.X   │ ---------   │
+ └───────┴────────────┴─────────────┴─────────────┘
+  </pre>
+  <p>
+    This is much more structured, clean, easier to memorize, silences
+    unnecessary inter-VLAN chatter, and utilizes logical second octect
+    identification per VLAN.
+  </p>
+  <br />
+  <h3>>> IP_STANDARDIZATION</h3>
+  <h4>[ PROBLEM ]</h4>
+  <p>
+    IP addresses are completely random with no structure, only distrubuted via
+    DHCP lease and made static if needed.
+  </p>
+  <h4>[ SOLUTION ]</h4>
+  <pre class="code">
+ ┌──────────────────────────────────────────────┐
+ │[ STANDARDIZED_IP_SCHEMA ]                    │
+ │                                              │
+ │  10.X.0.Y   #Second Octect is VLAN notation  │
+ │             #Fourth Octect is Device IP      │
+ │                                              │
+ │  RANGE            FUNCTION                   │
+ ├────────────┬─────────────────────────────────┤
+ │ .1         │ Gateway                         │
+ │ .2-.9      │ Core Infrastructure             │
+ │ .10-.49    │ Physical Servers                │
+ │ .50-.99    │ Infrastructure Services         │
+ │ .100-.199  │ Dynamic DHCP Pool               │
+ │ .200-.254  │ High-Address Reservations       │
+ └────────────┴─────────────────────────────────┘
+  </pre>
+  <p>
+    We are now moving to an easy to identify standardized scheme. To break down
+    the function, [ '.2-.9' ] are for switches, APs, and other core network
+    infrastructure; if/when I get a dedicated PiHole device, it would also fall
+    into this category. [ '.50-.99' ] are for the various
+    <strong>production</strong> VMs and LXCs. [ '.100-.199' ] are for
+    unassigned, outside of VLAN 10, this is unused in favor of High-Address
+    Reservations, but is kept for standardization. [ '.200-.254' ] are for any
+    test nodes, or defined hardware like the Dev PC, and Laptop. Additionally,
+    every IP outside of VLAN 10 is reserved. Core infrastructure and physical
+    servers use hard reservations, while the rest of the devices are reserved
+    through the DHCP server. VLAN 50 is also excluded from this as it uses a /30
+    subnet, the fourth octect is simply .1 and .2 it is important to note that
+    this is not a lease distrubuted by DHCP, rather these are hard bridge
+    configurations on the endpoint servers.
+  </p>
+  <h4>[ KEY_IMPROVEMENTS ]</h4>
+  <p>
+    Any device on the network is instantly recognizable by group. You know where
+    it belongs and it's function from IP alone.
+  </p>
+  <br />
+  <h3>>> FIREWALL_OVERHAUL</h3>
+  <h4>[ PROBLEM ]</h4>
+  <p>
+    This is more of an architectural difference between PaloAlto, Cisco, etc and
+    UniFi. Generally, I am used to using LAN IN firewall configurations, being
+    standard tables. However, in this network overhaul I decided to move further
+    into Zone-Based Firewall, rather than table-based firewalls or
+    object-oriented, zones are set by Internal, External, Gateway, VPN, and
+    Hotspot by default. I added my VLANs to the list with a DEFAULT DENY policy,
+    as well as a DEFAULT Inter-VLAN block. Any disallowed comminucation from WAN
+    in or out is automatically blocked, any Inter-VLAN chatter is blocked,
+    unless I set a pinhole rule to allow specific communication, and in the case
+    of DMZ, there is no Intra-VLAN communication meaning that even if two
+    devices exist in that same VLAN, they will never be able to communicate or
+    see each other. I also added the DHCPless Storage VLAN to this, despite the
+    fact that it's communication should never leave the switch, I put an
+    additional layer of security that is BLOCKALL across the board, nothing
+    comes in or out, no pinholes. This is to ensure that even communication in
+    the same switch is never exposed.
+  </p>
+  <br />
+  <p>
+    I may make a dedicated post, or detailed board of the VLAN configurations at
+    a later date.
+  </p>
+  <br />
+  <h3>>> NEW_ADDITIONS</h3>
+  <p>
+    Aside from smaller configuration changes, and tests I introduced both
+    Split-Horizon Nginx Proxy Manager to seperate the internal egress from the
+    external egress as well as a dedicated DNS server. Using a dedicated DNS
+    server, in my case AdGuard Home, allows for much more intricate tracking,
+    blocklists, wildcarding and rules. This was a major improvement to my
+    homelab workflow, as well as network-wide adblocking. Split-Horizon NPM was
+    a must in my public-facing network, simply, There is one instance that
+    handles all of my name.local.nottyxton.net domains in my trusted VLAN, and
+    another that handles the name.nottyxton.net domains in the DMZ. This was a
+    major security improvement as this removes the pinhole and keeps the traffic
+    isolated. What occurs in the DMZ should always stay in the DMZ.
+  </p>
+  <br />
+  <p>
+    One small note on my AdGuard Home blocklists, on top of the standard - a
+    little more forgiving - lists, I added some extras for specific
+    needs/desires in my home network. I'll add the rules below.
+  </p>
+  <pre class="code">
+# Common Windows DNS Blocks
+||wpad.local.nottyxton.net^$important
+||wpad^
+||isatap.local.nottyxton.net^$important
+||isatap^
+||llmnr.local.nottyxton.net^$important
+||llmnr^
+||netbios.local.nottyxton.net^$important
+||netbios^
+||teredo.ipv6.microsoft.com^$important
+
+# Windows Delivery Optimization (P2P Updates)
+||delivery.mp.microsoft.com^$important
+||vortex.data.microsoft.com^$important
+||settings-win.data.microsoft.com^$important
+
+# Roku Telemetry & Ads
+||logs.roku.com^$important
+||scribe.logs.roku.com^$important
+||ads.rokutime.com^$important
+||cooper.logs.roku.com^$important
+||p.ads.roku.com^$important
+
+# Universal Smart TV Ad-Servers & Tracking
+||samsungotn.net^$important
+||samsungads.com^$important
+||tv-ads.vizio.com^$important
+||lgsmartad.com^$important
+||yumenetworks.com^$important
+
+# Smart Home / IoT Discovery
+||discovery.meethue.com^
+||plex.tv^$important,domain=~yourlocalplexdomain.net
+||nas.qnap.com^
+
+# Mobile Universal App Tracking
+||app-measurement.com^$important
+||crashlytics.com^$important
+||events.launchdarkly.com^$important
+||graph.facebook.com^$important
+
+# Browser Telemetry
+||incoming.telemetry.mozilla.org^$important
+||browser.events.data.msn.com^$important
+||self.events.data.microsoft.com^$important
+
+# Windows Certificate list Updates
+||ctldl.windowsupdate.com^
+
+# LAN DNS Blocks
+||proxy.local.nottyxton.net^$important
+||gateway.local.nottyxton.net^$important
+  </pre>
+  <p>
+    After using AdGuard Home, I realized how chatty my roommate's Windows PC
+    was, so I made sure to block the unnecessary - extremelly deprecated -
+    chatter. As well as basic Telemetry blocking, ad blocking for Roku, as
+    chatty discovery. Removing the additional chatter and outright Windows
+    security risks, greatly improves the network's stability and security.
+  </p>
 </div>

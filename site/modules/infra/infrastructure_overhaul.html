@@ -113,113 +113,104 @@
   <br />
 
   <h3>>> HYBRID STORAGE</h3>
-  <h4>
-    [ PROBLEM ]
-    <h4>
-      <p>
-        Currently, all of our VMs are utilizing the Proxmox VE ZFS storage pool,
-        which is very limited (1TB mirrored ZFS) and does not offer great
-        parity.
-      </p>
-      <h4>
-        [ SOLUTION ]
-        <p>
-          The only VM this change will really effect is edge-srv-01. Since it
-          does not need to read or write data particularly fast, we are going to
-          move the VM's storage to our NAS. This process between Proxmox and
-          TrueNAS is really simple, we just mount the NFS share at the
-          Datacenter level, and point the VM's mount point to that directory.
-        </p>
-        <h4>[ KEY_IMPROVEMENTS ]</h4>
-        <ul class="config-list">
-          <li><span>[ NEW ]</span> Offloaded excess storage to TrueNAS.</li>
-          <li>
-            <span>[ NEW ]</span> Added PVE Datacenter strorage volumes for NFS
-            shares for LXCs and VM usage.
-          </li>
-        </ul>
+  <h4>[ PROBLEM ]</h4>
+  <p>
+    Currently, all of our VMs are utilizing the Proxmox VE ZFS storage pool,
+    which is very limited (1TB mirrored ZFS) and does not offer great parity.
+  </p>
+  <h4>[ SOLUTION ]</h4>
+  <p>
+    The only VM this change will really effect is edge-srv-01. Since it does not
+    need to read or write data particularly fast, we are going to move the VM's
+    storage to our NAS. This process between Proxmox and TrueNAS is really
+    simple, we just mount the NFS share at the Datacenter level, and point the
+    VM's mount point to that directory.
+  </p>
+  <h4>[ KEY_IMPROVEMENTS ]</h4>
+  <ul class="config-list">
+    <li><span>[ NEW ]</span> Offloaded excess storage to TrueNAS.</li>
+    <li>
+      <span>[ NEW ]</span> Added PVE Datacenter strorage volumes for NFS shares
+      for LXCs and VM usage.
+    </li>
+  </ul>
 
-        <h3>>> PROXMOX STORAGE</h3>
-        <h4>[ PROBLEM ]</h4>
-        <p>
-          Proxmox had been using its local storage to create backups, then copy
-          them to our TrueNAS dataset over NFS. While we will still be using
-          NFS, we are going to directly mount the shares from our Datacenter. We
-          have now offloaded our backups, images and isos, as well as our VM
-          disks. The naming conventions are not in parity, however. From the
-          TrueNAS end; I wanted things to be "operator-friendly" this was a
-          personal decision on my part, looking at shares that are more "unique"
-          is quicker for me to identify quickly. But in Proxmox we used our
-          purpose-oriented naming. /mnt/kazuhira/proxmox_backups is mounted to
-          prod_backups_01, or /mnt/ocelot/media is prod-media-01
-          /mnt/kazuhira/prometheus_data is itim-data-01. So on, so forth.
-        </p>
-        <h4>[ KEY_IMPROVEMENTS ]</h4>
-        <ul class="config-list">
-          <li>
-            <span>[ NEW ]</span> Standardized NFS mount naming conventions for
-            PVE.
-          </li>
-          <li>
-            <span>[ NEW ]</span> Introduced NFS mounts directly to PVE for
-            backups, disk images, and ISOs.
-          </li>
-        </ul>
+  <h3>>> PROXMOX STORAGE</h3>
+  <h4>[ PROBLEM ]</h4>
+  <p>
+    Proxmox had been using its local storage to create backups, then copy them
+    to our TrueNAS dataset over NFS. While we will still be using NFS, we are
+    going to directly mount the shares from our Datacenter. We have now
+    offloaded our backups, images and isos, as well as our VM disks. The naming
+    conventions are not in parity, however. From the TrueNAS end; I wanted
+    things to be "operator-friendly" this was a personal decision on my part,
+    looking at shares that are more "unique" is quicker for me to identify
+    quickly. But in Proxmox we used our purpose-oriented naming.
+    /mnt/kazuhira/proxmox_backups is mounted to prod_backups_01, or
+    /mnt/ocelot/media is prod-media-01 /mnt/kazuhira/prometheus_data is
+    itim-data-01. So on, so forth.
+  </p>
+  <h4>[ KEY_IMPROVEMENTS ]</h4>
+  <ul class="config-list">
+    <li>
+      <span>[ NEW ]</span> Standardized NFS mount naming conventions for PVE.
+    </li>
+    <li>
+      <span>[ NEW ]</span> Introduced NFS mounts directly to PVE for backups,
+      disk images, and ISOs.
+    </li>
+  </ul>
 
-        <h3>>> PORTAINER CHANGES</h3>
-        <h4>[ PORTAINER_EDGE ]</h4>
-        <p>
-          In this overhaul, I also made the switch from Docker Standalone Agents
-          to Docker Edge Agents, the main advantage that comes from this is
-          management over all connected nodes the orchestrator (management)
-          node. In order to transition all of the docker-compose.yml files over
-          so that I can quickly spin them back up, was copy them, save them
-          locally, then paste and deploy. Though, I did forget to do this with
-          the entirety of ops-core-01; thankfully, we can use Portainer's
-          inspect tool for the orphaned containers, get the necessary
-          information we need, paste them in our compose, then deploy them.
-          Currently, Portainer cannot automatically reconstruct the original
-          compose file from an orphaned container.
-        </p>
-        <p></p>
-        <h4>[ NAMING_CONVENTIONS ]</h4>
-        <p>
-          To continue with our production-ready naming, we will change the names
-          of our stacks and containers. For our Stacks we will be using [Service
-          Group]-[Identifier], for instance, our monitoring group on ops-node-01
-          is itim-prod (IT Infrastructure Monitoring - Production), and for the
-          containers running in this stack we use the container_name variable to
-          use [Stack Prefix]-[Service], for example, node-exporter would be
-          itim-node-exporter. Now we know what stack that container belongs to
-          just by looking at it, this also means we can have two of the same
-          container in a stack and differentiate between them.
-        </p>
-        <p></p>
-        <h4>[ ADDITIONS ]</h4>
-        <p>
-          I have added Prometheus, Grafana, Node Exporter, and cAdvisor on the
-          ops-core-01; for ops-node-01 and ops-proxy-01, I added node-exporter;
-          and for edge-srv-01 I added node-exporter and nvidia-dcgm-exporter; I
-          also installed node-exporter on Proxmox itself. This gives me granular
-          telemetry from the hypervisor, containers, and even the hardware.
-        </p>
+  <h3>>> PORTAINER CHANGES</h3>
+  <h4>[ PORTAINER_EDGE ]</h4>
+  <p>
+    In this overhaul, I also made the switch from Docker Standalone Agents to
+    Docker Edge Agents, the main advantage that comes from this is management
+    over all connected nodes the orchestrator (management) node. In order to
+    transition all of the docker-compose.yml files over so that I can quickly
+    spin them back up, was copy them, save them locally, then paste and deploy.
+    Though, I did forget to do this with the entirety of ops-core-01;
+    thankfully, we can use Portainer's inspect tool for the orphaned containers,
+    get the necessary information we need, paste them in our compose, then
+    deploy them. Currently, Portainer cannot automatically reconstruct the
+    original compose file from an orphaned container.
+  </p>
+  <p></p>
+  <h4>[ NAMING_CONVENTIONS ]</h4>
+  <p>
+    To continue with our production-ready naming, we will change the names of
+    our stacks and containers. For our Stacks we will be using [Service
+    Group]-[Identifier], for instance, our monitoring group on ops-node-01 is
+    itim-prod (IT Infrastructure Monitoring - Production), and for the
+    containers running in this stack we use the container_name variable to use
+    [Stack Prefix]-[Service], for example, node-exporter would be
+    itim-node-exporter. Now we know what stack that container belongs to just by
+    looking at it, this also means we can have two of the same container in a
+    stack and differentiate between them.
+  </p>
+  <p></p>
+  <h4>[ ADDITIONS ]</h4>
+  <p>
+    I have added Prometheus, Grafana, Node Exporter, and cAdvisor on the
+    ops-core-01; for ops-node-01 and ops-proxy-01, I added node-exporter; and
+    for edge-srv-01 I added node-exporter and nvidia-dcgm-exporter; I also
+    installed node-exporter on Proxmox itself. This gives me granular telemetry
+    from the hypervisor, containers, and even the hardware.
+  </p>
 
-        <h4>[ KEY_IMPROVEMENTS ]</h4>
-        <ul class="config-list">
-          <li>
-            <span>[ NEW ]</span> Transitioned to Portainer Edge Agents from
-            Docker Standalone.
-          </li>
-          <li>
-            <span>[ NEW ]</span> Introduced standardized naming conventions for
-            our compose stacks and containers.
-          </li>
-          <li>
-            <span>[ NEW ]</span> Implemented a dense monitoring stack for
-            infrastructure, down to the hardware.
-          </li>
-        </ul>
-      </h4>
-    </h4>
-  </h4>
+  <h4>[ KEY_IMPROVEMENTS ]</h4>
+  <ul class="config-list">
+    <li>
+      <span>[ NEW ]</span> Transitioned to Portainer Edge Agents from Docker
+      Standalone.
+    </li>
+    <li>
+      <span>[ NEW ]</span> Introduced standardized naming conventions for our
+      compose stacks and containers.
+    </li>
+    <li>
+      <span>[ NEW ]</span> Implemented a dense monitoring stack for
+      infrastructure, down to the hardware.
+    </li>
+  </ul>
 </div>
