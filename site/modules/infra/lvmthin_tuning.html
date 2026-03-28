@@ -1,0 +1,301 @@
+<div class="layer-container">
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> EXHAUSTION_AND_TUNING://<span class="layer-name">INFRASTRUCTURE</span>
+    </h2>
+    <p class="meta-comment">
+      Solving an LVM-Thin Swap Explosion and tuning resource management for
+      Proxmox.
+    </p>
+  </div>
+
+  <h3>>> LVM-THIN SWAP EXPLOSION</h3>
+  <h4>[ PROBLEM ]</h4>
+  <p>
+    When I woke up this morning, I went to monitor the servers and noticed that
+    the internet was dragging. I checked into Grafana and noticed that
+    ops-node-01 was completely slammed. When I tried to check into the Web UI
+    for Sonarr, I was met with a 504 error. It had completely locked up. This
+    told me two things: First, ops-node-01 being under heavy load slows down the
+    rest of the network - which is not desired whatsoever; Second, ops-node-01
+    was completely inaccessible.
+  </p>
+  <h4>[ DIAGNOSIS ]</h4>
+  <p>
+    After realizing this, I went into the Proxmox Web UI to check on the
+    ops-node-01 resource usage directly. I saw that the 1GB Swap was at ~98%
+    usage, while RAM was at ~17%. I then looked at the Raiden host resources and
+    saw two major red flags, IO Delay was sitting at 14.85% and more importantly
+    the Load Average was sitting at 49.60. Raiden only has 12 cores, this means
+    that there are 37 processes just idling, since the CPU usage was only ~9%,
+    this tells me it's hanging on the iowait.
+  </p>
+  <br />
+  <p>
+    I needed to figure out what disk specifically was causing the hang, so I
+    used <strong class="code">`iostat -x 1 5`</strong> to tell me exactly what
+    disk was the bottleneck. One block of the output gave:
+  </p>
+  <pre class="code">
+ avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           2.10    0.00    0.50   15.42    0.00   81.98
+Device            r/s     rkB/s   rrqm/s  %rrqm r_await rareq-sz     w/s     wkB/s   wrqm/s  %wrqm w_await wareq-sz     d/s     dkB/s   drqm/s  %drqm d_await dareq-sz     f/s f_await  aqu-sz  %util
+dm-0           245.00    980.00     0.00   0.00   34.72     4.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    8.51  99.90
+dm-1             0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+dm-2             0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+dm-3             0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+dm-4             0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+dm-6             0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+loop0            0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+loop1            0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+sda            229.00    980.00    16.00   6.53   34.70     4.28    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    7.95  99.90
+sdb              1.00     60.00     0.00   0.00    8.00    60.00    2.00      4.00     0.00   0.00    0.50     2.00    0.00      0.00     0.00   0.00    0.00     0.00    1.00    1.00    0.01   1.20
+sdc              0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+zd0              0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+zd16             0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00 
+  </pre>
+  <p>
+    Seeing that the %util was sitting at 99.90% for sda and dm-0 which is an LVM
+    volume, this is CRITICAL. They are under constant load, this is not only
+    going to tear apart the HDD, but it leaves no room for new processes. On top
+    of this, r_await sitting at a peak of 47ms, even for an HDD this is high
+    lag. There is also a lot of random I/O, which is likely caused by this
+    pinned swap. Not only is everything lagging, and overloaded, but the disk
+    itself is thrashing. On a mechanical drive, this will cause permanent damage
+    if not complete failure over time.
+  </p>
+  <br />
+  <p>
+    The way I have Raiden set up currently, /dev/sda is the boot drive only a
+    500GB HDD, while /dev/sdb and /dev/sdc are a 1TB mirrored ZFS pool, both
+    HDDs as well. Right now, none of the vdisks are on LVM or LVM-Thin, they are
+    all either on DUAL1T_ZFS or offloaded to Motherbase. This tells me that
+    /dev/sda is being slammed by the container's memory leak. For Proxmox, the
+    LVMs are stored on /dev/sda3 under /data. I decided to check the usual
+    suspects of Proxmox /var/lib/vz, and /var/log with
+    <strong class="code">`du -sh /var/lib/vz/*`</strong> and
+    <strong class="code">`du -sh /var/log`</strong> both of those only accounted
+    for ~26.5GB of data. So that isn't the issue. Next, I dediced to check for
+    any files that have been marked deleted, but are being held onto by
+    processes. Since ops-node-01 shows 98% swap, I figured that maybe a massive
+    swap file was set for deletion but being held onto.
+  </p>
+  <pre class="code">
+root@raiden:~# lsof +L1
+...
+Prowlarr  2699555   100000    8u   REG    0,1 2199023255552     0 1539162 /memfd:doublemapper (deleted)
+Radarr    2700076   100000    8u   REG    0,1 2199023255552     0 1528711 /memfd:doublemapper (deleted)
+...
+  </pre>
+  <p>
+    These two lines were a massive, yet horrifying find. These are "theoretical"
+    - meaning that these could maximally be, not their actual or current size -
+    2TB files. These are memfd files, meaning that when the physical RAM is
+    exhausted, linux aggressively shoves this data into the swap partition on
+    /dev/sda3. This explains both the 97.57% swap usage and why Raiden is
+    choking. Doublemapper is a known issue in the .NET runtime where especially
+    in certain environments, like mine, where containers with limited memory can
+    glitch, request an excess of virtual memory, then spill out into SWAP.
+  </p>
+  <h4>[ SOLUTION && FURTHER DIAGNOSIS ]</h4>
+  <p>Now that we've tracked down the issue, it's time to fix it.</p>
+
+  <p>
+    <br />
+  </p>
+
+  <p>
+    Immediately, I stopped ops-core-01, as it wouldn't repond to a shutdown. I
+    was initially expecting this to result in releasing the data it held onto,
+    but this wasn't the case. <strong class="code">`df -h'</strong> showed no
+    change, so I attempted to reinitialize the swap
+    <strong class="code">`swapoff -a && swapon -a`</strong>, again
+    <strong class="code">`df -h`</strong> showed minimal/no change.
+  </p>
+
+  <p>
+    <br />
+  </p>
+
+  <p>
+    Though, make one crucial observation, the "missing" 400GB was not in root,
+    it was in /data after all. Likely, the doublemapper ghost files ballooned
+    the host swap volume. The Proxmox UI showed a mismatch in the local-lvm
+    usage, it was only at 0%, but /dev/sda3 still showed 97% full. This tells me
+    that the pool was still reserved. LVM-Thin is an interesting case because it
+    allows for over-provisioning. It reports both the logical usage, and the
+    phsyical allocation. When Prowlarr/Radarr tried to doublemap the 2TB file,
+    it forced the kernel to allocate every physical block available on sda3 for
+    swapspace. Then, I checked the LVM physical data compared to the block
+    device usage.
+  </p>
+
+  <p></p>
+  <pre class="code">
+ root@raiden:~# lvs -a
+  LV              VG  Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  data            pve twi-aotz-- 337.86g             0.01   0.50                            
+  [data_tdata]    pve Twi-ao---- 337.86g                                                    
+  [data_tmeta]    pve ewi-ao----  <3.45g                                                    
+  [lvol0_pmspare] pve ewi-------  <3.45g                                                    
+  root            pve -wi-ao----  96.00g                                                    
+  swap            pve -wi-ao----   8.00g                                                    
+  vm-210-disk-0   pve Vwi-aotz--   4.00m data        14.06                                  
+
+root@raiden:~# lsblk
+NAME                         MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+loop0                          7:0    0    10G  0 loop 
+sda                            8:0    0 465.8G  0 disk 
+├─sda1                         8:1    0  1007K  0 part 
+├─sda2                         8:2    0     1G  0 part /boot/efi
+└─sda3                         8:3    0 464.8G  0 part 
+  ├─pve-swap                 252:0    0     8G  0 lvm  [SWAP]
+  ├─pve-root                 252:1    0    96G  0 lvm  /tmp/root_inspect
+  │                                                    /
+  ├─pve-data_tmeta           252:2    0   3.4G  0 lvm  
+  │ └─pve-data-tpool         252:4    0 337.9G  0 lvm  
+  │   ├─pve-data             252:5    0 337.9G  1 lvm  
+  │   └─pve-vm--210--disk--0 252:6    0     4M  0 lvm  
+  └─pve-data_tdata           252:3    0 337.9G  0 lvm  
+    └─pve-data-tpool         252:4    0 337.9G  0 lvm  
+      ├─pve-data             252:5    0 337.9G  1 lvm  
+      └─pve-vm--210--disk--0 252:6    0     4M  0 lvm  
+sdb                            8:16   0 931.5G  0 disk
+├─sdb1                         8:17   0 931.5G  0 part 
+└─sdb9                         8:25   0     8M  0 part 
+sdc                            8:32   0 931.5G  0 disk 
+├─sdc1                         8:33   0 931.5G  0 part 
+└─sdc9                         8:41   0     8M  0 part 
+zd0                          230:0    0     1M  0 disk 
+zd16                         230:16   0   100G  0 disk 
+├─zd16p1                     230:17   0   512M  0 part 
+├─zd16p2                     230:18   0  98.5G  0 part 
+└─zd16p3                     230:19   0   976M  0 part  
+  </pre>
+  <p>
+    Thankfully, data is virtually empty but lsblk shows that it's holding onto
+    the block addresses. We aren't able to force a blkdiscard, since the
+    operation is not supported, this means we'll have to reboot - a hit to the
+    99.99% uptime sure, thankfully I'm alloted 52 minutes and 36 seconds per
+    year. This will flush the swap, reset the FTL and clear any zombie
+    processes. Right before I do this I'm going to do some preventative
+    reconfiguration/tuning.
+  </p>
+  <br />
+  <p>
+    I'm going to bump the ram from 2GB up to 4GB, and drop the swap from 1GB to
+    512MB. This is small enough for any memory overflows, but small enough that
+    if it ever goes rogue again, won't crash Raiden - like it almost did had I
+    not caught it. After a reboot, the physical blocks still showed 97%
+    saturation. First I'm going to verify the LVM volume group, then check for
+    any snapshots with <strong class="code">`vgs && lvs -a`</strong>:
+  </p>
+  <pre class="code">
+root@raiden:~# vgs
+  VG  #PV #LV #SN Attr   VSize    VFree 
+  pve   1   3   0 wz--n- <464.76g 16.00g
+root@raiden:~# lvs -a
+  LV              VG  Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  data            pve twi-aotz-- 337.86g             0.00   0.50                            
+  [data_tdata]    pve Twi-ao---- 337.86g                                                    
+  [data_tmeta]    pve ewi-ao----  <3.45g                                                    
+  [lvol0_pmspare] pve ewi-------  <3.45g                                                    
+  root            pve -wi-ao----  96.00g                                                    
+  swap            pve -wi-ao----   8.00g      
+  </pre>
+  <p>
+    This shows me that the space is only reserved to data, since this is unused
+    now, I was to give this to root.
+  </p>
+  <br />
+  <p>
+    I'm going to delete local-lvm, extend the root partition, and then resize
+    the FS.
+  </p>
+  <pre class="code">
+root@raiden:~# lvremove pve/data && \
+lvextend -l +90%FREE pve/root && \
+resize2fs /dev/mapper/pve-root
+  </pre>
+  <p>
+    Lastly, I am going to verify everything suceeded by running both
+    <strong class="code">`lvs && df -h /`</strong>.
+  </p>
+  <pre class="code">
+root@raiden:~# lvs
+  LV   VG  Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  root pve -wi-ao---- 420.68g                                                    
+  swap pve -wi-ao----   8.00g
+root@raiden:~# df -h /
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/mapper/pve-root  414G   31G  366G   8% /
+  </pre>
+  <p>
+    This shows that now root has the rest of the partition (with some left over
+    for safety) and is only using 8% rather than 97%.
+  </p>
+  <h3>>> POST_MORTEM</h3>
+  <h4>[ RCA ]</h4>
+  <p>
+    A specific doublemapper/swap bug in the *arr stack caused the container to
+    exceed its assigned RAM, because the LXC had no Swap Limit defined, it began
+    "borrowing" the host's swap space on /dev/sda3. As the swap filled, the HDD
+    was being slammed resulting in high IO wait and locked the CPU scheduler,
+    driving the load average to 49+.
+  </p>
+  <h4>[ SOLUTION ]</h4>
+  <p>
+    Since the LVM-Thin pool would not allow shrinking, despite the overflow, the
+    thin pool was removed to return the physical extents to the volume group.
+    Reassigned the reclaimed space to the root partition and forced a filesystem
+    resize to bring Raiden back to 8% disk usage.
+  </p>
+  <h4>[ PREVENTION ]</h4>
+  <p>
+    Every LXC now has a strict Swap Limit of 512MB. If a process leaks, the
+    container crashes locally instead of taking down the host. Increased
+    ops-node-01 RAM to 4GB to provide enough headroom for .NET JIT operations
+    without hitting the disk.
+  </p>
+  <h3>> ADDITIONAL_ADJUSTMENTS</h3>
+  <h4>[ MULTIQUEUE ]</h4>
+  <p>
+    This adjusts how many CPU cores can process network interrupts
+    simultaneously. This prevents a single overloaded core from lagging the
+    other nodes on the network. Generally, you want this to match the
+    provisioned core-count.
+  </p>
+  <br />
+  <p>
+    Since edge-srv-01 has two cores, we'll set multiqueue to 2. This ensures
+    that different traffic types/protocols aren't fighting for the same
+    interrupt thread.
+  </p>
+  <h4>[ CPU_WEIGHTING ]</h4>
+  <p>
+    We don't want ops-node-01 to hang the front end processes, ops-node-01
+    should act as a background process, much like it's been set up to do. We'll
+    adjust our critical edge services, edge-srv-01 to 2048. ops-node-01 will be
+    set to 512. This ensures that if both are attempting to use the same CPU
+    core, edge-srv-01 gets 4x the priority. This is necessary as it hosts all of
+    the public facing services that we want to always work, and always work
+    fast. We do this with
+    <strong class="code">`[qm/pct] set [vm/lxc id] --cpuunits 2048`</strong>
+  </p>
+  <h4>[ SWAPPINESS ]</h4>
+  <p>
+    Since Raiden's default swappiness is set to 60, we want to lower this so
+    that it only uses swap when necessary, we want it to use the RAM as much as
+    possible.
+  </p>
+  <pre class="code">
+sysctl -w vm.swappiness=10 && \
+echo "vm.swappiness=10" >> /etc/sysctl.conf
+  </pre>
+  <br />
+  <p>
+    Now with these final adjustments made, our services will be more stable, and
+    more reactive to the environment. This is much better for a production
+    server.
+  </p>
+</div>
