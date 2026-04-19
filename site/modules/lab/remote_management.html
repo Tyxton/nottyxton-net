@@ -1,0 +1,113 @@
+<div class="layer-container">
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> REMOTE_MANAGEMENT://<span class="layer-name">GEN_LAB</span>
+    </h2>
+    <p class="meta-comment">Managing my homelab from 800+ miles away.</p>
+  </div>
+
+  <h3>[ SITUATION ]</h3>
+
+  <p>
+    The entirety of MSF is hosted in Houston, TX. Right now, due to life events
+    and unforseen circumstances, I am in an extended stay in my hometown in
+    Tennessee. The distance between me and my homelab is roughly 850 miles and a
+    15-Hour drive. Thankfully, I had everything prepped long before this
+    happened, but I'm going to go over everything I have in place to ensure
+    stability and my 99.99% uptime philosphy, as well as security from this
+    great distance.
+  </p>
+
+  <h3>[ WIREGUARD_TUNNEL ]</h3>
+
+  <p>
+    Long before I moved, I had setup a wireguard (wg-easy) container on
+    ops-core-01 setup to be able to communicate across 10.20.0.0, 10.30.0.0, and
+    10.40.0.0. I had also generated the configuration files and configured
+    Snake, Otacon, and Codec in advance to have this WG tunnel in place.
+  </p>
+  <br />
+  <p>
+    I did end up changing this, however, for ease of use, configuration, and
+    network-wide access without punching pinholes into ops-core-01; I opted to
+    use UniFi's built in Wireguard VPN server. This let's me login to the UniFi
+    site from any device down the line, create a new client, download or scan
+    the VPN configuration file, and immediately have my tunnel up. Instead of
+    needing an open tunnel to add a new client. This also removes the dependency
+    of my ops-nodes for the VPN, if I need to get into the network to fix
+    ops-core-01, the VPN inside would be inaccessible.
+  </p>
+
+  <h3>[ DNS ]</h3>
+
+  <p>
+    I configured AdGuard Home to also allow traffic in from the new VPN subnet,
+    I used 10.80.0.0. This allows me to use DNS remotely without inheretly being
+    on my Trusted VLAN, this is more secure for my tunnels and allows me to tell
+    exactly where all traffic is coming from, if the tunnel leaks and unwanted
+    traffic is noticed, I could tell it was coming from the VPN VLAN immediately
+    upon seeing the 10.80.0.x. Now, something like `grafana.local.nottyxton.net`
+    pulls up my grafana dashboard without opening it up to WAN. There is
+    absolutely no reason I should ever have my admin-access pages open to WAN,
+    this logic applies to services like Immich as well, the less I advertise the
+    better, if it does not need to be public, it is not.
+  </p>
+
+  <h3>[ THINKPAD_T440 ]</h3>
+
+  <p>
+    I did bring along my Thinkpad T440 initially I didn't have an inherent use
+    for it in mind, but I figured a spare compute node may prove handy out here.
+    While dated, this Thinkpad is what ran the original tyxton.net website years
+    ago. I have decided to re-purpose it as an always-on "gateway" for the
+    homelab. By that I mean, using it as a secondary ntfy relay server - able to
+    detect and notify me if it detects MSF is down (thanks to a script I will
+    document seperately). I hope to do more with it soon, but this is all it
+    acts as currently. Make sure I can still get my necessary alerts and events
+    from a great distance away without using their cloud-service.
+  </p>
+
+  <h3>[ MAINTENANCE ]</h3>
+
+  <p>
+    This is one of the biggest concerns for remote management, be it a remote
+    server cluster, co-lo, etc. If anything physically goes wrong, I will be in
+    the dark until ntfy lets me know and I will be unable to service the
+    machines running MSF. Thankfully, the servers are still running in my
+    apartment in Houston, where my roommate's are still actively in-and-out.
+    While not homelabbers, sysadmins, NOC technicians, they are still
+    technologically literate. I can communicate what needs to be done remotely
+    and they will be able to service them. If I drive fails on Motherbase, my
+    roommate can hotswap it and I can get it re-shimmed within minutes of
+    failure, rather than hours on a flight. Time is precious in these matters,
+    so having a set of hands ready is a great benefit to the current situation.
+  </p>
+  <br />
+  <p>
+    This has come in handy already, and I've only been away for a week and a
+    half. The power flickered in the apartment, cutting power to the UniFi
+    Stack, Raiden, and Motherbase. Thankfully, I have them configured to come
+    back online healthily and in an order than won't cause Stale File Handles,
+    or other dependency-related issues. There is a unique behavior with
+    Motherbase, if it shuts down suddenly, when it comes back online the fans
+    max out the RPM and hang through the boot and then will smooth back out to
+    their (relatively) quiet state. My roomate noticed the fans spinning harder
+    and louder than usual and called me immediately. Thanks to this immediate
+    phone-call I now know that my UPS is not functioning properly and was able
+    to replace it the same day, preventing anymore hard-shutdowns.
+  </p>
+  <br />
+  <p>
+    I have also left them with safe-shutdown instructions for if the power goes
+    out, to ensure that hard shutdowns never happen, especially with 14 hard
+    drives nearly constantly spinning on Motherbase.
+  </p>
+
+  <h3>[ CLOSING_THOUGHTS ]</h3>
+
+  <p>
+    While remote management, can be stressful, with these systems in place, it
+    ensures a smooth transition and workflow from afar. I hope to be back in HTX
+    soon to continue tinkering live.
+  </p>
+</div>
