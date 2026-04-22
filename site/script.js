@@ -30,11 +30,11 @@ window.loadModule = async function (moduleName) {
     );
   }
 
-  // 3. Path Logic
+  // Path Logic
   const filePath = moduleName.replace("_", "/");
   const fileName = filePath.split("/").pop();
 
-  // 4. Update the Prompt (Forcing the innerHTML)
+  // Update the Prompt (Forcing the innerHTML)
   if (commandLabel) {
     const isMobile = window.innerWidth < 768;
 
@@ -50,7 +50,7 @@ window.loadModule = async function (moduleName) {
     console.log("PROMPT_MODE:", isMobile ? "MOBILE" : "DESKTOP");
   }
 
-  // 5. Fetch Content
+  // Fetch Content
   try {
     const response = await fetch(`./modules/${filePath}.html`);
     if (!response.ok) throw new Error(`HTTP_${response.status}`);
@@ -87,18 +87,15 @@ window.addEventListener("keydown", (e) => {
     e.preventDefault();
 
     if (e.key === "F9") {
-      const commandLabel = document.getElementById("command-label");
-      if (commandLabel) {
-        commandLabel.innerHTML = `<span class="prompt">root@nottyton:~$</span> exec ./resume_download.sh --open`;
+      e.preventDefault();
+      window.loadModule("system_resources");
 
-        setTimeout(() => {
-          window.loadModule(currentModule);
-        }, 2000);
-      }
-
-      // Open PDF in a new tab
-      window.open("./assets/tSexton_Resume.pdf", "_blank");
-      // Execute the module load
+      document
+        .querySelectorAll(".nav-item")
+        .forEach((n) => n.classList.remove("active"));
+      document
+        .querySelector('[data-module="system_resources"]')
+        .classList.add("active");
     } else {
       window.loadModule(fKeyMap[e.key]);
 
@@ -214,17 +211,24 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(updateClocks, 1000);
   updateClocks(); // Initial call
 
-  // --- 4. THE FAIL-SAFE CLICK LISTENER ---
+  // --- THE CLICK LISTENER ---
   document.addEventListener("click", (e) => {
-    const item = e.target.closest(".nav-item, .file-link");
+    const item = e.target.closest(".nav-item, .file-link, .hub-window");
     if (!item) return;
 
     const mod = item.getAttribute("data-module");
 
-    if (mod === "resume") {
+    if (mod === "system_resume") {
       e.preventDefault();
       e.stopPropagation();
       window.open("./assets/tSexton_Resume.pdf", "_blank");
+      return;
+    }
+
+    if (mod === "system_source") {
+      e.preventDefault();
+      e.stopPropagation();
+      window.open("https://www.github.com/Tyxton", "_blank");
       return;
     }
 
@@ -241,6 +245,20 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       window.loadModule(mod);
     }
+  });
+
+  document.addEventListener("mouseover", (e) => {
+    const window = e.target.closest(".hub-window");
+    const desc = document.getElementById("resource-desc");
+    if (!window || !desc) return;
+
+    const type = window.getAttribute("data-module");
+    if (type === "resume_view")
+      desc.innerText = "ACCESS PROFESSIONAL HISTORY AND CREDENTIALS.";
+    if (type === "comms_view")
+      desc.innerText = "ESTABLISH DIRECT UPLINK TO OPERATOR.";
+    if (type === "source_view")
+      desc.innerText = "BROWSE EXTERNAL CODE REPOSITORIES.";
   });
 
   startBoot();

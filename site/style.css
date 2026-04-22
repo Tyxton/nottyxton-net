@@ -180,7 +180,7 @@ body::after {
   margin-left: 5px;
 }
 
-/* --- Depreciated
+/* --- Deprecated
 .nav-item {
   text-decoration: none;
   display: inline-flex;
@@ -499,6 +499,64 @@ h4 {
   font-weight: bold;
 }
 
+/* --- RESOURCES MODULES --- */
+.resources-hub {
+  margin-top: 20px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.hub-window {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  align-items: center;
+}
+
+.hub-window:hover {
+  color: var(--phosphor-bright);
+  background: var(--crt-bg);
+  text-shadow: 0 0 8px var(--phosphor-glow);
+}
+
+.window-content {
+  padding: 10px;
+  border-left: 1px solid var(--phosphor-muted);
+  border-right: 1px solid var(--phosphor-muted);
+}
+
+.window-label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.description-pane {
+  width: 100%;
+  margin-top: 10px;
+  border-top: 1px solid var(--phosphor-muted);
+  border-bottom: 1px solid var(--phosphor-muted);
+}
+
+#resource-desc {
+  margin: 0 auto 0 auto;
+}
+
+.description-pane .window-content {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+}
+
 /* --------------------------
   [ MOBILE_RESPONSIVENESS ]
 -------------------------- */
@@ -676,6 +734,11 @@ h4 {
   .legacy-row {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  /* --- Resources Mobile --- */
+  .hub-grid {
+    grid-template-columns: 1fr;
   }
 }
 
