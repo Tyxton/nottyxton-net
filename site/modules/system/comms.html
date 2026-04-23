@@ -1,0 +1,54 @@
+<div class="tui-container comms-module">
+  <div class="tui-header">
+    <span class="glitch" data-text="ESTABLISHING DIRECT UPLINK..."
+      >>> ESTABLISHING DIRECT UPLINK...</span
+    >
+    <hr class="tui-divider" />
+  </div>
+
+  <div class="comms-body">
+    <p class="status-text">
+      >> CONNECTED TO: <span class="highlight">NOTTYXTON_NET_NTFY</span>
+    </p>
+    <p class="status-text">
+      >> ENCRYPTION: <span class="highlight">AES-256-GCM</span>
+    </p>
+    <br />
+
+    <div class="input-group">
+      <label for="comms-alias" class="prompt-label">[ ALIAS ]:</label>
+      <input
+        type="text"
+        id="comms-alias"
+        class="tui-input"
+        placeholder="IDENTIFIER_REQUIRED"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="input-group">
+      <label for="comms-topic" class="prompt-label">[ TARGET ]:</label>
+      <select id="comms-topic" class="tui-input tui-select">
+        <option value="nottyxton-gen">GENERAL_INQUIRY</option>
+        <option value="nottyxton-hiring">RECRUITMENT_OPS</option>
+        <option value="nottyxton-etc">MISC_DATA</option>
+      </select>
+    </div>
+
+    <div class="input-group full-width">
+      <label for="comms-message" class="prompt-label">[ MESSAGE ]:</label>
+      <textarea
+        id="comms-message"
+        class="tui-input tui-textarea"
+        placeholder="ENTER_TRANSMISSION_CONTENT..."
+      ></textarea>
+    </div>
+
+    <div class="button-row">
+      <button id="send-btn" class="tui-btn">
+        <span class="btn-text">>> EXECUTE_TRANSMISSION</span>
+      </button>
+      <p id="transmission-status" class="status-text hidden"></p>
+    </div>
+  </div>
+</div>

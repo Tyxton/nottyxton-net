@@ -28,6 +28,10 @@ body {
   box-sizing: border-box;
 }
 
+.hidden {
+  display: none;
+}
+
 /* ---------------------------------------
         [ CRT_HARDWARE_EMULATION ]
   Scanlines, Flicker, and Bezel Effects
@@ -555,6 +559,69 @@ h4 {
   display: flex;
   align-items: center;
   padding-left: 20px;
+}
+
+/* -------------------------
+      [ CONTACT_FORM ]
+---------------------------- */
+
+.comms-module {
+  padding: 20px;
+}
+.input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.prompt-label {
+  width: 120px;
+  font-weight: bold;
+}
+
+.tui-input {
+  background: var(--crt-bg);
+  border: 1px solid var(--phosphor-bright);
+  color: var(--phosphor-bright);
+  padding: 8px;
+  flex-grow: 1;
+  outline: none;
+  font-size: 1.2em;
+  font-weight: bold;
+  font-family: "VT323", monospace;
+}
+
+.tui-textarea {
+  height: 120px;
+  resize: none;
+}
+
+.tui-btn {
+  background: var(--crt-bg);
+  color: var(--phosphor-bright);
+  border: 1px solid var(--phosphor-bright);
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.2em;
+  transition: all 0.2s;
+  width: 100%;
+  font-family: "VT323", monospace;
+}
+
+.tui-btn:hover {
+  background: var(--phosphor-bright);
+  color: var(--crt-bg);
+  box-shadow: 0 0 10px var(--phosphor-muted);
+}
+
+.status-text {
+  margin-top: 10px;
+}
+.input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 /* --------------------------

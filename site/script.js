@@ -60,6 +60,42 @@ window.loadModule = async function (moduleName) {
       viewscreen.classList.add("glitch-active");
       viewscreen.innerHTML = text;
 
+      // Contact Form Handler
+      if (moduleName === "system_comms") {
+        const sendBtn = document.getElementById("send-btn");
+        const statusEl = document.getElementById("transmission-status");
+
+        sendBtn?.addEventListener("click", async () => {
+          const alias = document.getElementById("comms-alias").value;
+          const topic = document.getElementById("comms-topic").value;
+          const message = document.getElementById("comms-message").value;
+
+          if (!alias || !message) {
+            statusEl.innerText = "[ERROR]: ALIAS_AND_MESSAGE_REQUIRED";
+            statusEl.classList.remove("hidden");
+            return;
+          }
+
+          sendBtn.disabled = true;
+          sendBtn.innerText = "SENDING...";
+          statusEl.innerText = "> UPLOADING_PACKET...";
+          statusEl.classList.remove("hidden");
+
+          const success = await sendNtfyMsg(alias, message, topic);
+
+          if (success) {
+            statusEl.innerHTML =
+              "> <span style='color:var(--phosphor-bright)'>TRANSMISSION_SUCCESSFUL.</span>";
+            sendBtn.innerText = "DONE";
+          } else {
+            statusEl.innerHTML =
+              "> <span style='color:var(--phosphor-muted)'>TRANSMISSION_FAILED.</span>";
+            sendBtn.disabled = false;
+            sendBtn.innerText = "RETRY_EXECUTION";
+          }
+        });
+      }
+
       // Restart typing animation
       viewscreen.classList.remove("typing-animation");
       void viewscreen.offsetWidth;
@@ -71,8 +107,49 @@ window.loadModule = async function (moduleName) {
     console.error("LOAD_ERR:", err);
   }
 };
+
+// --- CONTACT FORM BACKEND ---
+const sendNtfyMsg = async (alias, message, selectedTopic = "nottyxton-gen") => {
+  const WORKER_URL = "https://nottyxton-contact.btlsexton.workers.dev";
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        topic: selectedTopic,
+        title: `INQUIRY FROM: ${alias}`,
+        message: message,
+        tags: "nottyxton,general",
+      }),
+    });
+
+    if (response.ok) {
+      console.log("Transmission Successful.");
+      return response.ok;
+    } else {
+      console.error("Transmission Intercepted (Error).");
+      return false;
+    }
+  } catch (err) {
+    console.error("Connection Failed:", err);
+    return false;
+  }
+};
+
 // Keyboard Functions - NAV
 window.addEventListener("keydown", (e) => {
+  // If the user is typing in a form field, don't trigger navigation
+  const activeElement = document.activeElement;
+  if (
+    activeElement.tagName === "INPUT" ||
+    activeElement.tagName === "TEXTAREA" ||
+    activeElement.isContentEditable
+  ) {
+    return; // Exit early and let the user type
+  }
   const fKeyMap = {
     F1: "system_audit",
     F2: "infra_index",
@@ -118,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const mainContent = document.getElementById("main-content");
   let bootTimeouts = [];
 
-  // --- 2. BOOT LOGIC ---
+  // --- BOOT LOGIC ---
   function startBoot() {
     const bootLines = [
       { t: "NOTTYXTON BIOS v 2.0.1 (C) 2026", d: 0 },
@@ -183,10 +260,16 @@ document.addEventListener("DOMContentLoaded", () => {
       mainContent.classList.add("power-on-anim");
     }
 
-    window.loadModule("system_audit");
+    // Only load the audit module if the viewscreen is currently empty.
+    // This prevents the reload bug when typing or re-focusing that's been
+    // plaguing me for the past 2-3 months.
+    const viewscreen = document.getElementById("module-viewscreen");
+    if (viewscreen && viewscreen.innerHTML.trim() === "") {
+      window.loadModule("system_audit");
 
-    const f1 = document.querySelector('[data-module="system_audit"]');
-    if (f1) f1.classList.add("active");
+      const f1 = document.querySelector('[data-module="system_audit"]');
+      if (f1) f1.classList.add("active");
+    }
   }
 
   /* SYSTOHC */
