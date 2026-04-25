@@ -92,16 +92,61 @@
     an "undo".
   </p>
 
-  <h4>[ PORTAINER_BACKUPS ]</h4>
-  <p></p>
   <h4>[ CONTAINER_BACKUPS ]</h4>
+  <p>
+    For the docker containers themselves, I rely on a mix of volume mapping and
+    automated snapshots. All persistent data is mapped to /mnt/volume over nfs
+    to Motherbase. I have a container snapshot scheduled every 24 hours that is
+    uploaded to a different pool on Motherbase as well.
+  </p>
+
   <h4>[ TRUENAS_BACKUPS ]</h4>
+  <p>
+    Motherbase isn't just a target; it's a source. Right now I'm working on
+    sourcing an offsite S3-compatible buket to push encrypted snapshots to. This
+    would create the true 3-2-1 backup rule.
+  </p>
   <h4>[ SNAKE && OTACON_BACKUPS ]</h4>
+  <p>
+    For the physical Arch machines (Snake and Otacon), I use automated btrfs
+    snapshots via a pacman hook that creates and stores btrfs snapshots and
+    creates a systemd-boot entry on every update so that I can boot into it if
+    my main installation breaks (e.g. I don't pay attention to what's being
+    updated or the install goes stale.). These are kept to 5 latest, and are
+    reguarly uploaded to Motherbase via Restic.
+  </p>
   <h3>>> IaC</h3>
   <h4>[ EDGE_CLEANUP_JOB ]</h4>
+  <p>
+    I have utilized a Portainer Edge Job that triggers once a week via Cron Job
+    that automatically purges any unused/orphaned images, networks, volumes etc.
+    This is set to trigger after the snapshots just in case something I need
+    does get wiped, though I have preventative measures in place for this, such
+    as everything having a stack even if stopped.
+  </p>
   <h4>[ CI/CD_PIPELINE ]</h4>
+  <p>
+    For NOTTYXTON.NET, every git push after changes starts a Github Deploy
+    runner that automatically takes the new changes and rsync's it to
+    edge-srv-01's active web directory (/var/www/html) directly live-updating
+    the website without having any downtime.
+  </p>
   <h3>>> Monitoring</h3>
-  <h4>[ GRAFANA_PROMETHEUS ]</h4>
+  <h4>[ GRAFANA_PROMETHEUS_LOKI ]</h4>
+  <p>
+    I use Grafana Prometheus and Loki to automatically collate all of the
+    metrics and logs not only to dashboards, but I am currently building out
+    custom alerts that will be pushed via NTFY to my phone, laptop, or desktop;
+    notifying me of any issues before a phonecall, or happening to login at the
+    right time.
+  </p>
   <h4>[ CADVISOR_NODE_EXPORTER ]</h4>
-  <h4>[ LOKI_TO_COME ]</h4>
+  <p>
+    I use cAdvisor, Node Exporter, DCGM Node Exporter, Promtail, and Grafana
+    Alloy to collect and push/pull (depending on the specific LXC,VM and
+    service) to Grafana, Prometheus, and/or Loki. I have these deployed across
+    every VM/LXC as well as Raiden. This allows me to automatically collect all
+    of the data in one place rather than across 10-15 different dashboards and
+    panels.
+  </p>
 </div>
