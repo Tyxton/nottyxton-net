@@ -624,6 +624,15 @@ h4 {
   margin-bottom: 15px;
 }
 
+/* I forgot to add this */
+
+.tui-divider {
+  background-color: var(--phosphor-glow);
+  border: var(--phosphor-bright);
+  height: 2px;
+  margin: 10px auto;
+}
+
 /* --------------------------
   [ MOBILE_RESPONSIVENESS ]
 -------------------------- */
