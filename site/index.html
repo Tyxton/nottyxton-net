@@ -79,6 +79,22 @@
         </footer>
       </div>
     </div>
+    <div id="imageModal" class="img-modal-overlay" onclick="closeModal()">
+      <div class="img-modal-window" onclick="event.stopPropagation()">
+        <div class="img-modal-header">
+          <span class="img-modal-title"
+            >~/usr/.local/bin/file_viewer.sh - [ RAW_IMAGE ]</span
+          >
+          <button class="img-modal-close" onclick="closeModal()">[X]</button>
+        </div>
+        <div class="img-modal-body">
+          <img id="modalImg" src="" alt="High Res Image" />
+        </div>
+        <div class="img-modal-footer">
+          <span class="status">STATUS: RENDER_COMPLETE</span>
+        </div>
+      </div>
+    </div>
     <script src="script.js?v=3.1.25"></script>
   </body>
 </html>

@@ -1,0 +1,88 @@
+<div class="layer-container">
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> HARDWARE_MANIFEST://<span class="layer-name">GEN_LAB</span>
+    </h2>
+    <p class="meta-comment">The current and past architecture of MSF.</p>
+  </div>
+
+  <h3>[ HOSTNAME: Raiden ]</h3>
+  <p class="meta-comment">MSF Compute Server</p>
+
+  <p>
+  Raiden is the primary compute server in MSF, it is a refurbished Dell Precision 5810. I use Proxmox VE 8 for the hypervisor (soon EOL, so I will be upgrading to PVE 9), the specific hardware is listed below:
+  </p>
+
+  <span class="audit-label">[CPU]:</span> <span class="audit-value">Intel E5-1650 | 6C/12T</span>
+  <span class="audit-label">[GPU]:</span> <span class="audit-value">NVIDIA Quadro P4000</span>
+  <span class="audit-label">[RAM]:</span> <span class="audit-value">64 GB DDR4</span>
+  <span class="audit-label">[STORAGE]:</span> <span class="audit-value">2x1TB HDD ZFS, 1x500GB HDD (Boot/System)</span>
+  <span class="audit-label">[MODEL]:</span> <span class="audit-value">DELL Precision 5810</span>
+  <span class="audit-label">[OS]:</span> <span class="audit-value">Proxmox VE 8+</span>
+
+  <h3>[ HOSTNAME: Motherbase ]</h3>
+  <p class="meta-comment">MSF NAS Storage</p>
+
+  <span class="audit-label">[CPU]:</span> <span class="audit-value">2xIntel E5640 | 8C/16T Total</span>
+  <span class="audit-label">[RAM]:</span> <span class="audit-value">128GB DDR3</span>
+  <span class="audit-label">[STORAGE]:</span> <span class="audit-value">12x4TB HDD (ZFS Pools), 2x500GB HDD (Cache), 2x64GB Cruzer Glide (Boot)</span>
+  <span class="audit-label">[HBA]:</span> <span class="audit-value">LSI SAS2008 (IT Mode)</span>
+  <span class="audit-label">[BACKPLANE]:</span> <span class="audit-value">SAS2</span>
+  <span class="audit-label">[NIC]:</span> <span class="audit-value">2xIntegrated NIC in LAG</span>
+  <span class="audit-label">[MODEL]:</span> <span class="audit-value">DELL PowerEdge R510</span>
+  <span class="audit-label">[OS]:</span> <span class="audit-value">TrueNAS Scale CE 24+</span>
+
+  <span class="audit-label">[POOL_0]:</span> <span class="audit-value">1 x RAIDZ1, 3 wide, 4 TB | 1x 500GB Cache</span>
+  <span class="audit-label">[POOL_1]:</span> <span class="audit-value">1 x RAIDZ1, 3 wide, 4 TB</span>
+  <span class="audit-label">[POOL_2]:</span> <span class="audit-value">1 x RAIDZ1, 6 wide, 4 TB | 1x 500GB Cache</span>
+
+  <h3>[ HOSTNAME: Snake ]</h3>
+  <p class="meta-comment">Workstation, Dev, Gaming PC</p>
+
+  <h3>[ HOSTNAME: Otacon ]</h3>
+  <p class="meta-comment">Mobile Dev, Programming Thinkpad</p>
+
+  <span class="audit-label">[CPU]:</span> <span class="audit-value">Intel i5-2410M | 2C/4T</span>
+  <span class="audit-label">[RAM]:</span> <span class="audit-value">8GB DDR4-SODIM</span>
+  <span class="audit-label">[OS]:</span> <span class="audit-value">Arch Linux (lts)</span>
+  <span class="audit-label">[STORAGE]:</span> <span class="audit-value">1TB Samsung EVO 870 SSD</span>
+  <span class="audit-label">[MODEL]:</span> <span class="audit-value">Thinkpad X220</span>
+  
+  <h3>[ HOSTNAME: Codec ]</h3>
+  <p class="meta-comment">Cell Phone</p>
+
+  <span class="audit-label">[MODEL]:</span> <span class="audit-value">iPhone 13 Mini</span>
+
+  <h3>[ UniFi Stack ]</h3>
+  <p class="meta-comment">MSF Networking Stack</p>
+
+  <span class="audit-label">[GATEWAY]:</span> <span class="audit-value">UniFi UCG-M</span>
+  <span class="audit-label">[AP]:</span> <span class="audit-value">UniFi UX</span>
+  <span class="audit-label">[SWITCH]:</span> <span class="audit-value">UniFi 16 Port PoE Lite</span>
+
+  <h2 class="text-amber">
+      >> PREVIOUS_MEMBERS://<span class="layer-name">GEN_LAB</span>
+  </h2>
+
+  <h3>[ Thinkpad R61i ]</h3>
+
+
+<!--- Test image for the imageModal
+  <div class="terminal-frame">
+    <div class="frame-header">
+      <span class="prefix">SOURCE:</span>
+      <span class="path">~/assets/devices/thinkpad_r61i.png</span>
+    </div>
+
+    <a href="javascript:void(0)" 
+        class="dither-link" 
+        onclick="window.openModal('https://git.nottyxton.net/nottyxton/site-assets/raw/branch/main/assets/images/thinkpad_r61i.jpeg')">
+        <img src="assets/dithered/thinkpad_r61i_dithered.png" class="dither-img">
+    </a>
+
+    <div class="frame-footer">
+      <span class="status">[ CLICK_IMAGE_TO_DECRYPT ]</span>
+    </div>
+  </div>
+  ---!>
+</div>

@@ -19,6 +19,25 @@ window.playTuiSound = function (type) {
   }
 };
 
+window.openModal = function(rawUrl) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImg');
+    
+    if (modal && modalImg) {
+        modalImg.src = rawUrl;
+        modal.style.display = 'flex';
+        if (window.playTuiSound) window.playTuiSound("click");
+    }
+};
+
+window.closeModal = function() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.getElementById('modalImg').src = '';
+    }
+};
+
 window.loadModule = async function (moduleName) {
   // 1. Force find the elements every single time
   const viewscreen = document.getElementById("module-viewscreen");
@@ -296,6 +315,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- THE CLICK LISTENER ---
   document.addEventListener("click", (e) => {
+
+    if (e.target.closest(".dither-link")) {
+        window.playTuiSound("click");
+        return;
+    }
+
     const item = e.target.closest(".nav-item, .file-link, .hub-window");
     if (!item) return;
 
