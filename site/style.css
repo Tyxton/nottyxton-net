@@ -32,8 +32,6 @@ body {
   display: none;
 }
 
-
-
 /* ---------------------------------------
         [ CRT_HARDWARE_EMULATION ]
   Scanlines, Flicker, and Bezel Effects
@@ -292,7 +290,7 @@ body::after {
 }
 
 .module-content {
-    padding-bottom: 20px;
+  padding-bottom: 20px;
 }
 
 .audit-section {
@@ -651,6 +649,7 @@ h4 {
   display: inline-block;
   max-width: 100%;
   margin-top: 10px;
+  margin-bottom: 20px;
 }
 
 .dither-img {
