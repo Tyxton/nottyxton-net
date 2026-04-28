@@ -8,24 +8,38 @@
 
   <h3>[ HOSTNAME: Raiden ]</h3>
   <p class="meta-comment">MSF Compute Server</p>
-
-  <p>
+  <br />
+  <p class="module-content">
   Raiden is the primary compute server in MSF, it is a refurbished Dell Precision 5810. I use Proxmox VE 8 for the hypervisor (soon EOL, so I will be upgrading to PVE 9), the specific hardware is listed below:
   </p>
 
+  <div class="audit-row">
   <span class="audit-label">[CPU]:</span> <span class="audit-value">Intel E5-1650 | 6C/12T</span>
+  </div>
+  <div class="audit-row">
   <span class="audit-label">[GPU]:</span> <span class="audit-value">NVIDIA Quadro P4000</span>
+  </div>
+  <div class="audit-row">
   <span class="audit-label">[RAM]:</span> <span class="audit-value">64 GB DDR4</span>
+  </div>
+  <div class="audit-row">
   <span class="audit-label">[STORAGE]:</span> <span class="audit-value">2x1TB HDD ZFS, 1x500GB HDD (Boot/System)</span>
+  </div>
+  <div class="audit-row">
   <span class="audit-label">[MODEL]:</span> <span class="audit-value">DELL Precision 5810</span>
+  </div>
+  <div class="audit-row">
   <span class="audit-label">[OS]:</span> <span class="audit-value">Proxmox VE 8+</span>
-  >span class="audit-label">[LXC/VM OS]:</span> class="audit-value">Debian 12</span>
-
-  <p>
+  </div>
+  <div class="audit-row">
+  <span class="audit-label">[LXC/VM OS]:</span> <span class="audit-value">Debian 12</span>
+  </div>
+  <br />
+  <p class="module-content">
   This currently runs all of the LXCs and VMs that make up MSF. This makes up all of my Docker containers, services, as well as other core networking Infrastructure like Nginx Proxy Manager and AdGuardHome. Eventually I would like to setup a HA cluster using 3 identical Thin Clients, or NUCs. This would split up the workload among 3 compute nodes, as well as offer resilience and failover for the network.
   </p>
 
-  <p>
+  <p class="module-content">
   Raiden originally started off as a second-hand thinkstation, though the compute power was lacking leading me to upgrade it to the 5810 I have today.
   </p>
 
@@ -51,7 +65,7 @@
 
   <p>
   Motherbase is the primary storage server in MSF, it is a third-hand Dell PowerEdge R510. I use TrueNAS Scale for the OS, the specific hardware is listed below:
-  >/p>
+  </p>
 
   <span class="audit-label">[CPU]:</span> <span class="audit-value">2xIntel E5640 | 8C/16T Total</span>
   <span class="audit-label">[RAM]:</span> <span class="audit-value">128GB DDR3 ECC</span>

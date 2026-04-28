@@ -32,6 +32,8 @@ body {
   display: none;
 }
 
+
+
 /* ---------------------------------------
         [ CRT_HARDWARE_EMULATION ]
   Scanlines, Flicker, and Bezel Effects
@@ -287,6 +289,10 @@ body::after {
   margin: 0 auto;
   padding: 20px;
   z-index: 10;
+}
+
+.module-content {
+    padding-bottom: 20px;
 }
 
 .audit-section {
@@ -756,6 +762,7 @@ h4 {
     font-size: 0.9rem;
     line-height: 1.5;
     text-align: left;
+    padding-bottom: 10px;
   }
 
   p,
