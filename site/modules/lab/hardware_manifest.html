@@ -17,6 +17,52 @@
       be upgrading to PVE 9), the specific hardware is listed below:
     </p>
 
+    <div class="audit-row">
+      <span class="audit-label">[CPU]:</span>
+      <span class="audit-value">Intel E5-1650 | 6C/12T</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[GPU]:</span>
+      <span class="audit-value">NVIDIA Quadro P4000</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[RAM]:</span>
+      <span class="audit-value">64 GB DDR4</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[STORAGE]:</span>
+      <span class="audit-value">2x1TB HDD ZFS, 1x500GB HDD (Boot/System)</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[MODEL]:</span>
+      <span class="audit-value">DELL Precision 5810</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[OS]:</span>
+      <span class="audit-value">Proxmox VE 8+</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[LXC/VM OS]:</span>
+      <span class="audit-value">Debian 12</span>
+    </div>
+
+    <br />
+
+    <p class="module-content">
+      This currently runs all of the LXCs and VMs that make up MSF. This makes
+      up all of my Docker containers, services, as well as other core networking
+      Infrastructure like Nginx Proxy Manager and AdGuardHome. Eventually I
+      would like to setup a HA cluster using 3 identical Thin Clients, or NUCs.
+      This would split up the workload among 3 compute nodes, as well as offer
+      resilience and failover for the network.
+    </p>
+
+    <p class="module-content">
+      Raiden originally started off as a second-hand thinkstation, though the
+      compute power was lacking leading me to upgrade it to the 5810 I have
+      today.
+    </p>
+
     <div class="terminal-frame">
       <div class="frame-header">
         <span class="prefix">SOURCE:</span>
@@ -42,250 +88,179 @@
         <span class="status">[ CLICK_IMAGE_TO_DECRYPT ]</span>
       </div>
     </div>
-  </div>
 
-  <div class="audit-row">
-    <span class="audit-label">[CPU]:</span>
-    <span class="audit-value">Intel E5-1650 | 6C/12T</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[GPU]:</span>
-    <span class="audit-value">NVIDIA Quadro P4000</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[RAM]:</span>
-    <span class="audit-value">64 GB DDR4</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[STORAGE]:</span>
-    <span class="audit-value">2x1TB HDD ZFS, 1x500GB HDD (Boot/System)</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[MODEL]:</span>
-    <span class="audit-value">DELL Precision 5810</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[OS]:</span>
-    <span class="audit-value">Proxmox VE 8+</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[LXC/VM OS]:</span>
-    <span class="audit-value">Debian 12</span>
-  </div>
+    <h3>[ HOSTNAME: Motherbase ]</h3>
+    <p class="meta-comment">MSF NAS Storage</p>
 
-  <br />
+    <p>
+      Motherbase is the primary storage server in MSF, it is a third-hand Dell
+      PowerEdge R510. I use TrueNAS Scale for the OS, the specific hardware is
+      listed below:
+    </p>
 
-  <p class="module-content">
-    This currently runs all of the LXCs and VMs that make up MSF. This makes up
-    all of my Docker containers, services, as well as other core networking
-    Infrastructure like Nginx Proxy Manager and AdGuardHome. Eventually I would
-    like to setup a HA cluster using 3 identical Thin Clients, or NUCs. This
-    would split up the workload among 3 compute nodes, as well as offer
-    resilience and failover for the network.
-  </p>
+    <div class="audit-row">
+      <span class="audit-label">[CPU]:</span>
+      <span class="audit-value">2xIntel E5640 | 8C/16T Total</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[RAM]:</span>
+      <span class="audit-value">128GB DDR3 ECC</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[STORAGE]:</span>
+      <span class="audit-value"
+        >12x4TB HDD (ZFS Pools), 2x500GB HDD (Cache), 2x64GB Cruzer Glide
+        (Boot)</span
+      >
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[HBA]:</span>
+      <span class="audit-value">LSI SAS2008 (IT Mode)</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[BACKPLANE]:</span>
+      <span class="audit-value">SAS2</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[NIC]:</span>
+      <span class="audit-value">2xIntegrated NIC in LAG</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[MODEL]:</span>
+      <span class="audit-value">DELL PowerEdge R510</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[OS]:</span>
+      <span class="audit-value">TrueNAS Scale CE 24+</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[POOL_0]:</span>
+      <span class="audit-value">1 x RAIDZ1, 3 wide, 4 TB | 1x 500GB Cache</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[POOL_1]:</span>
+      <span class="audit-value">1 x RAIDZ1, 3 wide, 4 TB</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[POOL_2]:</span>
+      <span class="audit-value">1 x RAIDZ1, 6 wide, 4 TB | 1x 500GB Cache</span>
+    </div>
+    <p>
+      This currently is being used as <strong>just</strong> a storage server.
+      While it has more theoritcal resources than Raiden, I don't use it for any
+      compute as 48TB of ZFS Storage makes good use of the RAM installed, I
+      don't want to pull that capacity for docker containers or other compute -
+      though I have been looking into MINIO under TrueNAS. It using DDR3 means
+      that the 128GB of RAM is not as impressive as the 64GB of DDR4 on Raiden,
+      so that itself makes it less compatible for compute tasks. Eventually I
+      would like to scale this up as well, but the R510 has served me well for
+      storage, the only think I could really care to benefit from would be
+      increased storage size. I intend to continue a non-converged setup, so
+      adding compute power is not a priority for me.
+    </p>
 
-  <p class="module-content">
-    Raiden originally started off as a second-hand thinkstation, though the
-    compute power was lacking leading me to upgrade it to the 5810 I have today.
-  </p>
+    <h3>[ HOSTNAME: Snake ]</h3>
+    <p class="meta-comment">Workstation, Dev, Gaming PC</p>
 
-  <div class="terminal-frame">
-    <div class="frame-header">
-      <span class="prefix">SOURCE:</span>
-      <span class="path">~/assets/devices/thinkstation.png</span>
+    <p>
+      Snake has evolved the most out of the current fleet, while not directly
+      part of the MSF structure, plays a huge role in it development and
+      maintenence cycle.This is my main PC, which I use for most computer
+      related tasks unrelated to MSF. It's is my gaming rig, primary dev
+      machine, and workstation. The specific hardware is listed below:
+    </p>
+
+    <div class="audit-row">
+      <span class="audit-label">[CPU]:</span>
+      <span class="audit-value">Intel i9-12900k | 16C/24T</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[GPU]:</span>
+      <span class="audit-value">ASUS NVIDIA GeForce 2060 (rev a.)</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[RAM]:</span>
+      <span class="audit-value">32GB DDR5</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[OS]:</span>
+      <span class="audit-value">Arch Linux</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[STORAGE]:</span>
+      <span class="audit-value"
+        >2x1TB Samsung EVO 870 (btrfs), 1x2TB HDD (bulk/ext4)</span
+      >
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[MOTHERBOARD]:</span>
+      <span class="audit-value">ASUS PRIME Z790-V AX</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[COOLING]:</span>
+      <span class="audit-value">NZXT Kraken 360</span>
     </div>
 
-    <a
-      href="javascript:void(0)"
-      class="dither-link"
-      onclick="
-        window.openModal(
-          'https://git.nottyxton.net/nottyxton/site-assets/raw/branch/main/assets/images/first_thinkstation.jpeg',
-        )
-      "
-    >
-      <img
-        src="assets/dithered/first_thinkstation_dithered.png"
-        class="dither-img"
-      />
-    </a>
+    <h3>[ HOSTNAME: Otacon ]</h3>
+    <p class="meta-comment">Mobile Dev, Programming Thinkpad</p>
 
-    <div class="frame-footer">
-      <span class="status">[ CLICK_IMAGE_TO_DECRYPT ]</span>
+    <div class="audit-row">
+      <span class="audit-label">[CPU]:</span>
+      <span class="audit-value">Intel i5-2410M | 2C/4T</span>
     </div>
-  </div>
+    <div class="audit-row">
+      <span class="audit-label">[RAM]:</span>
+      <span class="audit-value">8GB DDR4-SODIM</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[OS]:</span>
+      <span class="audit-value">Arch Linux (lts)</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[STORAGE]:</span>
+      <span class="audit-value">1TB Samsung EVO 870 SSD</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[MODEL]:</span>
+      <span class="audit-value">Thinkpad X220</span>
+    </div>
 
-  <h3>[ HOSTNAME: Motherbase ]</h3>
-  <p class="meta-comment">MSF NAS Storage</p>
+    <h3>[ HOSTNAME: Codec ]</h3>
+    <p class="meta-comment">Cell Phone</p>
 
-  <p>
-    Motherbase is the primary storage server in MSF, it is a third-hand Dell
-    PowerEdge R510. I use TrueNAS Scale for the OS, the specific hardware is
-    listed below:
-  </p>
+    <p>
+      This is just my cell-phone, though it has changed back and forth from a
+      dumbphone to a smartphone. I am rather unhappy with Apple/iOS and I intend
+      to be moving towards an Android device to give me more control as well as
+      freedoms I am not alloted on iPhone. This would better benefit my MSF
+      workflow.
+    </p>
 
-  <div class="audit-row">
-    <span class="audit-label">[CPU]:</span>
-    <span class="audit-value">2xIntel E5640 | 8C/16T Total</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[RAM]:</span>
-    <span class="audit-value">128GB DDR3 ECC</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[STORAGE]:</span>
-    <span class="audit-value"
-      >12x4TB HDD (ZFS Pools), 2x500GB HDD (Cache), 2x64GB Cruzer Glide
-      (Boot)</span
-    >
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[HBA]:</span>
-    <span class="audit-value">LSI SAS2008 (IT Mode)</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[BACKPLANE]:</span>
-    <span class="audit-value">SAS2</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[NIC]:</span>
-    <span class="audit-value">2xIntegrated NIC in LAG</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[MODEL]:</span>
-    <span class="audit-value">DELL PowerEdge R510</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[OS]:</span>
-    <span class="audit-value">TrueNAS Scale CE 24+</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[POOL_0]:</span>
-    <span class="audit-value">1 x RAIDZ1, 3 wide, 4 TB | 1x 500GB Cache</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[POOL_1]:</span>
-    <span class="audit-value">1 x RAIDZ1, 3 wide, 4 TB</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[POOL_2]:</span>
-    <span class="audit-value">1 x RAIDZ1, 6 wide, 4 TB | 1x 500GB Cache</span>
-  </div>
-  <p>
-    This currently is being used as <strong>just</strong> a storage server.
-    While it has more theoritcal resources than Raiden, I don't use it for any
-    compute as 48TB of ZFS Storage makes good use of the RAM installed, I don't
-    want to pull that capacity for docker containers or other compute - though I
-    have been looking into MINIO under TrueNAS. It using DDR3 means that the
-    128GB of RAM is not as impressive as the 64GB of DDR4 on Raiden, so that
-    itself makes it less compatible for compute tasks. Eventually I would like
-    to scale this up as well, but the R510 has served me well for storage, the
-    only think I could really care to benefit from would be increased storage
-    size. I intend to continue a non-converged setup, so adding compute power is
-    not a priority for me.
-  </p>
+    <div class="audit-row">
+      <span class="audit-label">[MODEL]:</span>
+      <span class="audit-value">iPhone 13 Mini</span>
+    </div>
 
-  <h3>[ HOSTNAME: Snake ]</h3>
-  <p class="meta-comment">Workstation, Dev, Gaming PC</p>
+    <h3>[ UniFi Stack ]</h3>
+    <p class="meta-comment">MSF Networking Stack</p>
 
-  <p>
-    Snake has evolved the most out of the current fleet, while not directly part
-    of the MSF structure, plays a huge role in it development and maintenence
-    cycle.This is my main PC, which I use for most computer related tasks
-    unrelated to MSF. It's is my gaming rig, primary dev machine, and
-    workstation. The specific hardware is listed below:
-  </p>
+    <div class="audit-row">
+      <span class="audit-label">[GATEWAY]:</span>
+      <span class="audit-value">UniFi UCG-M</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[AP]:</span>
+      <span class="audit-value">UniFi UX</span>
+    </div>
+    <div class="audit-row">
+      <span class="audit-label">[SWITCH]:</span>
+      <span class="audit-value">UniFi 16 Port PoE Lite</span>
+    </div>
 
-  <div class="audit-row">
-    <span class="audit-label">[CPU]:</span>
-    <span class="audit-value">Intel i9-12900k | 16C/24T</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[GPU]:</span>
-    <span class="audit-value">ASUS NVIDIA GeForce 2060 (rev a.)</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[RAM]:</span>
-    <span class="audit-value">32GB DDR5</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[OS]:</span>
-    <span class="audit-value">Arch Linux</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[STORAGE]:</span>
-    <span class="audit-value"
-      >2x1TB Samsung EVO 870 (btrfs), 1x2TB HDD (bulk/ext4)</span
-    >
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[MOTHERBOARD]:</span>
-    <span class="audit-value">ASUS PRIME Z790-V AX</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[COOLING]:</span>
-    <span class="audit-value">NZXT Kraken 360</span>
-  </div>
+    <h2 class="text-amber">
+      >> PREVIOUS_MEMBERS://<span class="layer-name">GEN_LAB</span>
+    </h2>
 
-  <h3>[ HOSTNAME: Otacon ]</h3>
-  <p class="meta-comment">Mobile Dev, Programming Thinkpad</p>
-
-  <div class="audit-row">
-    <span class="audit-label">[CPU]:</span>
-    <span class="audit-value">Intel i5-2410M | 2C/4T</span>
+    <h3>[ Thinkpad R61i ]</h3>
   </div>
-  <div class="audit-row">
-    <span class="audit-label">[RAM]:</span>
-    <span class="audit-value">8GB DDR4-SODIM</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[OS]:</span>
-    <span class="audit-value">Arch Linux (lts)</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[STORAGE]:</span>
-    <span class="audit-value">1TB Samsung EVO 870 SSD</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[MODEL]:</span>
-    <span class="audit-value">Thinkpad X220</span>
-  </div>
-
-  <h3>[ HOSTNAME: Codec ]</h3>
-  <p class="meta-comment">Cell Phone</p>
-
-  <p>
-    This is just my cell-phone, though it has changed back and forth from a
-    dumbphone to a smartphone. I am rather unhappy with Apple/iOS and I intend
-    to be moving towards an Android device to give me more control as well as
-    freedoms I am not alloted on iPhone. This would better benefit my MSF
-    workflow.
-  </p>
-
-  <div class="audit-row">
-    <span class="audit-label">[MODEL]:</span>
-    <span class="audit-value">iPhone 13 Mini</span>
-  </div>
-
-  <h3>[ UniFi Stack ]</h3>
-  <p class="meta-comment">MSF Networking Stack</p>
-
-  <div class="audit-row">
-    <span class="audit-label">[GATEWAY]:</span>
-    <span class="audit-value">UniFi UCG-M</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[AP]:</span>
-    <span class="audit-value">UniFi UX</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[SWITCH]:</span>
-    <span class="audit-value">UniFi 16 Port PoE Lite</span>
-  </div>
-
-  <h2 class="text-amber">
-    >> PREVIOUS_MEMBERS://<span class="layer-name">GEN_LAB</span>
-  </h2>
-
-  <h3>[ Thinkpad R61i ]</h3>
 </div>
