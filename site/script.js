@@ -19,23 +19,23 @@ window.playTuiSound = function (type) {
   }
 };
 
-window.openModal = function(rawUrl) {
-    const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImg');
-    
-    if (modal && modalImg) {
-        modalImg.src = rawUrl;
-        modal.style.display = 'flex';
-        if (window.playTuiSound) window.playTuiSound("click");
-    }
+window.openModal = function (rawUrl) {
+  const modal = document.getElementById("imageModal");
+  const modalImg = document.getElementById("modalImg");
+
+  if (modal && modalImg) {
+    modalImg.src = rawUrl;
+    modal.style.display = "flex";
+    if (window.playTuiSound) window.playTuiSound("click");
+  }
 };
 
-window.closeModal = function() {
-    const modal = document.getElementById('imageModal');
-    if (modal) {
-        modal.style.display = 'none';
-        document.getElementById('modalImg').src = '';
-    }
+window.closeModal = function () {
+  const modal = document.getElementById("imageModal");
+  if (modal) {
+    modal.style.display = "none";
+    document.getElementById("modalImg").src = "";
+  }
 };
 
 window.loadModule = async function (moduleName) {
@@ -315,10 +315,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- THE CLICK LISTENER ---
   document.addEventListener("click", (e) => {
-
     if (e.target.closest(".dither-link")) {
-        window.playTuiSound("click");
-        return;
+      window.playTuiSound("click");
+      return;
     }
 
     const item = e.target.closest(".nav-item, .file-link, .hub-window");
@@ -353,6 +352,31 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       window.loadModule(mod);
     }
+  });
+
+  // --- COLLAPSIBLE LOGIC ---
+  document.addEventListener("click", (e) => {
+    const header = e.target.closest(".collapsible-header");
+    if (!header) return;
+
+    const container = header.parentElement;
+    const content = container.querySelector(".collapsible-content");
+    const icon = header.querySelector(".toggle-icon");
+
+    if (
+      (content && content.style.display === "none") ||
+      content.style.display === ""
+    ) {
+      content.style.display = "block";
+      icon.innerText = "[-] ";
+      content.classList.add("flicker-in");
+    } else {
+      content.style.display = "none";
+      icon.innerText = "[+] ";
+      content.classList.remove("flicker-in");
+    }
+
+    if (window.playTuiSound) window.playTuiSound("click");
   });
 
   document.addEventListener("mouseover", (e) => {

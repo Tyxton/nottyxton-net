@@ -508,6 +508,55 @@ h4 {
   font-weight: bold;
 }
 
+/* --- COLLPASIBLE CONTENT --- */
+.collapsible-header {
+  background: none;
+  border: none;
+  color: var(--phosphor-bright);
+  font-family: inherit;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 10px 0;
+  width: 100%;
+  text-align: left;
+  display: block;
+  text-shadow:
+    0 0 2px var(--phosphor-dim),
+    0 0 8px var(--phosphor-bright);
+}
+
+.collapsible-header:hover {
+  background: var(--phosphor-glow);
+}
+
+.collapsible-header:hover::after {
+  content: "█";
+  animation: blink 1s step-end infinite;
+  margin-left: 5px;
+}
+
+.collapsible-content {
+  padding-left: 20px;
+  border-left: 1px dashed var(--phosphor-bright);
+  margin-bottom: 20px;
+}
+
+.flicker-in {
+  animation: step-draw 0.15s steps(4) forwards;
+}
+
+@keyframes step-draw {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* --- RESOURCES MODULES --- */
 .resources-hub {
   margin-top: 20px auto 0 auto;

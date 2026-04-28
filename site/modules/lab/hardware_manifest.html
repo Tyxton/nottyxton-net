@@ -16,78 +16,236 @@
     be upgrading to PVE 9), the specific hardware is listed below:
   </p>
 
-  <div class="audit-row">
-    <span class="audit-label">[CPU]:</span>
-    <span class="audit-value">Intel E5-1650 | 6C/12T</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[GPU]:</span>
-    <span class="audit-value">NVIDIA Quadro P4000</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[RAM]:</span>
-    <span class="audit-value">64 GB DDR4</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[STORAGE]:</span>
-    <span class="audit-value">2x1TB HDD ZFS, 1x500GB HDD (Boot/System)</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[MODEL]:</span>
-    <span class="audit-value">DELL Precision 5810</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[OS]:</span>
-    <span class="audit-value">Proxmox VE 8+</span>
-  </div>
-  <div class="audit-row">
-    <span class="audit-label">[LXC/VM OS]:</span>
-    <span class="audit-value">Debian 12</span>
-  </div>
+  <div class="collapsible-window">
+    <button class="collapsible-header">
+      <span class="toggle-icon">[+] </span>[ DETAILS://RAIDEN ] - >>
+      ASSET_AUDIT: PRIMARY_COMPUTE
+    </button>
 
-  <br />
+    <div class="collapsible-content" style="display: none">
+      <div class="audit-row">
+        <span class="audit-label">[CPU]:</span>
+        <span class="audit-value">Intel E5-1650 | 6C/12T</span>
+      </div>
+      <div class="audit-row">
+        <span class="audit-label">[GPU]:</span>
+        <span class="audit-value">NVIDIA Quadro P4000</span>
+      </div>
+      <div class="audit-row">
+        <span class="audit-label">[RAM]:</span>
+        <span class="audit-value">64 GB DDR4</span>
+      </div>
+      <div class="audit-row">
+        <span class="audit-label">[STORAGE]:</span>
+        <span class="audit-value"
+          >2x1TB HDD ZFS, 1x500GB HDD (Boot/System)</span
+        >
+      </div>
+      <div class="audit-row">
+        <span class="audit-label">[MODEL]:</span>
+        <span class="audit-value">DELL Precision 5810</span>
+      </div>
+      <div class="audit-row">
+        <span class="audit-label">[OS]:</span>
+        <span class="audit-value">Proxmox VE 8+</span>
+      </div>
+      <div class="audit-row">
+        <span class="audit-label">[LXC/VM OS]:</span>
+        <span class="audit-value">Debian 12</span>
+      </div>
 
-  <p class="module-content">
-    This currently runs all of the LXCs and VMs that make up MSF. This makes up
-    all of my Docker containers, services, as well as other core networking
-    Infrastructure like Nginx Proxy Manager and AdGuardHome. Eventually I would
-    like to setup a HA cluster using 3 identical Thin Clients, or NUCs. This
-    would split up the workload among 3 compute nodes, as well as offer
-    resilience and failover for the network.
-  </p>
+      <br />
 
-  <p class="module-content">
-    Raiden originally started off as a second-hand thinkstation, though the
-    compute power was lacking leading me to upgrade it to the 5810 I have today.
-  </p>
+      <p class="module-content">
+        This currently runs all of the LXCs and VMs that make up MSF. This makes
+        up all of my Docker containers, services, as well as other core
+        networking Infrastructure like Nginx Proxy Manager and AdGuardHome.
+        Eventually I would like to setup a HA cluster using 3 identical Thin
+        Clients, or NUCs. This would split up the workload among 3 compute
+        nodes, as well as offer resilience and failover for the network.
+      </p>
 
-  <div class="terminal-frame">
-    <div class="frame-header">
-      <span class="prefix">SOURCE:</span>
-      <span class="path">~/msf/raiden.png</span>
+      <p class="module-content">
+        Raiden originally started off as a second-hand thinkstation, though the
+        compute power was lacking leading me to upgrade it to the 5810 I have
+        today.
+      </p>
+
+      <div class="terminal-frame">
+        <div class="frame-header">
+          <span class="prefix">SOURCE:</span>
+          <span class="path">~/msf/raiden.png</span>
+        </div>
+
+        <a
+          href="javascript:void(0)"
+          class="dither-link"
+          onclick="
+            window.openModal(
+              'https://git.nottyxton.net/nottyxton/site-assets/raw/branch/main/assets/images/rear_raiden.jpeg',
+            )
+          "
+        >
+          <img
+            src="assets/dithered/rear_raiden_dithered.png"
+            class="dither-img"
+          />
+        </a>
+
+        <div class="frame-footer">
+          <span class="status">[ CLICK_IMAGE_TO_DECRYPT ]</span>
+        </div>
+      </div>
+
+      <p class="module-content">
+        Unfortunately this isn't the best picture of Raiden, but this is the
+        back of it from a few years ago now, sitting on top of Motherbase.
+      </p>
     </div>
-
-    <a
-      href="javascript:void(0)"
-      class="dither-link"
-      onclick="
-        window.openModal(
-          'https://git.nottyxton.net/nottyxton/site-assets/raw/branch/main/assets/images/rear_raiden.jpeg',
-        )
-      "
-    >
-      <img src="assets/dithered/rear_raiden_dithered.png" class="dither-img" />
-    </a>
-
-    <div class="frame-footer">
-      <span class="status">[ CLICK_IMAGE_TO_DECRYPT ]</span>
-    </div>
   </div>
 
-  <p class="module-content">
-    Unfortunately this isn't the best picture of Raiden, but this is the back of
-    it from a few years ago now, sitting on top of Motherbase.
-  </p>
+  <div class="collapsible-window">
+    <button class="collapsible-header">
+      <span class="toggle-icon">[+] </span>[ HISTORY://RAIDEN ] - >> MIGRATION:
+      THINKPAD_TO_MSF
+    </button>
+
+    <div class="collapsible-content" style="display: none">
+      <p class="module-content">
+        It took me many years to get up to the Dell Precision 5810, as I've
+        referenced a few times, I used to use a Thinkpad T440 to run a webserver
+        - which the legacy website is hosted at blog.nottyxton.net. Originally,
+        my "Primary Compute" was just a nginx instance running inside Ubuntu
+        Server on a Thinkpad T440.
+      </p>
+
+      <div class="terminal-frame">
+        <div class="frame-header">
+          <span class="prefix">SOURCE:</span>
+          <span class="path">~/archive/first_server.png</span>
+        </div>
+
+        <a
+          href="javascript:void(0)"
+          class="dither-link"
+          onclick="
+            window.openModal(
+              'https://git.nottyxton.net/nottyxton/site-assets/raw/branch/main/assets/images/t440_shelfserver.jpeg',
+            )
+          "
+        >
+          <img
+            src="assets/dithered/t440_shelfserver_dithered.png"
+            class="dither-img"
+          />
+        </a>
+
+        <div class="frame-footer">
+          <span class="status">[ CLICK_IMAGE_TO_DECRYPT ]</span>
+        </div>
+      </div>
+
+      <p class="module-content">
+        From there, I realized I wanted more. I had been experimenting on Snake
+        with QEMU/KVM to side-load Windows and Hackintosh, in that I had learned
+        about type-1 hypervisors, and their use in servers. I read about VMWare
+        ESXI, Proxmox, and Windows Hyper-V; considering I had been wanting to
+        move away from Windows and the long-lasting issues I'd had with them,
+        this left me between a decision of ESXI and Proxmox. I ended up deciding
+        on Proxmox since it was open-source (a sentiment I have always
+        appreciated), I was beginning to be very comfortable with Linux and ZFS,
+        and was interested in the LXC support. This felt like a natural decision
+        to make for my homelab.
+      </p>
+
+      <p></p>
+
+      <p class="module-content">
+        Now, I had a goal that exceeded my T440; I ended up buying a used
+        Thinkstation P320 from eBay for ~$50. Unfortunately the one I recieved
+        had a faulty NIC, I had reached out to the seller, which sent me a
+        replacement the next day. I used the resources from the failed
+        Thinkstation, to double the RAM and Storage of the new server. This
+        Thinkstation had 32 GB of DDR4 and Intel E3-1240, a decent improvement
+        over the T440. The chassis was cramped, and hard to add to, but I had
+        more compute.
+      </p>
+
+      <div class="terminal-frame">
+        <div class="frame-header">
+          <span class="prefix">SOURCE:</span>
+          <span class="path">~/archive/p320.png</span>
+        </div>
+
+        <a
+          href="javascript:void(0)"
+          class="dither-link"
+          onclick="
+            window.openModal(
+              'https://git.nottyxton.net/nottyxton/site-assets/raw/branch/main/assets/images/thinkstation_p320.jpeg',
+            )
+          "
+        >
+          <img
+            src="assets/dithered/thinkstation_p320_dithered.png"
+            class="dither-img"
+          />
+        </a>
+
+        <div class="frame-footer">
+          <span class="status">[ CLICK_IMAGE_TO_DECRYPT ]</span>
+        </div>
+      </div>
+
+      <p class="module-content">
+        This allowed me to learn Proxmox. I would spend some time downloading
+        and configuring a few VMs, eventually I had landed on two: VM0 and WEB.
+        One for the website, another for everything else. These are still in my
+        early learning stages, no VLAN tagging, no isolation, just "two
+        computers in one". However, I would be introduced to Docker. At the
+        time, I had downloaded Yacht, a basic *arr stack, Heimdall, services I
+        would have never had before. Unfortunately, I lost this Thinkpad in an
+        attempt to upgrade the PSU for a NVIDIA 1050 Ti.
+      </p>
+
+      <p class="module-content">
+        After this, I migrated the drives, and recovered the site data - the
+        rest was not critical and was easily-replaceable. To replace it, I
+        bought a Dell Precision 5810, a slight upgrade and a move towards more
+        enterprise grade gear, including the BIOS. I have adjusted and changed
+        the configuration multiple times since, even recently as detailed in
+        INFRA://infrastructure_overhaul. Utilizing LXCs, VMs, NFS Mounts, VLAN
+        Tagging, Linux Bridges, etc. With a much more sophisticated Docker setup
+        with Portainer Edge across all nodes.
+      </p>
+
+      <div class="terminal-frame">
+        <div class="frame-header">
+          <span class="prefix">SOURCE:</span>
+          <span class="path">~/archive/homepage.png</span>
+        </div>
+
+        <a
+          href="javascript:void(0)"
+          class="dither-link"
+          onclick="
+            window.openModal(
+              'https://git.nottyxton.net/nottyxton/site-assets/raw/branch/main/assets/images/current_homepage.jpeg',
+            )
+          "
+        >
+          <img
+            src="assets/dithered/current_homepage_dithered.png"
+            class="dither-img"
+          />
+        </a>
+
+        <div class="frame-footer">
+          <span class="status">[ CLICK_IMAGE_TO_DECRYPT ]</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <h3>[ HOSTNAME: Motherbase ]</h3>
   <p class="meta-comment">MSF NAS Storage</p>
@@ -447,7 +605,7 @@
     web-browsing or terminal sessions, though this did lead to me leaning into
     very low-resource terminal alternatives to programs. Some of these follow me
     to this day: i3, urxvt, and polybar. This initiated my enjoyment of ricing
-    and maximizing resource-effeciency where I could. This was not my first time
+    and maximizing resource-efficiency where I could. This was not my first time
     using Linux, thankfully, but it was my first time using a TWM and really
     leaning into the customization available to me. Before the R61i, I mostly
     just used stock KDE Plasma 5.
@@ -470,6 +628,96 @@
     >
       <img
         src="assets/dithered/thinkpad_r61i_dithered.png"
+        class="dither-img"
+      />
+    </a>
+
+    <div class="frame-footer">
+      <span class="status">[ CLICK_IMAGE_TO_DECRYPT ]</span>
+    </div>
+  </div>
+
+  <h3>[ Unknown Dell Laptop ]</h3>
+  <p class="meta-comment">>> ARCHIVED | Linux Introductions</p>
+
+  <br />
+
+  <p class="module-content">
+    Unfortunately, I don't remember much about this Dell Laptop other than that
+    I had gotten it secondhand. By this point I had minimal knowledge of Linux,
+    but had long since started learning and playing with computers - this also
+    predates the T440 as my first webserver. I don't remember exactly what
+    distro this is, and the Application Launcher icon in the bottom left corner
+    I believe is from whatever theme I was using, but I want to say it was
+    base-arch which I had spend hours RTFMing to get working. At the time, the
+    decision to use Arch Linux was merely for the challenge of the complexity as
+    I wasn't entirely familiar with the CLI, later-on I would decide to stick
+    with it - eventually I'll migrate a blog post from the original
+    blog.nottyxton.net site that explains why I prefer it over Debian and
+    Gentoo. At the time, I was using it like I would when it had Windows, all
+    web browsing, so I never noticed a difference, just the satisfaction of
+    using Linux.
+  </p>
+
+  <div class="terminal-frame">
+    <div class="frame-header">
+      <span class="prefix">SOURCE:</span>
+      <span class="path">~/archive/first_otacon.png</span>
+    </div>
+
+    <a
+      href="javascript:void(0)"
+      class="dither-link"
+      onclick="
+        window.openModal(
+          'https://git.nottyxton.net/nottyxton/site-assets/raw/branch/main/assets/images/otacon_first_iteration.jpeg',
+        )
+      "
+    >
+      <img
+        src="assets/dithered/otacon_first_iteration_dithered.png"
+        class="dither-img"
+      />
+    </a>
+
+    <div class="frame-footer">
+      <span class="status">[ CLICK_IMAGE_TO_DECRYPT ]</span>
+    </div>
+  </div>
+
+  <h3>[ Thinkpad T440 ]</h3>
+  <p class="meta-comment">>> ARCHIVED | The First Server</p>
+
+  <br />
+
+  <p class="module-content">
+    Into my earlier Linux journey, I wanted a website to call my own, I had
+    recently aquired a secondhand Thinkpad T440, a mediocre at best Thinkpad;
+    though, it was all I had spare at the time. I installed Ubuntu Server on
+    this, and it sat on my bookshelf with the lid always open displaying top.
+    All it ran was nginx, with a wide-open port forward on the ISP provided
+    router, no firewall configurations. To change any of the site data, I would
+    SSH into it and directly alter the files live. Thankfully, I've come a long
+    way since then.
+  </p>
+
+  <div class="terminal-frame">
+    <div class="frame-header">
+      <span class="prefix">SOURCE:</span>
+      <span class="path">~/archive/first_server.png</span>
+    </div>
+
+    <a
+      href="javascript:void(0)"
+      class="dither-link"
+      onclick="
+        window.openModal(
+          'https://git.nottyxton.net/nottyxton/site-assets/raw/branch/main/assets/images/t440_shelfserver.jpeg',
+        )
+      "
+    >
+      <img
+        src="assets/dithered/t440_shelfserver_dithered.png"
         class="dither-img"
       />
     </a>
