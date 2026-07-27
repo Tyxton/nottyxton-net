@@ -10,7 +10,7 @@ My live TUI-inspired portfolio/documentation site.
 
 # Navigation
 
-The navigation of nottyxton.net can be mobile-drive, mouse driven, or keyboard driven.
+The navigation of nottyxton.net can be mobile-driven, mouse driven, or keyboard driven.
 
 The Fn keys are built to actually work when pressing F1-F9.
 

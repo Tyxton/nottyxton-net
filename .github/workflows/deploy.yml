@@ -15,7 +15,7 @@ jobs:
       - name: Set Git User
         run: |
           git config --global user.name "Tyler Sexton"
-          git config --global user.email "79432377+Tyxton@users.noreply.github.com"
+          git config --global user.email "git@nottyxton.net"
 
       - name: Deploy to Server via Rsync
         uses: Burnett01/rsync-deployments@7.0.0
