@@ -8,18 +8,6 @@ My live TUI-inspired portfolio/documentation site.
 
 ---
 
-# Navigation
-
-The navigation of nottyxton.net can be mobile-driven, mouse driven, or keyboard driven.
-
-The Fn keys are built to actually work when pressing F1-F9.
-
-This is actively under development, and changes may be made as the project develops.
-
-While I do my best to be clinically accurate in my documentation, I cannot guarantee 100% accuracy to all setups and configurations.
-
----
-
 # LEGAL
 
 - **SOFTWARE & LOGIC (MIT)**: The codebase, TUI logic, terminal emulation scripts, and underlying framework licensed under the MIT License. You are free to use, modify, and distribute the code for any purpose, provided the original copyright notice is retained.
