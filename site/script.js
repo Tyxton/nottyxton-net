@@ -158,6 +158,23 @@ const sendNtfyMsg = async (alias, message, selectedTopic = "nottyxton-gen") => {
   }
 };
 
+// --- BROWSER HISTORY SYNC ---
+// Keeps the content and "active" highlight in sync with
+// backwards/forwards browser navi.
+window.addEventListener("popstate", () => {
+  const hash = window.location.hash.replace("#", "");
+  const targetModule = hash ? hash : "system_audit";
+
+  window.loadModule(targetModule);
+
+  document.querySelectorAll(".nav-item").forEach((btn) => {
+    btn.classList.remove("active");
+    if (btn.getAttribute("data-module") === targetModule) {
+      btn.classlist.add("active");
+    }
+  });
+});
+
 // Keyboard Functions - NAV
 window.addEventListener("keydown", (e) => {
   // If the user is typing in a form field, don't trigger navigation
@@ -284,10 +301,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // plaguing me for the past 2-3 months.
     const viewscreen = document.getElementById("module-viewscreen");
     if (viewscreen && viewscreen.innerHTML.trim() === "") {
-      window.loadModule("system_audit");
+      // Check for existing hash, default if not exists
+      const hash = window.location.hash.replace("#", "");
+      const initialModule = hash ? hash : "system_audit";
 
-      const f1 = document.querySelector('[data-module="system_audit"]');
-      if (f1) f1.classList.add("active");
+      window.loadModule(initialModule);
+
+      // reworking the F1 "active" bind
+      const activeNav = document.querySelector(
+        `[data-module="${initialModule}"]`,
+      );
+      if (activeNav && activeNav.classList.contains("nav-item")) {
+        activeNav.classList.add("active");
+      }
     }
   }
 
@@ -342,6 +368,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (mod) {
       e.preventDefault();
       e.stopPropagation();
+
+      // Update URL Hash without reloading page //
+      history.pushState(null, null, `#${mod}`);
 
       // Only update the active state for the top nav keys //
       if (item.classList.contains("nav-item")) {
