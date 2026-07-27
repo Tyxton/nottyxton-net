@@ -67,6 +67,18 @@
     in once place rather than fragmented (I will detail the full Portainer -&gt;
     Dockge migration in a later post, but this was largely thanks to Ansible).
   </p>
+
+  <pre class="code">
+.
+├── ansible/                 #playbooks, roles, inventory, etc.
+├── ops-core-01/             #target node
+│   └── stacks/
+│       └── foo_stack/       #stack name
+│           └── compose.yml  #stack compose.yml
+├── edge-srv-01/             
+├── media-proc-01/
+└── data-imgs-01/            #the rest of the nodes follow...
+  </pre>
   <h4>[ SECRETS_MANAGEMENT ]</h4>
   <p class="module-content">
     As you may have noticed looking at the monorepo, there are no .env files
