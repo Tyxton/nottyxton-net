@@ -1,0 +1,113 @@
+<div class="layer-container">
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> ANSIBLE_MONOREPO://<span class="layer-name">AUTOMATION</span>
+    </h2>
+    <p class="meta-comment">
+      Utilizing an Ansible Monorepo to deploy, configure, and maintain nodes
+      using an SSoT pipeline.
+    </p>
+  </div>
+
+  <h3>>> INTRODUCING_ANSIBLE</h3>
+  <h4>[ REASONING ]</h4>
+  <p class="module-content">
+    Initially I was going to go for pure GitOps deployment via Gitea Runners on
+    a local Gitea instance. As I was starting to build out that initial repo and
+    it's runner scripts - I realized it was wildly inefficient for wide-scale
+    deployment. I had heard about Ansible, but has always avoided it since I was
+    hesitant to learn a overly complex new system. However, it was the best
+    choice for what I was trying to accomplish: treating my repository as a
+    Single Source of Truth (SSoT). This would mean instead of going ssh'ing into
+    my target node, configuring prereqs, depending on the service individual
+    configuration files, going into Portainer's Web UI and building out the
+    compose, and only after all of that deploying the container. I can change a
+    few lines of code and set the playbook to run. One of the largest benefits
+    to this is that Ansible is entirely stateless meaning none of the end nodes
+    need additional configuration to work with Ansible. I set up all of the host
+    variables from the development computer(s) and Ansible does the rest.
+  </p>
+  <h4>[ DEPLOYMENT_STRATEGY ]</h4>
+  <p class="module-content">
+    I have chosen to deploy everything Ad-Hoc rather than relying on Git Runners
+    to auto-deploy fully. Manually running the playbook from either one of my
+    development computers allows me to enjoy all of the benefits of this new
+    automated workflow - while still ensuring if anything breaks I know
+    immediately rather than relying on a notification backend or simply noticing
+    a service went down.
+  </p>
+  <h4>[ COVERAGE ]</h4>
+  <p class="module-content">
+    The majority of my Ansible roles so far has been focused on Docker
+    containers. As you can tell from the repository, and a lot of the other
+    documentation on this site, many of the services depend on the Docker Engine
+    rather than running bare-metal. On top of deploying and configuring all of
+    my docker stacks across the 4 docker nodes; recently I have added host
+    configuration to the playbook such as unattended-upgrades, crowdsec
+    (server/agent), and firewall management.
+  </p>
+  <h4>[ CONFIGURATION_DRIFT ]</h4>
+  <p class="module-content">
+    One of my biggest flaws as a developer in the homelab has been configuration
+    drift. Varying directories by node, ssh'ing into nodes to deal with
+    edge-cases and configuration (like prometheus, loki, or alloy
+    configurations), user management. Over the course of several years, things
+    became mangled and inconsistent. Thanks to Ansible, especially the Jinja2
+    templating it's allowed me to unify the configuration and eliminate
+    configuration drift.
+  </p>
+
+  <h3>>> DOCKER_MANAGEMENT</h3>
+  <h4>[ DOCKER_COMPOSE ]</h4>
+  <p class="module-content">
+    As sister directories to ansible/ I have directories for each docker node:
+    ops-core-01/stacks, edge-srv-01/stacks, media-proc-01/stacks,
+    data-imgs-01/stacks. These contain all of the compose stacks for the entire
+    lab. This allows me to move away from the Portainer UI and keep things all
+    in once place rather than fragmented (I will detail the full Portainer -&gt;
+    Dockge migration in a later post, but this was largely thanks to Ansible).
+  </p>
+  <h4>[ SECRETS_MANAGEMENT ]</h4>
+  <p class="module-content">
+    As you may have noticed looking at the monorepo, there are no .env files
+    (they would have been excluded anyways), but all of the .env files are built
+    by Ansible Jinja2 templating and vault_secrets. I will eventually add
+    .env.example templates to each stack to keep a good reference, but they are
+    not needed when running the playbook. This allows me to keep things DRY
+    (Don't Repeat Yourself) and portable. If for some reason in the future, I
+    want to change my docker_data directory from
+    /opt/docker-data/&lt;service&gt; to say /mnt/tank/docker-data/ all I would
+    need to do is update one line of code rather than dozens across 4 nodes. If
+    I ever add a new docker host down the line, all I have to do is point
+    Ansible at it, define it's roles, and it will automatically inherit all of
+    the configuration without me manually rebuilding it from the ground up.
+  </p>
+
+  <h3>> QOL_IMPROVEMENTS</h3>
+  <h4>[ REQUIREMENTS ]</h4>
+  <p class="module-content">
+    With many of the roles that span across multiple nodes like
+    configure_crowdsec or especially configure_alloy, they all share many of the
+    same needs while keeping their own unique requirements. For instance setting
+    up the Crowdsec LAPI on ops-core-01 and disabling it on edge-srv-01 - They
+    both need to install crowdsec, but the configuration step is different. Or
+    dealing with 4+ config.alloys; instead of building 4+ separate config.alloy
+    files, I build one modular file and let Jinja2 handle the individual needs
+    of each system - like DCGM-Node-Exporter for edge-srv-01 which is the only
+    host to have a GPU, or even the aggregation behavior of ops-core-01 vs the
+    push behavior of the rest. This takes a very large mental tax off of
+    deployment and configuration. Gone are the days of building separate
+    configuration files, scp'ing or rsync'ing them to their respective
+    locations, and keeping mental tabs of which service does what. It's all
+    easily referenceable and editable from one place.
+  </p>
+
+  <h4>[ CONNECTIVITY ]</h4>
+  <p class="module-content">
+    As many other homelabbers will know, there is a huge initial deployment
+    stage on connecting APIs and agents; with crowdsec in particular and soon
+    for the rest of the lab, I have learned to automate the handshake using
+    Ansible Secrets. I cannot yet speak on how versatile this will be, but it is
+    a nice prospect.
+  </p>
+</div>
