@@ -61,9 +61,9 @@ window.loadModule = async function (moduleName) {
       // Shorter Mobile Version: $~ cat file.log
       commandLabel.innerHTML = `<span class="prompt">$~</span> cat ${fileName}.log`;
     } else {
-      // Full Desktop Version: root@nottyton:~$ cat /root/projects/modules/path/file.log
+      // Full Desktop Version: root@nottyxton:~$ cat /root/projects/modules/path/file.log
       const displayPath = `/root/projects/modules/${filePath}.log`;
-      commandLabel.innerHTML = `<span class="prompt">root@nottyton:~$</span> cat ${displayPath}`;
+      commandLabel.innerHTML = `<span class="prompt">root@nottyxton:~$</span> cat ${displayPath}`;
     }
 
     console.log("PROMPT_MODE:", isMobile ? "MOBILE" : "DESKTOP");
