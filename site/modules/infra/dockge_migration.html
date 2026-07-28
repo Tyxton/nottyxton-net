@@ -1,0 +1,78 @@
+<div class="layer-container">
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> DOCKGE_MIGRATION://<span class="layer-name">INFRASTRUCTURE</span>
+    </h2>
+    <p class="meta-comment">Transitioning from Portainer (CE) to Dockge.</p>
+  </div>
+
+  <h3>>> PORTAINER (CE)</h3>
+  <h4>[ THE_PROS ]</h4>
+  <p class="module-content">
+    Portainer is a great management interface, especially when learning Docker
+    containerization workflows. It's very easy to open up your web browser, go
+    to the Portainer Web UI - slap in your Docker Compose file populate the .env
+    if you need to and get a service running. It's not the fastest, but it's
+    intuitive. Before the migration, I was using Portainer Edge - I had access
+    to all 4 of my docker nodes from one place, and could deploy anything from
+    anywhere, with a couple of cronjobs to boot. You had granular control over
+    each individual container; you could start, stop, restart, even edit your
+    compose and only the changed container would restart. It handles Docker
+    standalone, swarm, and Kubernetes. On top of that, it has full-lifecycle
+    management. It's a very good <strong>Orchestrator</strong>.
+  </p>
+  <h4>[ THE_CONS ]</h4>
+  <p class="module-content">
+    All of the compose stacks, .env files, networks, etc are abstracted into
+    Portainer's own database. With my new
+    <a class="file-link" href="/#auto_ansible_monorepo">Ansible Monorepo</a>,
+    Portainer was completely incompatible. Unfortunately Portainer is very
+    manual, everything is done in the Web UI and there is little room for
+    automation in the Community Edition, when building a Single Source of Truth
+    (SSoT) for your homelab via a monorepo you need an alternative.
+  </p>
+
+  <h3>>> DOCKGE</h3>
+  <h4>[ WHY_DOCKGE ]</h4>
+  <p class="module-content">
+    While not only running lighter, Dockge solves my SSoT issue as it's
+    filesystem-first. All of the stacks and containers have a physical file to
+    reference (i.e. foo_stack/compose.yml) rather than being abstracted. Any
+    edits made to the compose files reflects the file on disk - most
+    importantly, any new files or pushes to the disks, also is reflected in
+    Dockge. This would mean that my Ansible playbooks can inject the compose and
+    .env files to disk, restart/start the containers, and it's immediately to
+    the desired state.
+  </p>
+
+  <h4>[ DOCKGE_ROLE ]</h4>
+  <p class="module-content">
+    Since I am now using an SSoT model, Dockge - for me - is no longer an
+    orchestrator. It's role in my lab now is a bird's eye view of the stacks,
+    what is running healthily, what is not, and update management (pulling new
+    images). This means that I may move away from having a service like this
+    altogether at some point and rely solely on services like Uptime Kuma and
+    What's Up Docker, though for now this was the path of least resistance.
+  </p>
+
+  <h3>>> TRADE_OFFS</h3>
+  <h4>[ PORTAINER'S_BOONS ]</h4>
+  <p class="module-content">
+    As I touched on before, there are some things that Portainer does better, or
+    does that Dockge doesn't do at all. Dockge is oriented around a single-user
+    workflow, whereas Portainer has multi-user orchestration, permissions
+    management, and in Business Edition RBAC. Dockge only supports Docker
+    Compose on Docker Standalone. Dockge does not have deep metrics for
+    networks, image, individual containers, or volumes.
+  </p>
+
+  <h3>>> OVERVIEW</h3>
+  <p class="module-content">
+    While lacking in the vast features of Portainer, I think of it as a more
+    specialized tool that fits the needs of both me and my homelab better. I'm a
+    sole SysAdmin working on one site with better means of aggregating metrics,
+    and all volumes are mapped to physical disk locations rather than abstracted
+    Docker volumes. Especially for the Community Edition of Portainer, I think
+    it's a worthwhile trade.
+  </p>
+</div>
