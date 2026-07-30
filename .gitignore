@@ -1,3 +1,6 @@
 github_deploy*
 /pages/*
 /pages
+.stfolder/
+st.versions/
+*.sync-conflict*

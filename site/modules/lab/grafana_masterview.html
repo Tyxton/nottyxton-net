@@ -1,0 +1,1175 @@
+<div class="layer-container">
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> GRAFANA_MASTERVIEW://<span class="layer-name">GEN_LAB</span>
+    </h2>
+    <p class="meta-comment">
+      Collecting UniFi, Proxmox, LXC/VM, TrueNAS Scale, and Docker Container
+      Metrics and Logs in one dashboard.
+    </p>
+  </div>
+
+  <h4>>> PREAMBLE</h4>
+  <p class="module-content">
+    This is going to be a rather long entry so I will break them up into
+    sections by role. In order to expand details of a particular project or
+    resource configuration as well as queries. Just click the "+" bar for each
+    node/service.
+  </p>
+
+  <p class="module-content">
+    I am neither a Data Scientist nor a Mathematician. A lot of the custom
+    queries may not be 100% accurate, but for my purposes more than adequate.
+  </p>
+
+  <section class="audit-section">
+    <h4>[ LIVE_VIEW ]</h4>
+    <div class="terminal-frame">
+      <div class="frame-header">
+        <span class="prefix">SOURCE:</span>
+        <span class="path">~/grafana/ops-core-01</span>
+      </div>
+      <a
+        href="javascript:void(0)"
+        class="dither-link"
+        onclick="window.openModal('/metrics/msf-metrics.png')"
+      >
+        <img
+          src="/metrics/msf-metrics.png"
+          class="dither-img"
+          alt="MSF Masterview Dashboard"
+          loading="lazy"
+        />
+      </a>
+
+      <p class="frame-footer">
+        A live view of the dashboard, updated every 30 minutes.
+      </p>
+    </div>
+  </section>
+
+  <div class="collapsible-window">
+    <button class="collapsible-header">
+      <span class="toggle-icon">[+] </span>[ DETAILS:// UNIFI_METRICS ] -
+      &gt;&gt; UNIFI UNPOLLER TO GRAFANA
+    </button>
+
+    <div class="collapsible-content" style="display: none">
+      <h3>>> DEPLOYING_UNPOLLER</h3>
+      <h4>[ DOCKER ]</h4>
+
+      <p class="module-content">
+        Deploying unpoller is rather simple, all you need to do is point it at
+        your gateway with a created user and it starts scraping immediately.
+      </p>
+
+      <pre class="code">
+  unpoller:
+    image: ghcr.io/unpoller/unpoller:latest
+    container_name: monitoring-unpoller
+    restart: unless-stopped
+    networks:
+      - core-itim   # easy to refer with a common name http://monitoring-unpoller:9130
+    environment:
+      - UP_UNIFI_DEFAULT_URL=${GW_URL}          # e.g. 192.168.1.1
+      - UP_UNIFI_DEFAULT_USER=${UNIFI_USER}     # Create an Admin user for Unpoller to Auth
+      - UP_UNIFI_DEFAULT_PASS=${UNIFI_PASS}     # Create a password for it
+      - UP_UNIFI_DEFAULT_VERIFY_SSL=false       
+      - UP_PROMETHEUS_HTTP_LISTEN=0.0.0.0:9130 
+      - UP_INFLUXDB_DISABLE=true
+    ports:
+      - "9130:9130"
+    </pre>
+
+      <h4>[ SCRAPING ]</h4>
+
+      <p class="module-content">
+        This is made pretty simple as well, you can create an Prometheus scrape
+        directly, or in my case Grafana Alloy.
+      </p>
+
+      <pre class="code">
+  // Unifi Unpoller Scraping
+  prometheus.scrape "unpoller" {
+      targets         = [{"__address__" = "monitoring-unpoller:9130"}]
+      forward_to      = [prometheus.remote_write.default.receiver]
+      job_name        = "unifi/network"
+      scrape_interval = "30s"
+  }
+    </pre>
+
+      <p class="module-content">
+        Unpoller was one of if not the easiest to setup in my monitoring stack
+        because it's so straight forward. At some point I may write a custom
+        relabel rule for it, though I don't deem it necessary at all.
+      </p>
+
+      <h3>>> MONITORING</h3>
+      <p class="module-content">
+        Because I didn't relabel anything, many of the community-made dashboards
+        work incredibly. The Unpoller team as a full-suite ready to go:
+      </p>
+      <ul class="config-list">
+        <li><span>[ 11312 ]</span> - Switch Metrics</li>
+        <li><span>[ 11313 ]</span> - Gateway Metrics</li>
+        <li><span>[ 11314 ]</span> - AP Metrics</li>
+        <li>
+          <span>[ 113(0,1,5) ]</span> - these cover Client DPI, Sites, and
+          Clients; I won't really worry with these too much for a basic
+          overview.
+        </li>
+      </ul>
+
+      <p class="module-content">
+        For all of the panels in "Network Overview" I imported the panels,
+        pulled out the dynamic classes and it started displaying beautifully.
+      </p>
+
+      <h3>>> MISSING_LOGS</h3>
+      <p class="module-content">
+        I have yet to implement the native log exporter to alloy just yet as it
+        will be a major relabeling job to be able to query it how I want.
+      </p>
+    </div>
+  </div>
+
+  <div class="collapsible-window">
+    <button class="collapsible-header">
+      <span class="toggle-icon">[+] </span>[ DETAILS:// PVE_METRICS ] - &gt;&gt;
+      RAIDEN OTEL TO GRAFANA
+    </button>
+
+    <div class="collapsible-content" style="display: none">
+      <h3>>> PVE_OTEL</h3>
+      <h4>[ EXPORTING ]</h4>
+
+      <p class="module-content">
+        This was almost as simple as Unpoller, though I did create a dedicated
+        LXC to scrape Raiden's logs. For the OpenTelemetry export, you simply go
+        to the Proxmox Web UI -&gt; Datacenter -&gt; Metric Server. Point it to
+        your collecting alloy instance and port, disable Verify SSL, and make
+        sure it is enabled.
+      </p>
+
+      <p class="module-content">
+        The logs were more involved in my case. Introduced into the MSF suite is
+        ops-itim-01, a sister node to ops-core-01. Its sole purpose is to
+        collect and export PVE logs and metrics. The reason I setup a dedicated
+        LXC for this was largely for isolation and damage control, an island
+        with secure information is easier to protect than a metropolitan area,
+        it's also one less thing running on the hypervisor - which I always try
+        to avoid, and it takes the load off of ops-core-01's alloy instance to
+        parse and normalize an extra set of logs. As additional mount points I
+        added:
+      </p>
+      <pre class="code">
+  mp0: /var/log,mp=/mnt/host/log,ro=1,backup=0
+  mp1: /var/log/journal,mp=/mnt/host/log/journal,ro=1,backup=0
+    </pre>
+
+      <p class="module-content">
+        This gives the container access to the host's logs, ro=1 is extremely
+        important here, you don't want the container to have write access to
+        host logs. Not that alloy tampers with it anyways, it's best practice.
+      </p>
+
+      <h4>[ INGESTING ]</h4>
+      <p class="module-content">
+        The alloy instance ingesting the metrics and logs needs two unique
+        blocks on top of it's own collection.
+      </p>
+
+      <pre class="code">
+// ------------------------------ //
+//  PROXMOX METRICS (ops-itim-01) //
+// ------------------------------ //
+
+otelcol.receiver.otlp "pve_receiver" {
+    http {
+        endpoint = "0.0.0.0:4318"
+    }
+    grpc {
+        endpoint = "0.0.0.0:4317"
+    }
+
+    output {
+        metrics = [otelcol.processor.transform.pve_normalize.input]
+    }
+}
+
+otelcol.processor.transform "pve_normalize" {
+    error_mode = "ignore"
+    
+    output {
+        metrics = [otelcol.exporter.prometheus.to_prometheus.input]
+    }
+}
+
+otelcol.exporter.prometheus "to_prometheus" {
+    forward_to = [prometheus.relabel.pve_host_override.receiver]
+}
+
+prometheus.relabel "pve_host_override" {
+    forward_to = [prometheus.remote_write.default.receiver]
+
+    rule {
+        target_label = "instance"
+        replacement  = "raiden"
+    }
+
+    rule {
+        target_label = "nodename"
+        replacement  = "raiden"
+    }
+
+    rule {
+        target_label = "Hostname"
+        replacement  = "raiden"
+    }
+}
+    </pre>
+      <p class="module-content">
+        For the metrics, you need to add the http and/or grpc receiver. I added
+        a normalization step that overrides the default instance, nodename, and
+        Hostname to raiden - this makes it easier for me to sort in Grafana.
+        Then, it goes into a translation step going from Otel metrics into
+        native Prometheus metrics, where it hits the relabel again to
+        double-check that these rules are adhered.
+      </p>
+      <pre class="code">
+// ---------------------------- //
+//  PROXMOX LOGS (ops-itim-01)  //
+// ---------------------------- //
+local.file_match "host_logs" {
+    path_targets = [
+        {"__path__" = "/mnt/host/log/pve-firewall.log", "job" = "pve/firewall",  "instance" = "raiden", "nodename" = "raiden"},
+        {"__path__" = "/mnt/host/log/pve/tasks/**",     "job" = "pve/tasks",     "instance" = "raiden", "nodename" = "raiden"},
+        {"__path__" = "/mnt/host/log/pveam.log",        "job" = "pve/appliance", "instance" = "raiden", "nodename" = "raiden"},
+    ]
+}
+
+loki.source.file "host_logs_scrape" {
+    targets       = local.file_match.host_logs.targets
+    forward_to    = [loki.process.fleet_logs.receiver]
+}
+
+loki.source.journal "host_journal" {
+    path          = "/mnt/host/log/journal"
+    max_age       = "24h"
+    relabel_rules = loki.relabel.journal.rules
+    forward_to    = [loki.process.fleet_logs.receiver]
+    labels        = {
+        "job"      = "integrations/node-exporter",
+        "instance" = "raiden",
+        "nodename" = "raiden",
+    }
+}
+    </pre>
+      <p class="module-content">
+        For the logs, I went with a very similar approach. I started out with
+        these 3 for a quick test and general overview, but I will also be adding
+        webui, vm, lxc, and vzdump logs. I standardized the jobs to match the
+        existing &lt;SOURCE&gt;/&lt;SERVICE&gt; format as well as the same host
+        normalization that we did before. Alloy ingests these and the journal in
+        real time and exports it to the main aggregator on ops-core-01 already
+        normalized/sanitized.
+      </p>
+      <h4>[ VISUALIZATION ]</h4>
+      <p class="module-content">
+        For most of this section I used [ 23855 ] and tweaked a lot of it to
+        visualize the way I wanted it. This dashboard was a great choice because
+        it specifically using Prometheus w/ Otel as the source, meaning I didn't
+        have to tweak much of the metrics going in.
+      </p>
+    </div>
+  </div>
+
+  <div class="collapsible-window">
+    <button class="collapsible-header">
+      <span class="toggle-icon">[+] </span>[ DETAILS:// TRUENAS_METRICS ] -
+      &gt;&gt; MOTHERBASE TO GRAFANA
+    </button>
+
+    <div class="collapsible-content" style="display: none">
+      <h3>>> TRUENAS_GRAPHITE</h3>
+      <h4>[ EXPORTING ]</h4>
+      <p class="module-content">
+        This is one of the least graceful setups in the monitoring stack, I will
+        be the first to admit that a lot of times it feels less like an
+        integration and more like a workaround. Nonetheless, you can find the
+        "Reporting Exporters" via TrueNAS Web UI -&gt; Reporting -&gt;
+        Exporters. There you can configure your Graphite export.
+      </p>
+      <ul class="config-list">
+        <li>
+          <span>[ Type ]</span> GRAPHITE - Unfortunately, it's your only choice
+          natively.
+        </li>
+        <li><span>[ Prefix ]</span> defaults to truenas.</li>
+        <li>
+          <span>[ Namespace ]</span> I recommend setting this to the hostname of
+          your system.
+        </li>
+        <li>
+          <span>[ Send Names Instead of IDs ]</span> I recommend checking this
+          for easy identification.
+        </li>
+        <li><span>[ Matching Charts ]</span> * - Capture Everything</li>
+      </ul>
+      <h4>[ INGESTING ]</h4>
+      <p class="module-content">
+        You then need to setup a graphite receiver, in my case it's a docker
+        container.
+      </p>
+      <pre class="code">
+graphite-exporter:
+    image: prom/graphite-exporter:latest
+    container_name: monitoring-graphite
+    restart: unless-stopped
+    ports:
+      - "2003:2003/tcp"  # Where the metrics get pushed to
+      - "2003:2003/udp"  
+      - "9108:9108"      # The port alloy will scrape
+    networks:
+      - core-itim
+    volumes:
+      - ${DOCKER_DIR}/graphite/graphite_mapping.conf:/etc/graphite-exporter/graphite_mapping.conf
+    command:
+      - "--graphite.mapping-config=/etc/graphite-exporter/graphite_mapping.conf"
+      - "--graphite.listen-address=:2003"
+      - "--web.listen-address=:9108"
+      </pre>
+      <p class="module-content">
+        You then need to set up your graphite_mapping config, mine looks like
+        this:
+      </p>
+      <pre class="code">
+mappings:
+- match: "msf.motherbase.*.net.*.*"
+  name: "truenas_network_traffic_bytes"
+  labels:
+    host: "$1"
+    interface: "$2"
+    direction: "$3"
+
+- match: "msf.motherbase.*.cpu.usage.*"
+  name: "truenas_cpu_usage_percent"
+  labels:
+    host: "$1"
+    core: "all"
+    type: "$2"
+
+# Broad ZFS Matcher
+- match: "msf.motherbase.*.zfs.*.*"
+  name: "truenas_zfs_stat"
+  labels:
+    host: "$1"
+    pool: "$2"
+    metric: "$3"
+
+# Broad Dataset Matcher
+- match: "msf.motherbase.*.dataset.*.*.*"
+  name: "truenas_dataset_stat"
+  labels:
+    host: "$1"
+    pool: "$2"
+    dataset: "$3"
+    metric: "$4"
+
+# Catch-all for everything else to keep the 'msf' prefix clean
+- match: "msf.motherbase.*.*.*"
+  name: "truenas_${2}_${3}"
+  labels:
+    host: "$1"
+      </pre>
+      <p class="module-content">
+        I would not recommend using the above config. To be completely
+        transparent, it doesn't seem to work at all and instead pushes all of
+        the raw metrics straight through. I am actively working on this, though.
+      </p>
+
+      <h4>[ CUSTOM_ZFS_EXPORT ]</h4>
+      <pre class="code">
+#!/bin/bash
+# ZFS Export Metrics Bridge
+# Pushes the logical pool data to the graphite exporter
+
+TARGET_IP="10.20.0.50"
+TARGET_PORT="2003"
+PREFIX="msf.motherbase.truenas.zfs.pool"
+TIMESTAMP=$(date +%s)
+
+for pool in kazuhira ocelot meiling; do
+        cap=$(zpool list -H -o capacity $pool | tr -d '%')
+        health_raw=$(zpool list -H -o health $pool)
+        [ "$health_raw" == "ONLINE" ] && health=1 || health=0
+
+        echo "$PREFIX.$pool.capacity $cap $TIMESTAMP" > /dev/udp/$TARGET_IP/$TARGET_PORT
+        echo "$PREFIX.$pool.health $health $TIMESTAMP" > /dev/udp/$TARGET_IP/$TARGET_PORT
+done
+      </pre>
+      <p class="module-content">
+        I wrote this custom bridge I think about 2 years ago. I have it
+        triggered via cronjob every minute. This wraps up the local ZFS pool
+        data and ships it via UDP to the graphite container. It's setup to be
+        fire-and-forget, if the container ever goes down the cronjob won't exit
+        and fail.
+      </p>
+
+      <p class="module-content">
+        The main reason I wrote this bridge script was because TrueNAS does not
+        natively export a binary health indicator, nor capacity of each
+        pool.This simple script allows be to have a better naming convention,
+        granular control of the metrics, and more simple querying.
+      </p>
+      <h4>[ SYSLOG_EXPORT ]</h4>
+      <p class="module-content">
+        Thankfully, TrueNAS's native Syslog exporter is a bit easier to setup.
+        It's a simple plug-and-play Web UI option in System -&gt; Advanced
+        Settings. Point it to your Alloy scraper, and it just works.
+      </p>
+      <h4>[ SCRAPING ]</h4>
+      <p class="module-content">
+        You then need to have your Prometheus/Alloy instance scrape it,
+        thankfully this is made quite simple, unlike everything else.
+      </p>
+      <pre class="module-content">
+prometheus.scrape "motherbase_graphite" {
+    targets         = [{"__address__" = "monitoring-graphite:9108"}]
+    forward_to      = [prometheus.remote_write.default.receiver]
+    job_name        = "truenas/motherbase"
+    scrape_interval = "30s"
+}
+      </pre>
+      <h4>[ LOG_SCRAPING ]</h4>
+      <pre class="code">
+loki.source.syslog "motherbase_logs" {
+    listener {
+        address  = "0.0.0.0:1514"
+        protocol = "udp"
+        labels   = {
+            "job"      = "truenas/syslog",
+            "instance" = "motherbase",
+            "nodename" = "motherbase",
+        }
+    }
+    forward_to = [loki.process.fleet_logs.receiver]
+}
+      </pre>
+      <p class="module-content">
+        This is how we ingest the syslog as before, just configure the listening
+        port, define label overrides if you'd like, and it just works.
+      </p>
+      <h4>[ VISUALIZING ]</h4>
+      <p class="module-content">
+        This contains some of the more complicated visualization setups since
+        none of the metrics truly were standardized on top of graphite, in my
+        opinion not being a great exporter. I haven't found a way yet to use the
+        disk common name either over the serial. I will break each panel up
+        individually.
+      </p>
+      <h3>>> PANEL_QUERYS</h3>
+      <h4>[ ZFS_POOL_HEALTH ]</h4>
+      <pre class="code">
+(
+  label_replace(
+    {__name__=~"msf_motherbase_truenas_zfs_pool_.*_capacity"}, 
+    "pool", "$1", "__name__", "msf_motherbase_truenas_zfs_pool_(.*)_capacity"
+  )
+  * on(pool) group_left(status_code)
+  label_replace(
+    label_replace(
+      {__name__=~"msf_motherbase_truenas_zfs_pool_.*_health"} == 1, 
+      "pool", "$1", "__name__", "msf_motherbase_truenas_zfs_pool_(.*)_health"
+    ),
+    "status_code", "🟢 HEALTHY", "__name__", ".*"
+  )
+)
+or
+(
+  label_replace(
+    {__name__=~"msf_motherbase_truenas_zfs_pool_.*_capacity"}, 
+    "pool", "$1", "__name__", "msf_motherbase_truenas_zfs_pool_(.*)_capacity"
+  )
+  * on(pool) group_left(status_code)
+  label_replace(
+    label_replace(
+      {__name__=~"msf_motherbase_truenas_zfs_pool_.*_health"} == 0, 
+      "pool", "$1", "__name__", "msf_motherbase_truenas_zfs_pool_(.*)_health"
+    ),
+    "status_code", "🔴 DEGRADED", "__name__", ".*"
+  )
+)
+      </pre>
+
+      <p class="module-content">
+        This was a bit of a workaround admittedly to merge health status in with
+        capacity. I would recommend doing two separate panels, though the
+        label_replace function works great for a bulk-query.
+      </p>
+
+      <h4>[ CPU_USAGE ]</h4>
+      <pre class="code">
+truenas_cpu_cpu{instance=~"$truenas_nodes"}
+
+count(
+  {__name__=~".*truenas_cpu_cpu[0-9]+.*", instance=~"$truenas_nodes"}
+)
+      </pre>
+      <p class="module-content">
+        I borrowed the Proxmox CPU_USAGE panel and adjusted the queries. Because
+        this is a dual socketed system and truenas lists each core separately, I
+        added a count query to count every cpu_cpu metric followed by any
+        digits, in my case cpu0, cpu1, ... cpu15. If I added a core-by-core
+        graph, it would likely look similar to this.
+      </p>
+
+      <h4>[ ARC_ACTIVITY ]</h4>
+      <pre class="code">
+truenas_ddmis_ddmis{instance=~"$truenas_nodes"}
+
+truenas_dmhit_dmhit{instance=~"$truenas_nodes"}
+
+truenas_ddhit_ddhit{instance=~"$truenas_nodes"}
+      </pre>
+      <p class="module-content">
+        This shows a time-scale graph of ARC Hits to ARC Misses.
+      </p>
+
+      <h4>[ ARC_HIT_RATIO ]</h4>
+      <pre class="code">
+(truenas_ddhit_ddhit{instance=~"$truenas_nodes"} + truenas_dmhit_dmhit{instance=~"$truenas_nodes"})
+/ (truenas_ddhit_ddhit{instance=~"$truenas_nodes"} + truenas_dmhit_dmhit{instance=~"$truenas_nodes"} + truenas_ddmis_ddmis{instance=~"$truenas_nodes"})
+      </pre>
+      <p class="module-content">
+        Similar to above, this gives you the percentage of hits to misses.
+        Generally speaking you want this to stay above 90%, otherwise your disks
+        are being spun up too often, below 80-90% I would look into increasing
+        your RAM or adding a dedicated LARC Cache.
+      </p>
+
+      <h4>[ MEMORY_ALLOCATION ]</h4>
+      <pre class="code">
+truenas_total_total{instance=~"$truenas_nodes"}
+
+truenas_available_available{instance=~"$truenas_nodes"}
+
+truenas_avail_avail{instance=~"$truenas_nodes"}
+      </pre>
+      <p class="module-content">
+        This was a major pain, thanks to the unusual naming convention it look a
+        lot of hunting and eventually using Ctrl+F in the raw graphite export to
+        read the HELP/TYPE notes to figure out where these metrics were and what
+        their name was. total_total is Total Memory, available_available is the
+        Available Memory to the system, avail_avail is the memory used by ARC.
+      </p>
+
+      <h4>[ DISK_IOPS ]</h4>
+      <pre class="code">
+sum by (serial) (
+  label_replace(
+    {__name__=~"msf_motherbase_truenas_disk_stats_ops__serial_lunid_.*_read_ops"}, 
+    "serial", 
+    "$1", 
+    "__name__", 
+    "msf_motherbase_truenas_disk_stats_ops__serial_lunid_(.+)_read_ops"
+  )
+)
+
+sum by (serial) (
+  label_replace(
+    {__name__=~"msf_motherbase_truenas_disk_stats_ops__serial_lunid_.*_write_ops"}, 
+    "serial", 
+    "$1", 
+    "__name__", 
+    "msf_motherbase_truenas_disk_stats_ops__serial_lunid_(.+)_write_ops"
+  )
+) * -1
+      </pre>
+      <p class="module-content">
+        In order to better distinguish read from write ops, I inverted the
+        write_ops. This plays back into the raw serials instead of common names
+        /dev/sdX, it is incredibly hard to read disk stats on the fly. This
+        wildcard catches all of the individual disk stats.
+      </p>
+
+      <h4>[ MOST_USED_DISKS ]</h4>
+      <pre class="code">
+(
+  sum by (serial) (
+    label_replace(
+      {__name__=~"msf_motherbase_truenas_disk_stats_ops__serial_lunid_.*_(read|write)_ops"}, 
+      "serial", 
+      "$1", 
+      "__name__", 
+      "msf_motherbase_truenas_disk_stats_ops__serial_lunid_(.+)_(read|write)_ops"
+    )
+  )
+  /
+  scalar(
+    avg(
+      sum by (serial) (
+        label_replace(
+          {__name__=~"msf_motherbase_truenas_disk_stats_ops__serial_lunid_.*_(read|write)_ops"}, 
+          "serial", 
+          "$1", 
+          "__name__", 
+          "msf_motherbase_truenas_disk_stats_ops__serial_lunid_(.+)_(read|write)_ops"
+        )
+      )
+    )
+  )
+) * 100
+</pre>
+      <p class="module-content">
+        This was also a major pain. This calculates the relative IOPS workload
+        share by disk, 100% is the baseline average while 200% means it's
+        workload is double that of the rest of the disks.
+      </p>
+
+      <h4>[ BUSY_HEATMAP ]</h4>
+      <pre class="code">
+sum by (serial) (
+  label_replace(
+    {__name__=~"msf_motherbase_truenas_disk_stats_busy__serial_lunid_.*_busy"}, 
+    "serial", 
+    "$1", 
+    "__name__", 
+    "msf_motherbase_truenas_disk_stats_busy__serial_lunid_(.+)_busy"
+  )
+)
+    </pre>
+      <p class="module-content">
+        This draws out a heatmap of when the drives are busy, this compliments
+        nicely to the chart above, and as you could imagine correlates heavily.
+      </p>
+
+      <h4>[ CONCLUSIONS ]</h4>
+      <p class="module-content">
+        As I mentioned before, this may not be 100% accurate, a lot of this
+        section feels like a workaround to better statistics, simply working
+        with what Graphite gave me as a source. I truly wish TrueNAS natively
+        supported a different exporter.
+      </p>
+    </div>
+  </div>
+
+  <div class="collapsible-window">
+    <button class="collapsible-header">
+      <span class="toggle-icon">[+] </span>[ DETAILS:// LXC_VM_METRICS ] -
+      &gt;&gt; WORKLOAD FLEET TO GRAFANA
+    </button>
+
+    <div class="collapsible-content" style="display: none">
+      <h3>>> NODE_EXPORTER_INTEGRATION</h3>
+      <h4>[ INGESTING ]</h4>
+
+      <p class="module-content">
+        Since we have a mix of Docker Nodes and Raw Debian 12/13, things are
+        similar, but slightly different. Alloy does have native cadvisor and
+        node-exporter metric ingestion, this means (almost) no sidecars with one
+        caveat: dcgm-node-exporter still needs a sidecar container to read GPU
+        metrics.
+      </p>
+
+      <h4>[ INGEST_DOCKER ]</h4>
+      <pre class="code">
+prometheus.exporter.unix "host" {
+    rootfs_path = "/host"
+    sysfs_path = "/host/sys"
+    procfs_path = "/host/proc"
+}
+
+prometheus.exporter.cadvisor "docker" {
+    docker_host = "unix:///var/run/docker.sock"
+}
+
+prometheus.scrape "unix_metrics" {
+    targets    = prometheus.exporter.unix.host.targets
+    forward_to = [prometheus.relabel.host_processing.receiver]
+    job_name   = "integrations/unix"
+}
+
+prometheus.scrape "cadvisor_metrics" {
+    targets    = prometheus.exporter.cadvisor.docker.targets
+    forward_to = [prometheus.relabel.cadvisor_processing.receiver]
+    job_name   = "integrations/cadvisor"
+}
+
+prometheus.relabel "host_processing" {
+    forward_to = [prometheus.remote_write.default.receiver]
+
+    rule {
+        target_label = "instance"
+        replacement  = "{{ inventory_hostname }}"
+    }
+
+    rule {
+        target_label = "nodename"
+        replacement = "{{ inventory_hostname }}"
+    }
+
+    rule {
+        target_label = "Hostname"
+        replacement  = "{{ inventory_hostname }}"
+    }
+}
+
+prometheus.relabel "cadvisor_processing" {
+    forward_to = [prometheus.remote_write.default.receiver]
+
+    rule {
+        target_label = "instance"
+        replacement  = "{{ inventory_hostname }}"
+    }
+
+    rule {
+        target_label = "nodename"
+        replacement = "{{ inventory_hostname }}"
+    }
+    
+    rule {
+        source_labels = ["name"]
+        target_label  = "container"
+    }
+
+    rule {
+        source_labels = ["name"]
+        target_label  = "id"
+    }
+
+    rule {
+        target_label = "Hostname"
+        replacement  = "{{ inventory_hostname }}"
+    }
+}
+</pre>
+      <p class="module-content">
+        This scrapes the local docker hosts' metrics as well as the containers',
+        then like everything else it's a normalization step to standardize and
+        format our data for easy-querying and human-readability.
+      </p>
+
+      <h4>[ INGEST_NATIVE ]</h4>
+      <pre class="code">
+prometheus.exporter.unix "host" {
+    rootfs_path = "/"
+    procfs_path = "/proc"
+    sysfs_path  = "/sys"
+}
+
+prometheus.scrape "unix_metrics" {
+    targets    = prometheus.exporter.unix.host.targets
+    forward_to = [prometheus.relabel.host_processing.receiver]
+    job_name   = "integrations/unix"
+}
+
+prometheus.relabel "host_processing" {
+    forward_to = [prometheus.remote_write.default.receiver]
+
+    rule {
+        target_label = "instance"
+        replacement  = "{{ inventory_hostname }}"
+    }
+
+    rule {
+        target_label = "nodename"
+        replacement = "{{ inventory_hostname }}"
+    }
+
+    rule {
+        target_label = "Hostname"
+        replacement  = "{{ inventory_hostname }}"
+    }
+}
+</pre>
+      <p class="module-content">
+        Like above, it scrapes the host metrics. Since there is no Docker Engine
+        and alloy is running directly on the host we don't need cadvisor, nor
+        the /host/ prefix. Specifying rootfs, procfs, and sysfs here is a bit
+        redundant since these are the default paths. It hits the same
+        normalization step here.
+      </p>
+
+      <h4>[ INGEST_GPU ]</h4>
+      <pre class="code">
+prometheus.scrape "gpu_metrics" {
+    targets    = [{"__address__" = "itim-dcgm-exporter:9400"}]
+    forward_to = [prometheus.relabel.gpu_processing.receiver]
+    job_name   = "nvidia-dcgm"
+}
+
+prometheus.relabel "gpu_processing" {
+    forward_to = [prometheus.remote_write.default.receiver]
+
+    rule {
+        target_label = "nodename"
+        replacement  = "{{ inventory_hostname }}"
+    }
+
+    rule {
+        target_label = "instance"
+        replacement  = "{{inventory_hostname }}"
+    }
+
+    rule {
+        source_labels = ["modelName"]
+        target_label  = "gpu"
+    }
+
+    rule {
+        target_label = "Hostname"
+        replacement  = "{{ inventory_hostname }}"
+    }
+}
+</pre>
+      <p class="module-content">
+        This scrapes the data from the dcgm-node-exporter container since we
+        still have to sidecar it and then normalizes the data.
+      </p>
+
+      <h3>>> INGEST_AGGREGATION</h3>
+      <h4>[ SPLIT_SETUP ]</h4>
+      <p class="module-content">
+        Because I have so many nodes, I have ops-core-01 acting as a fleet
+        aggregator, it collects all of the metrics to one point. If you have a
+        similar setup, the above won't work properly - or at least fully. You
+        need to add the actual discovery and scrape rules for each, in my case:
+      </p>
+      <pre class="code">
+// ---------------------------------- //
+//  FLEET SCRAPING (AGGREGATOR ONLY)  //
+// ---------------------------------- //
+
+discovery.relabel "fleet_base" {
+    targets = [
+    {% for host in groups['prom_endpoint'] | default([]) %}
+        { "__address__" = "{{ hostvars[host].ansible_host | default(host) }}:9100", "instance" = "{{ host }}" },
+    {% endfor %}
+    ]
+}
+
+// Node Exporter Fleet Scraping
+prometheus.scrape "node_exporter_fleet" {
+    targets         = discovery.relabel.fleet_base.output
+    forward_to      = [prometheus.remote_write.default.receiver]
+    job_name        = "node-exporter"
+    scrape_interval = "15s"
+}
+
+// cAdvisor Fleet Relabeling (Maps 9100 node-exporter port to 8080 cAdvisor port)
+discovery.relabel "cadvisor_targets" {
+    targets = discovery.relabel.fleet_base.output
+    rule {
+        source_labels = ["__address__"]
+        regex         = "(.*):9100"
+        replacement   = "$1:8080"
+        target_label  = "__address__"
+    }
+}
+
+prometheus.scrape "cadvisor_fleet" {
+    targets         = discovery.relabel.cadvisor_targets.output
+    forward_to      = [prometheus.remote_write.default.receiver]
+    job_name        = "cadvisor"
+    scrape_interval = "30s"
+}
+      </pre>
+      <p class="module-content">
+        This is Jinja2 templating, you would need to map the individual IP
+        addresses of each node if not using Ansible, and same each instance
+        accordingly. The regex relabel rule makes it simple to reuse the same
+        discovery rule and just remap the cadvisor listener, this way you don't
+        have to rewrite the whole list twice.
+      </p>
+
+      <h3>>> INGEST_LOGS</h3>
+      <h4>[ GLOBAL ]</h4>
+      <pre class="code">
+loki.relabel "journal" {
+    forward_to = []
+
+    rule {
+        source_labels = ["__journal__systemd_unit"]
+        target_label  = "unit"
+    }
+
+    rule {
+        source_labels = ["__journal__boot_id"]
+        target_label  = "boot_id"
+    }
+
+    rule {
+        source_labels = ["__journal__transport"]
+        target_label  = "transport"
+    }
+
+    rule {
+        source_labels = ["__journal__priority_keyword"]
+        target_label  = "level"
+    }
+
+    rule {
+        source_labels = ["__journal__hostname"]
+        target_label  = "instance"
+    }
+}
+
+loki.source.journal "systemd_logs" {
+    forward_to    = [loki.process.fleet_logs.receiver]
+    relabel_rules = loki.relabel.journal.rules
+    labels = {
+        "job" = "integrations/node_exporter",
+    }
+}
+      </pre>
+      <p class="module-content">
+        Here I have each node scraping their systemd-journal and normalizing it
+        locally.
+      </p>
+      <h4>[ DOCKER ]</h4>
+      <pre class="code">
+discovery.docker "linux" {
+    host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "logs_integrations_docker" {
+    targets = []
+
+    rule {
+        target_label = "job"
+        replacement  = "integrations/docker"
+    }
+
+    rule {
+        target_label = "instance"
+        replacement  = "{{ inventory_hostname }}"
+    }
+
+    rule {
+        source_labels = ["__meta_docker_container_name"]
+        regex         = "/(.*)"
+        target_label  = "container"
+    }
+
+    rule {
+        source_labels = ["__meta_docker_container_log_stream"]
+        target_label  = "stream"
+    }
+}
+
+loki.source.docker "default" {
+    host          = "unix:///var/run/docker.sock"
+    targets       = discovery.docker.linux.targets
+    relabel_rules = discovery.relabel.logs_integrations_docker.rules
+    labels        = {}
+    forward_to    = [
+        loki.process.fleet_logs.receiver,
+    ]
+}
+</pre>
+      <p class="module-content">
+        Here we collect all of the containers' logs and pass them through a
+        similar relabeling step.
+      </p>
+
+      <h3>>> VISUALIZATION</h3>
+      <h4>[ HOST_METRICS ]</h4>
+      <p class="module-content">
+        This setup was rather simple, I used the top panel from [ 1860 ] and
+        just changed the query to instance=~"$nodes" and the $nodes value to all
+        and had it repeat for each node.
+      </p>
+      <h4>[ CONTAINER_METRICS ]</h4>
+      <p class="module-content">
+        While the Masterview I created does not display individual container
+        metrics, it's rather simple to wire up, and there's plenty of ready-made
+        dashboards that offer it. The main advantage here is the logging.
+      </p>
+    </div>
+  </div>
+
+  <div class="collapsible-window">
+    <button class="collapsible-header">
+      <span class="toggle-icon">[+] </span>[ DETAILS:// LOGGING ] - &gt;&gt;
+      GLOBAL LOG INGEST TO GRAFANA
+    </button>
+
+    <div class="collapsible-content" style="display: none">
+      <h3>>> INGEST</h3>
+      <h4>[ GLOBAL_NORMALIZATION ]</h4>
+      <p class="module-content">
+        Since Alloy collects so many different kinds of logs, from near endless
+        sources, I needed a robust solution that cleaned everything on a
+        non-granular level. It's made to handle Docker Container, Systemd, and
+        Syslog uniformly so that all data looks the same for easy lookups,
+        queries, etc.
+      </p>
+      <pre class="code">
+loki.process "fleet_logs" {
+  forward_to = [loki.write.default.receiver]
+
+  stage.json {
+    expressions = {
+      extracted_level = "level",
+      severity        = "severity",
+      json_message    = "log",
+    }
+  }
+
+  // Fallback regex for standard log levels (non-greedy, word-bounded)
+  // Encountered a specific behaviour in Unifi Unpoller where this log:
+  // XXXX/XX/XX XX:XX:XX [INFO] UniFi Measurements Exported... Err: 0 ...
+  // Would map it as an ERROR because it would catch `Err:` before the INFO.
+  stage.regex {
+    expression = "(?i).*?\\b(?P&lt;fallback_level&gt;CRITICAL|FATAL|ERROR|WARN(?:ING)?|INFO|DEBUG|NOTICE|TRACE)\\b"
+  }
+
+  // Consolidate log level hierarchy
+  stage.template {
+    source   = "working_level"
+    template = "{% raw %}{{ if .extracted_level }}{{ .extracted_level }}{{ else if .severity }}{{ .severity }}{{ else if .fallback_level }}{{ .fallback_level }}{{ else if .level }}{{ .level }}{{ else }}info{{ end }}{% endraw %}"
+  }
+
+  // Lowercase collation
+  stage.template {
+    source   = "working_level"
+    template = "{% raw %}{{ .working_level | lower }}{% endraw %}"
+  }
+
+  stage.replace {
+    source     = "working_level"
+    expression = "err|crit|fatal|panic|error"
+    replace    = "error"
+  }
+
+  stage.replace {
+    source     = "working_level"
+    expression = "warn|warning"
+    replace    = "warn"
+  }
+  
+  stage.replace {
+    source     = "working_level"
+    expression = "info|information|debug|notice"
+    replace    = "info"
+  }
+
+  // Finalize labels
+  stage.labels {
+    values = {
+      level             = "working_level",
+      unit              = "unit",
+      syslog_identifier = "__journal__syslog_identifier",
+    }
+  }
+
+  // Clean output formatting
+  stage.template {
+    source   = "message"
+    template = "{% raw %}{{ if .json_message }}{{ .json_message }}{{ else }}{{ .Entry }}{{ end }}{% endraw %}"
+  }
+}
+    </pre>
+
+      <p class="module-content">
+        This happens in a couple of stages. First, our pipeline tries to extract
+        clean JSON. If it fails, it falls back to standard regex processing for
+        plaintext logs.
+      </p>
+      <p class="module-content">
+        I had to refactor the original regex expression because it was "greedy",
+        what that means is that it reads the line right to left, on top of that
+        it wasn't word bounded; If it found "ERR" it would mark it as ERROR,
+        which is good, however it would also flag OVERRIDE, PREFERRED, etc. I
+        had a specific edge case with Unifi Unpoller, which to my knowledge are
+        the only lines that exhibited this; however this change is a major
+        improvement as any container, host, etc could have been mislabeled at
+        any point. The specific log I noticed this in was:
+        <strong
+          >`XXXX/XX/XX XX:XX:XX [INFO] UniFi Measurements Exported... Err: 0
+          ...`</strong
+        >. As we can see, it clearly says INFO, but because it was greedy it
+        caught the "Err" first, marking it as an error.
+      </p>
+      <p class="module-content">
+        After that, it creates a hierarchy, going from JSON -&gt; SEVERITY (From
+        JSON/Syslog) -&gt; FALLBACK_LEVEL (from our regex) -&gt; any existing
+        level variable -&gt; if it finds nothing, it labels it as INFO. Then, it
+        normalizes everything to lowercase for the next step (ERR become err).
+        Then it collates dozens of different log flags into unified conventions.
+        err|crit|critical|panic|error all become error, so on. Then, it indexes
+        these fields into loki labels so that it's queryable. Lastly, if it was
+        a long JSON string, it unwraps it to read just the "log:" otherwise it
+        gives the standard .Entry.
+      </p>
+
+      <h3>>> VISUALIZATION</h3>
+      <p class="module-content">
+        You can visualize logs in so many different kinds of ways. As you can
+        see from the render, I have 3 different kinds of log visuals. A
+        timescale graph, a stat panel, and a trailing log box.
+      </p>
+
+      <h4>[ TIMESCALE_GRAPH ]</h4>
+      <pre class="code">
+sum by (level) (
+  count_over_time(
+    {instance=~"$nodes|$pve_nodes|$truenas_nodes"} 
+    [$__interval]
+  )
+)
+    </pre>
+      <p class="module-content">
+        This simply counts the number of logs of each type over the time
+        selected for the dashboard and displays them in a graph.
+      </p>
+      <h4>[ STAT_PANEL ]</h4>
+      <pre class="code">
+sum by (level) (
+  count_over_time(
+    {instance=~"$nodes|$pve_nodes|$truenas_nodes"} 
+    [$__range]
+  )
+)
+    </pre>
+      <p class="module-content">
+        Almost the exact same except we're using [$__range] so that we get one
+        singular number over the course of the time selected.
+      </p>
+
+      <p class="module-content">
+        Additionally, you can filter out errors or even errors by container for
+        a nice stat panel.
+      </p>
+
+      <pre class="code">
+sum by (instance, container) (
+  count_over_time(
+    {instance=~"$nodes"} 
+    | logfmt
+    | container!=""
+    | level="error" [$__range]
+  )
+)
+      </pre>
+      <p class="module-content">
+        If you wanted just the instance itself, you would drop the container
+        variables.
+      </p>
+
+      <h4>[ TRAILING_LOGS ]</h4>
+      <pre class="code">
+{instance=~"$nodes|$pve_nodes|$truenas_nodes"} | logfmt | level=~"(?i)error" | keep instance, container, level, line
+    </pre>
+      <p class="module-content">
+        This displays all logs, that match a case-insensitive error. This is
+        particularly nice because normally "Unique Labels" in Grafana matches
+        absolutely everything attached, but with the keep rule, we get to pick
+        and choose. For the case of this line we want the instance and container
+        pinned to each log line. You always want to keep level and line since it
+        enables [LEVEL]: Log parsing.
+      </p>
+    </div>
+  </div>
+</div>

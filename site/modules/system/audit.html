@@ -1,11 +1,35 @@
 <div class="system-audit">
   <pre class="audit-header">
 [ AUDIT_REPORT: MSF_01 ]
-TIMESTAMP: 2026-07-28
+TIMESTAMP: 2026-07-29
 STATUS: DEPLOYED / HEALTHY
 LINK: ACTIVE / HEALTHY
 -----------------------------------------</pre>
+  <section class="audit-section">
+    <h3>>> LIVE_METRICS</h3>
+    <div class="terminal-frame">
+      <div class="frame-header">
+        <span class="prefix">SOURCE:</span>
+        <span class="path">~/grafana/ops-core-01</span>
+      </div>
+      <a
+        href="javascript:void(0)"
+        class="dither-link"
+        onclick="window.openModal('/metrics/msf-metrics.png')"
+      >
+        <img
+          src="/metrics/msf-metrics.png"
+          class="dither-img"
+          alt="MSF Masterview Dashboard"
+          loading="lazy"
+        />
+      </a>
 
+      <p class="frame-footer">
+        Updated Every 30 Minutes via Rsync Script from Grafana Renderer
+      </p>
+    </div>
+  </section>
   <section class="audit-section">
     <h3>>> IDENTITY_SUMMARY</h3>
     <div class="audit-grid">
@@ -62,6 +86,16 @@ LINK: ACTIVE / HEALTHY
   <section class="audit-section">
     <h3>>> RECENT_LOG_ENTRIES</h3>
     <div class="log-entry">
+      <span class="log-data">2026.07.30</span> - Added
+      <a class="file-link" href="/#lab_grafana_masterview"
+        >#lab_grafana_masterview</a
+      >.
+    </div>
+    <div class="log-entry">
+      <span class="log-data">2026.07.29</span> - Added metrics module for
+      nottyxton digest.
+    </div>
+    <div class="log-entry">
       <span class="log-data">2026.07.28</span> - Updated Proxmox VE 8.4.16 to
       Proxmox VE 9.2.5
     </div>
@@ -88,10 +122,6 @@ LINK: ACTIVE / HEALTHY
     <div class="log-entry">
       <span class="log-data">2026.04.22</span> - F9 Reworked from RESUME to
       RESOURCES panel. COMMS under development.
-    </div>
-    <div class="log-entry">
-      <span class="log-data">2026.04.17</span> - Remotely managing MSF from
-      Tennessee. Documentation in /lab/
     </div>
   </section>
 

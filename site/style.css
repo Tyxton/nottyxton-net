@@ -345,6 +345,11 @@ h4 {
   max-width: 100%;
   scrollbar-width: thin;
   scrollbar-color: var(--phosphor-dim) transparent;
+  border: 0.18rem dashed var(--phosphor-muted);
+  background: var(--crt-off);
+  padding: 20px 5px 5px 10px;
+  margin-bottom: 10px;
+  color: var(--phosphor-dim);
 }
 
 .blinking-cursor {
@@ -512,7 +517,7 @@ h4 {
 .collapsible-header {
   background: none;
   border: none;
-  color: var(--phosphor-bright);
+  color: var(--phosphor-dim);
   font-family: inherit;
   font-size: 1.2rem;
   font-weight: bold;
@@ -522,12 +527,13 @@ h4 {
   text-align: left;
   display: block;
   text-shadow:
-    0 0 2px var(--phosphor-dim),
+    0 0 2px var(--phosphor-muted),
     0 0 8px var(--phosphor-bright);
 }
 
 .collapsible-header:hover {
-  background: var(--phosphor-glow);
+  background: var(--phosphor-bright);
+  color: var(--crt-bg);
 }
 
 .collapsible-header:hover::after {
@@ -692,18 +698,21 @@ h4 {
 --------------------------- */
 
 .terminal-frame {
-  border: 1px solid var(--phosphor-bright);
+  border-bottom: 0.18rem dashed var(--phosphor-bright);
   padding: 5px;
   background: var(--crt-bg);
   display: inline-block;
-  max-width: 100%;
+  max-width: 50%;
   margin-top: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .dither-img {
+  object-fit: cover;
+  object-position: top;
   display: block;
-  max-width: 200px;
+  width: 100%;
+  height: 100%;
   filter: brightness(0.9) contrast(1.1);
   transition: all 0.2s ease-in-out;
   padding: 5px;
@@ -714,6 +723,17 @@ h4 {
   cursor: crosshair;
 }
 
+.dither-link {
+  mix-blend-mode: screen;
+  filter: brightness(0.6) sepia(100%) saturate(300%) hue-rotate(5deg);
+  display: block;
+  height: 240px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--phosphor-glow);
+  transition: border-color 0.2s ease;
+}
+
 .dither-link:hover + .frame-footer .status {
   color: var(--phosphor-glow);
   text-shadow: 0 0 5px var(--crt-bg);
@@ -721,6 +741,10 @@ h4 {
 
 .img-modal-body {
   padding: 5px;
+  width: 100%;
+  max-height: calc(85vh - 40px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .img-modal-footer {
@@ -762,7 +786,7 @@ h4 {
 
 .img-modal-body img {
   max-width: 100%;
-  max-height: 80vh;
+  height: auto !important;
   display: block;
   border-top: 1px solid var(--phosphor-bright);
 }
@@ -772,6 +796,15 @@ h4 {
   border: none;
   cursor: pointer;
   font-weight: bold;
+}
+
+.frame-header {
+  padding-bottom: 5px;
+}
+
+.frame-footer {
+  padding-top: 10px;
+  font-size: 0.8rem;
 }
 
 /* --------------------------
@@ -1048,4 +1081,13 @@ h4 {
     transform: scale(1, 1);
     filter: brightness(1);
   }
+}
+
+/* Image Handling */
+.terminal-frame {
+  max-width: 80vw !important;
+}
+
+.img-modal-close {
+  font-size: 0.9rem !important;
 }
