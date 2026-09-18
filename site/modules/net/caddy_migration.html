@@ -1,0 +1,104 @@
+<div class="layer-container">
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> CADDY_MIGRATION://<span class="layer-name">NETWORKING</span>
+    </h2>
+    <p class="meta-comment">
+      Transitioning from Nginx Proxy Manager to Caddy+Authelia.
+    </p>
+  </div>
+
+  <h3>>> NPM</h3>
+  <p class="module-content">
+    I want to start off by stating I do like NPM, I do not have anything against
+    it in particular - it just no longer fit the workflow I am transitioning
+    towards. It's a great tool, and a really good reverse-proxy.
+  </p>
+
+  <h4>[ DATABASE_DRIVEN ]</h4>
+  <p class="module-content">
+    I started off with NPM as my reverse-proxy of choice, it has served me very
+    well over the years. However, in the transition towards an IaC SSoT
+    infrastructure, it fell short. Much like my reason to
+    <a class="file-link" href="/#net_dockge_migration"
+      >transition away from Portainer</a
+    >, NPM stores everything in it's own database. Everything from
+    configuration, certificate management &amp; acquisitions, user management,
+    even entries are all unmanageable externally. You have to use the Web UI to
+    configure and use NPM.
+  </p>
+  <h4>[ ADVANCED_CONFIGURATIONS ]</h4>
+  <p class="module-content">
+    Another one of the issues I had with NPM was the "Advanced Configuration"
+    tab - specifically in regards to Authelia. With NPM you have to manually
+    write out the `auth_request` blocks, Caddy handles it natively with grace
+    via its `forward_auth` directive. Dealing with the raw Nginx syntax was
+    clunky, hard to keep track of and required a lot more mental load than 3
+    lines to configure the auth setup in Caddy once and re-use it as an import
+    for any service I need.
+  </p>
+
+  <pre class="code">
+# ==-- CADDYFILE ENTRY --== #
+(authelia-gate) {
+    forward_auth auth-authelia:9091 {
+        uri /api/verify?rd=https://auth.nottyxton.net
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
+}
+# ==-- +++++++++++++++ --== #
+</pre>
+
+  <h3>>> CADDY</h3>
+  <h4>[ CODE_DRIVEN ]</h4>
+  <p class="module-content">
+    Everything in Caddy can be configured as a single Caddyfile, with Jinja2
+    templating this becomes very robust. It did take me quite a bit of time to
+    figure out cloudflare wildcard DNS-01 certificates as well as setting up the
+    handle blocks for the individual sites. Though, once I did figure it out,
+    adding a new service is as simple as adding a new item in the dict. This is
+    my current production
+    <a
+      class="file-link"
+      href="https://github.com/Tyxton/msf-prod/blob/main/ansible/roles/configure_caddy/templates/Caddyfile.j2"
+      target="_blank"
+      rel="noopener noreferrer"
+      >Caddyfile.j2</a
+    >. Since this is a split-horizon setup, at some point I'll setup a Redis
+    instance for the certificates - but the database projects are months out.
+  </p>
+
+  <h4>[ CADDYFILE ]</h4>
+  <p class="module-content">
+    I decided to use separate Cloudflare API tokens for ops-core-01 and
+    edge-srv-01 to isolate blast-radius. If either/or gets compromised, they
+    only have the token for their specific zone under *.local.nottyxton.net or
+    *.nottyxton.net.
+  </p>
+
+  <p class="module-content">
+    For the headers, I use SAMEORIGIN to prevent Clickjacking attacks,
+    XSS-Prevention to block Cross-Site-Scripting attacks, nosniff to prevent
+    MIME-type sniffing, and HSTS to prevent MitM attacks. I plan on also
+    implementing CSP to supplement XSS, referrer policy, and permissions-policy.
+    This will go into staging as it's untested. Then, we have our pretty
+    boiler-plate Authelia gate. Followed by our actual domain handling.
+  </p>
+
+  <h3>>> TRAEFIK</h3>
+  <h4>[ WHY_NOT_TRAEFIK ]</h4>
+  <p class="module-content">
+    The main reason this took me almost a month of development was 3.5 weeks of
+    trying to get Traefik working in the way I wanted it to. My first conclusion
+    for a robust code-driven reverse proxy was naturally traefik. Where I failed
+    was design philosophy. Traefik's main advantage is docker auto-discovery
+    which I intentionally decided not to use. The monorepo is to act as an SSoT,
+    everything must be declared in order for it to exist - auto-discovery goes
+    against that and the extra 5-10 labels per container blow up the compose
+    files. I was trying to work against Traefik while also dealing with it's
+    complex syntax and configurations in Jinja2. I had portions of the edge
+    network working, but couldn't get everything. Eventually, I realized that
+    Traefik was simply not the tool for the job - despite how robust it is.
+    Sometimes, simplicity really is better - and in this case led me to Caddy.
+  </p>
+</div>
