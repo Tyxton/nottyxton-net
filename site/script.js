@@ -38,20 +38,32 @@ window.closeModal = function () {
   }
 };
 
+// Extension Mapping
+const extensionMap = {
+  system_not_found: "err",
+  system_audit: "log",
+  system_resources: "sys",
+  system_comms: "tx",
+  // Fallback for all indexes (*_index)
+  default_index: "idx",
+};
+
+function getModuleExtension(moduleName) {
+  if (extensionMap[moduleName]) return extensionMap[moduleName];
+  if (moduleName.endsWith("_index")) return extensionMap.default_index;
+  return "log";
+}
+
 window.loadModule = async function (moduleName) {
-  // 1. Force find the elements every single time
   const viewscreen = document.getElementById("module-viewscreen");
   const commandLabel = document.getElementById("command-label");
-
-  if (!commandLabel) {
-    console.warn(
-      "COMMAND_LABEL_NOT_FOUND: Check if <div id='command-label'> exists in index.html",
-    );
-  }
+  const headerNav = document.getElementById("tui-nav-row");
+  const headerTel = document.getElementById("header-telemetry");
 
   // Path Logic
   const filePath = moduleName.replace("_", "/");
   const fileName = filePath.split("/").pop();
+  const ext = getModuleExtension(moduleName);
 
   // Update the Prompt (Forcing the innerHTML)
   if (commandLabel) {
@@ -59,10 +71,10 @@ window.loadModule = async function (moduleName) {
 
     if (isMobile) {
       // Shorter Mobile Version: $~ cat file.log
-      commandLabel.innerHTML = `<span class="prompt">$~</span> cat ${fileName}.log`;
+      commandLabel.innerHTML = `<span class="prompt">$~</span> cat ${fileName}.${ext}`;
     } else {
       // Full Desktop Version: root@nottyxton:~$ cat /root/projects/modules/path/file.log
-      const displayPath = `/root/projects/modules/${filePath}.log`;
+      const displayPath = `/root/projects/modules/${filePath}.${ext}`;
       commandLabel.innerHTML = `<span class="prompt">root@nottyxton:~$</span> cat ${displayPath}`;
     }
 
@@ -76,6 +88,12 @@ window.loadModule = async function (moduleName) {
     const text = await response.text();
 
     if (viewscreen) {
+      // Return to default state if not 404
+      if (moduleName !== "system_not_found") {
+        headerNav?.classList.remove("hidden");
+        headerTel?.classList.remove("hidden");
+      }
+
       viewscreen.classList.add("glitch-active");
       viewscreen.innerHTML = text;
 
@@ -115,6 +133,19 @@ window.loadModule = async function (moduleName) {
         });
       }
 
+      // 404 Header Handler
+      if (moduleName === "system_not_found") {
+        const headerNav = document.getElementById("tui-nav-row");
+        const headerTel = document.getElementById("header-telemetry");
+
+        headerNav?.classList.add("hidden");
+        headerTel?.classList.add("hidden");
+
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((btn) => btn.classList.remove("active"));
+      }
+
       // Restart typing animation
       viewscreen.classList.remove("typing-animation");
       void viewscreen.offsetWidth;
@@ -124,6 +155,11 @@ window.loadModule = async function (moduleName) {
     }
   } catch (err) {
     console.error("LOAD_ERR:", err);
+
+    // Display a 404 instead of a blank page (don't loop)
+    if (moduleName !== "system_not_found") {
+      window.loadModule("system_not_found");
+    }
   }
 };
 
