@@ -267,8 +267,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const mainContent = document.getElementById("main-content");
   let bootTimeouts = [];
 
+  const hash = window.location.hash.replace("#", "");
+  const initialModule = hash ? hash : "system_audit";
+
   // --- BOOT LOGIC ---
   function startBoot() {
+    // skip startBoot if landing on the 404
+    if (initialModule === "system_not_found") {
+      finishBoot();
+      return;
+    }
+
     const bootLines = [
       { t: "NOTTYXTON BIOS v 2.0.1 (C) 2026", d: 0 },
       { t: "CPU: Intel(R) Xeon(R) Gold - 16 Cores @ 3.2GHz", d: 100 },
