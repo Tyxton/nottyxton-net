@@ -1,0 +1,80 @@
+<div class="layer-container">
+  <div class="layer-header">
+    <h2 class="text-amber">
+      >> FOB_SETUP://<span class="layer-name">INFRASTRUCTURE</span>
+    </h2>
+    <p class="meta-comment">
+      Forward Operating Base (FOB): Distributed multi-node cluster provisioning
+      and remote site integration.
+    </p>
+  </div>
+
+  <h3>>> HARDWARE_MANIFEST</h3>
+  <h4>[ ACQUISITION && SPECIFICATION ]</h4>
+  <p class="module-content">
+    To scale capabilties outside of the primary MSF infrastructure, a secondary
+    site (FOB) is being established. The new cluster comprises three identical
+    Dell XPS nodes designated for an immutable Kubernetes (K3s) control/worker
+    plane, paired with a SFF Lenovo ThinkCentre node acting as a local gateway
+    and Wireguard site-to-site bridge.
+  </p>
+
+  <pre class="code">
+┌─────────────────┬───────────────────────┬────────────────────────────────────┐
+│ HARDWARE        │  ROLE                 │ HARDWARE                           │
+├─-=============-─┼─-===================-─┼─-================================-─┤
+│ Dell XPS (3)    │  K3s Compute Cluster  │ Intel i5 | 32GB DDR4 | 512GB NVME  │
+│                 │                       │                                    │
+│ SFF ThinkCentre │  Portal/Gateway Node  │ Intel i3 (7th Gen) | 16GB DDR4 |   │
+│                 │                       │ 256GB NVME SSD | 2TB HDD (Bulk)    │
+└─────────────────┴───────────────────────┴────────────────────────────────────┘
+</pre>
+
+  <h4>[ HARDWARE_UPGRADES ]</h4>
+  <p class="module-content">
+    Memory density across the Dell XPS cluster was doubled to 32GB per node to
+    ensure adequate scheduling headroom for full container migration. The
+    ThinkCentre gateway was also doubled to 16GB RAM alongside a 2TB local bulk
+    storage drive to buffer telemetry and and state data locally, eliminating
+    total reliance on the primary WAN tunnel to Raiden and Motherbase.
+  </p>
+
+  <h3>>> TOPOLOGY && ARCHITECTURE</h3>
+  <h4>[ CLUSTER_PROVISIONING ]</h4>
+  <p class="module-content">
+    The three Dell XPS (`fob-k3s-01, fob-k3s-02, fob-k3s-03`) nodes are
+    configured as a strict hardware triplet to support an immutable K3s model.
+    This cluster will be in a development state before being merged into the
+    larger MSF fleet.
+  </p>
+
+  <p class="module-content">
+    The ThinkCenter node (`fob-portal-01`) acts as an edge gateway. Due to
+    environmental constraints, the FOB LAN is connected via Wi-Fi and bridges to
+    the local UniFi Switch 8 over ethernet. The node runs a containerized UniFi
+    Controller to manage the switch and maintain a persistent site-to-site
+    WireGuard tunnel back to the core infrastructure.
+  </p>
+
+  <h4>[ HOST_NAMING_CONVENTIONS ]</h4>
+  <p class="module-content">
+    In accordance with MSF naming standards (`[Area]-[Role]-[ID]`), the nodes
+    map to the following nodenames:
+  </p>
+  <ul class="config-list">
+    <li><span>fob-k3s-01</span> // Dell XPS Node 1 (Control/Worker)</li>
+    <li><span>fob-k3s-02</span> // Dell XPS Node 2 (Worker)</li>
+    <li><span>fob-k3s-03</span> // Dell XPS Node 3 (Worker)</li>
+    <li><span>fob-portal-01</span> // ThinkCentre Gateway / Bridge</li>
+  </ul>
+
+  <h3>>> IaC</h3>
+  <p class="module-content"></p>
+  <h4>[ OS && DEPLOYMENT ]</h4>
+  <p class="module-content">
+    All FOB nodes follow the same standardized format of MSF. The base OS being
+    Debian 13, in parallel, these nodes will be additions to the Ansible SSoT
+    monorepo - as well as introduing OpenTofu (Terraform) provisioning workflows
+    for Day-0 infrastructure deployment and automated PXE orchestration.
+  </p>
+</div>

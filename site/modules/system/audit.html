@@ -1,7 +1,7 @@
 <div class="system-audit">
   <pre class="audit-header">
-[ AUDIT_REPORT: MSF_01 ]
-TIMESTAMP: 2026-09-17
+[ AUDIT_REPORT: MSF_01, FOB_01 ]
+TIMESTAMP: 2026-10-27
 STATUS: DEPLOYED / HEALTHY
 LINK: ACTIVE / HEALTHY
 -----------------------------------------</pre>
@@ -66,7 +66,8 @@ LINK: ACTIVE / HEALTHY
     <ul class="audit-list">
       <li>
         <span class="status-ok">[ OK ]</span>
-        <strong>Compute:</strong> Single-Node Proxmox Server
+        <strong>Compute:</strong> Single-Node Proxmox Server, Tri-Node FOB K3s
+        Cluster
       </li>
       <li>
         <span class="status-ok">[ OK ]</span> <strong>Storage:</strong> ZFS
@@ -74,7 +75,7 @@ LINK: ACTIVE / HEALTHY
       </li>
       <li>
         <span class="status-ok">[ OK ]</span> <strong>Network:</strong> UniFi
-        Firewall w/ VLAN Segmentation
+        Firewall w/ VLAN Segmentation, FOB site-to-site gateway & bridge
       </li>
       <li>
         <span class="status-ok">[ OK ]</span> <strong>Link:</strong> Remote
@@ -85,6 +86,12 @@ LINK: ACTIVE / HEALTHY
 
   <section class="audit-section">
     <h3>>> RECENT_LOG_ENTRIES</h3>
+    <div class="log-entry">
+      <span class="log-data">2026.10.27</span> -
+      <a class="file-link" href="/#infra_fob_setup"
+        >Forward Operating Base (FOB) Development Begun.</a
+      >.
+    </div>
     <div class="log-entry">
       <span class="log-data">2026.09.17</span> -
       <a class="file-link" href="/#net_caddy_migration"
